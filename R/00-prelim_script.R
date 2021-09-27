@@ -11,9 +11,14 @@ try_df = disk.frame::disk.frame(
   here::here("inst", "exdata", "try", "12477.df")
 )
 
-try_species = readr::read_table(
+try_species = data.table::fread(
   here::here("inst", "exdata", "try", "TryAccSpecies.txt")
 )
+
+try_list = try_species %>%
+  filter(validEnc(AccSpeciesName),
+         grepl(" ", AccSpeciesName, fixed = TRUE)) %>%
+  pull(AccSpeciesName)
 
 # Load GloNAF data -------------------------------------------------------------
 glonaf_con = DBI::dbConnect(
@@ -51,14 +56,84 @@ glonaf_species = DBI::dbGetQuery(
 )
 
 glonaf_list = glonaf_species %>%
-  distinct(taxon_corrected)
+  distinct(taxon_corrected) %>%
+  mutate(taxon_corrected = stringr::str_trim(taxon_corrected)) %>%
+  pull(taxon_corrected) %>%
+  unique()
 
 
 # Harmonize both taxonomies ----------------------------------------------------
 
+## Ok weird error, will skip for now
+# match_lvcp = lcvplants::lcvp_match(
+#   try_species %>%
+#     filter(validEnc(AccSpeciesName),
+#            grepl(" ", AccSpeciesName, fixed = TRUE)) %>%
+#     pull(AccSpeciesName),
+#   glonaf_list[["taxon_corrected"]]
+# )
+
+
+## Doesn't work either for weird reasons (encoding?)
+# match_lcvp_glonaf = lcvplants::lcvp_search(glonaf_list)
+
+## Set up World Flora Online
+# WorldFlora::WFO.download(save.dir = here::here("inst", "exdata", "wfo"))
+
+# match_wfo_glonaf = WorldFlora::WFO.match(
+#   glonaf_species %>%
+#     distinct(taxon_corrected) %>%
+#     mutate(taxon_corrected = stringr::str_trim(taxon_corrected)) %>%
+#     rename(spec.name = taxon_corrected),
+#   WFO.file = here::here("inst", "exdata", "wfo", "classification.txt"))
+
+
+# Proceeds with exact matching
+exact_try_glonaf = try_species %>%
+  right_join(glonaf_species %>%
+              distinct(taxon_orig),
+            by = c(AccSpeciesName = "taxon_orig")) %>%
+  mutate(TraitNum = ifelse(is.na(TraitNum), 0, TraitNum))
+
 
 
 # Compute number of trait available --------------------------------------------
+
+fig_num_trait = exact_try_glonaf %>%
+  ggplot(aes(TraitNum)) +
+  geom_histogram(color = "white") +
+  scale_x_log10(name = "Number of diff. Traits in TRY") +
+  scale_y_log10(name = "Number of species") +
+  labs(subtitle = "GloNAF aliens in TRY (12k sp. out of 86k)") +
+  theme_bw() +
+  theme(aspect.ratio = 1,
+        panel.grid = element_blank())
+
+ggsave(
+  plot = fig_num_trait,
+  filename =  here::here("inst", "figures",
+                         "figure_glonaf_try_number_traits.png")
+)
+
+
+# What traits are available?
+fig_detail_traits = exact_try_glonaf %>%
+  filter(TraitNum != 0) %>%
+  distinct(AccSpeciesID) %>%
+  inner_join(try_df %>%
+               filter(!is.na(TraitID)) %>%
+               collect(), by = "AccSpeciesID") %>%
+  distinct(AccSpeciesID, AccSpeciesName, TraitID, TraitName) %>%
+  count(TraitName, sort = TRUE, name = "n_sp") %>%
+  mutate(TraitName = factor(TraitName) %>%
+           forcats::fct_reorder(n_sp)) %>%
+  slice_max(n_sp, n = 15) %>%
+  ggplot(aes(n_sp, TraitName)) +
+  geom_point() +
+  scale_x_log10(name = "Number of species measured") +
+  labs(y = "Trait name", subtitle = "Details on 12k GloNAF measured species") +
+  theme_bw() +
+  theme(aspect.ratio = 1)
 
 
 # Location of trait measurements -----------------------------------------------
