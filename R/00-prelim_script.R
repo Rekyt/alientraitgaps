@@ -97,6 +97,22 @@ exact_try_glonaf = try_species %>%
   mutate(TraitNum = ifelse(is.na(TraitNum), 0, TraitNum))
 
 
+# Problematic harmonization with LCVP and GloNAF -------------------------------
+
+binomial_glonaf = glonaf_species %>%
+  distinct(taxon_corrected) %>%
+  mutate(n_spaces = stringr::str_count(taxon_corrected, " "))
+
+problematic_species = binomial_glonaf %>%
+  filter(n_spaces == 0) %>%
+  head() %>%
+  mutate(taxon_corrected = substr(taxon_corrected, 1, nchar(taxon_corrected) - 1))
+
+lcvplants::lcvp_search(problematic_species$taxon_corrected)
+
+match_glonaf_lcvp = lcvplants::lcvp_search(glonaf_species[["taxon_corrected"]])
+
+
 
 # Compute number of trait available --------------------------------------------
 
