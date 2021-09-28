@@ -91,8 +91,9 @@ glonaf_list = glonaf_species %>%
 # Proceeds with exact matching
 exact_try_glonaf = try_species %>%
   right_join(glonaf_species %>%
-              distinct(taxon_orig),
-            by = c(AccSpeciesName = "taxon_orig")) %>%
+              distinct(species_id, genus, epithet) %>%
+              transmute(species = paste(genus, epithet, sep = " ")),
+            by = c(AccSpeciesName = "species")) %>%
   mutate(TraitNum = ifelse(is.na(TraitNum), 0, TraitNum))
 
 
@@ -103,8 +104,8 @@ fig_num_trait = exact_try_glonaf %>%
   ggplot(aes(TraitNum)) +
   geom_histogram(color = "white") +
   scale_x_log10(name = "Number of diff. Traits in TRY") +
-  scale_y_log10(name = "Number of species") +
-  labs(subtitle = "GloNAF aliens in TRY (12k sp. out of 86k)") +
+  scale_y_sqrt(name = "Number of species") +
+  labs(subtitle = "GloNAF aliens in TRY (19k / 21k)") +
   theme_bw() +
   theme(aspect.ratio = 1,
         panel.grid = element_blank())
@@ -131,9 +132,36 @@ fig_detail_traits = exact_try_glonaf %>%
   ggplot(aes(n_sp, TraitName)) +
   geom_point() +
   scale_x_log10(name = "Number of species measured") +
-  labs(y = "Trait name", subtitle = "Details on 12k GloNAF measured species") +
+  scale_y_discrete(labels = scales::wrap_format(20)) +
+  labs(y = "Trait name", subtitle = "Most measured trait on 19k GloNAF species",
+       caption = "TRY open data on a selected subset of traits") +
   theme_bw() +
   theme(aspect.ratio = 1)
 
+fig_detail_traits
+
+
+# What is the most commonly measured trait combination?
+try_traits = exact_try_glonaf %>%
+  filter(TraitNum != 0) %>%
+  distinct(AccSpeciesID) %>%
+  inner_join(try_df %>%
+               filter(!is.na(TraitID)) %>%
+               collect(), by = "AccSpeciesID") %>%
+  distinct(AccSpeciesID, AccSpeciesName, TraitID, TraitName)
+
+fig_glonaf_combine_traits = try_traits %>%
+  tibble::as_tibble() %>%
+  select(-AccSpeciesID,-TraitID) %>%
+  group_by(AccSpeciesName) %>%
+  summarise(trait_names = list(TraitName)) %>%
+  ggplot(aes(x = trait_names)) +
+  geom_bar() +
+  geom_text(stat='count', aes(label = after_stat(count)), vjust = -1) +
+  ggupset::scale_x_upset(n_intersections = 8) +
+  labs(caption = "TRY open data on a selected subset of traits",
+       subtitle = "Most commonly measured combination of traits on aliens")
+
+fig_glonaf_combine_traits
 
 # Location of trait measurements -----------------------------------------------
