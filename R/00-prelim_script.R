@@ -12,7 +12,8 @@ try_df = disk.frame::disk.frame(
 )
 
 try_species = data.table::fread(
-  here::here("inst", "exdata", "try", "TryAccSpecies.txt")
+  here::here("inst", "exdata", "try", "TryAccSpecies.txt"),
+  encoding = "UTF-8"
 )
 
 try_list = try_species %>%
@@ -30,36 +31,47 @@ glonaf_con = DBI::dbConnect(
   port = 6609
 )
 
-glonaf_species = DBI::dbGetQuery(
-  glonaf_con,
-  paste0(
-    "SELECT DISTINCT taxon_orig.id AS taxon_orig_id, taxon_orig.taxon_orig, ",
-    "family_tpl.name AS family, taxon_orig.species_id, genus.name AS genus, ",
-    "species.hybrid, species.epithet, infra_rank.name AS infra_rank, ",
-    "species.epithet_infra, author.name AS author, ",
-    "name_status.name AS TPL_name_status_standardized, species.tpl_id, ",
-    "species.species_alt_id, taxon_orig.taxon_corrected, ",
-    "taxon_orig.gen_hybrid AS taxon_orig_genus_hybrid, ",
-    "taxon_orig.hybrid AS taxon_orig_hybrid, taxon_orig.abbrev, ",
-    "taxon_orig.cultivar, taxon_orig.cult_name, ",
-    "taxon_orig.TPL_Taxonomic_status AS TPL_name_status_orig FROM flora_orig",
-    "\nLEFT JOIN list ON flora_orig.list_id = list.id\n",
-    "LEFT JOIN taxon_orig ON flora_orig.taxon_orig_id = taxon_orig.id\n",
-    "LEFT JOIN species ON taxon_orig.species_id = species.id\n",
-    "LEFT JOIN genus ON species.genus_id = genus.id\n",
-    "LEFT JOIN family_tpl ON genus.family_tpl_id = family_tpl.id\n",
-    "LEFT JOIN infra_rank ON species.infra_rank_id = infra_rank.id\n",
-    "LEFT JOIN author ON species.author_id = author.id\n",
-    "LEFT JOIN name_status ON species.name_status_id = name_status.id\n",
-    "WHERE list.outdated = 0"
-  )
-)
+# Count number of species per alien status
+glonaf_count_alien_status = tbl(glonaf_con, "flora_orig") %>%
+  select(taxon_orig_id, status_id) %>%
+  distinct() %>%
+  count(status_id, sort = TRUE) %>%
+  inner_join(tbl(glonaf_con, "status"), by = c("status_id" = "id")) %>%
+  collect()
 
-glonaf_list = glonaf_species %>%
-  distinct(taxon_corrected) %>%
-  mutate(taxon_corrected = stringr::str_trim(taxon_corrected)) %>%
-  pull(taxon_corrected) %>%
-  unique()
+# Filter really alien species
+glonaf_alien_species = tbl(glonaf_con, "flora_orig") %>%
+  # Get taxa that are referenced as naturalized, aliens, or invasive
+  filter(status_id %in% c(2, 4, 5, 7)) %>%
+  distinct(taxon_orig_id) %>%
+  # Get species names and ids
+  inner_join(tbl(glonaf_con, "taxon_orig"), by = c("taxon_orig_id" = "id")) %>%
+  # Corrected names after matching TPL
+  distinct(species_id) %>%
+  inner_join(tbl(glonaf_con, "species"), by = c("species_id" = "id")) %>%
+  select(-species_id) %>%
+  # Add Name status from TPL
+  inner_join(tbl(glonaf_con, "name_status"), by = c(name_status_id = "id")) %>%
+  select(-name_status_id) %>%
+  # Get only binomial name
+  filter(infra_rank_id == 4) %>%
+  # Add full genus name
+  inner_join(glonaf_con %>%
+               tbl("genus") %>%
+               select(genus_id = id, genus = name), by = "genus_id") %>%
+  select(-genus_id) %>%
+  # Add author name
+  inner_join(glonaf_con  %>%
+               tbl("author") %>%
+               select(author_id = id, author_name = name),
+             by = "author_id") %>%
+  select(-author_id) %>%
+  collect()
+
+glonaf_list = glonaf_alien_species %>%
+  filter(name == "accepted") %>%
+  distinct(genus, epithet, author_name) %>%
+  mutate(full_name = paste(genus, epithet, author_name))
 
 
 # Harmonize both taxonomies ----------------------------------------------------
@@ -69,23 +81,16 @@ glonaf_list = glonaf_species %>%
 #   try_species %>%
 #     filter(validEnc(AccSpeciesName),
 #            grepl(" ", AccSpeciesName, fixed = TRUE)) %>%
-#     pull(AccSpeciesName),
-#   glonaf_list[["taxon_corrected"]]
+#     pull(AccSpeciesName) %>%
+#     unique(),
+#   glonaf_list[["full_name"]]
 # )
 
+# Match GloNAF list
+match_lcvp_glonaf = lcvplants::lcvp_search(glonaf_list[["full_name"]])
 
-## Doesn't work either for weird reasons (encoding?)
-# match_lcvp_glonaf = lcvplants::lcvp_search(glonaf_list)
-
-## Set up World Flora Online
-# WorldFlora::WFO.download(save.dir = here::here("inst", "exdata", "wfo"))
-
-# match_wfo_glonaf = WorldFlora::WFO.match(
-#   glonaf_species %>%
-#     distinct(taxon_corrected) %>%
-#     mutate(taxon_corrected = stringr::str_trim(taxon_corrected)) %>%
-#     rename(spec.name = taxon_corrected),
-#   WFO.file = here::here("inst", "exdata", "wfo", "classification.txt"))
+# Match TRY list
+match_lcvp_try = lcvplants::lcvp_search(try_list)
 
 
 # Proceeds with exact matching
