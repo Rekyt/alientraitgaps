@@ -74,24 +74,53 @@ glonaf_list = glonaf_alien_species %>%
   mutate(full_name = paste(genus, epithet, author_name))
 
 
+# Match TRY using TNRS ---------------------------------------------------------
+tictoc::tic(msg = "Time elapsed for matching TRY species: ")
+match_try_tnrs = TNRS::TNRS(try_list)
+tictoc::toc()
+
+saveRDS(match_try_tnrs, "inst/cleaned_data/match_try_tnrs.Rds")
+
+
+# Match GloNAF using TNRS ------------------------------------------------------
+tictoc::tic(msg = "Time elapsed for matching GloNAF species: ")
+match_glonaf_tnrs = TNRS::TNRS(glonaf_list[["full_name"]])
+tictoc::toc()
+
+saveRDS(match_glonaf_tnrs, "inst/cleaned_data/match_glonaf_tnrs.Rds")
+
+
 # Harmonize both taxonomies ----------------------------------------------------
 
-## Ok weird error, will skip for now
-# match_lvcp = lcvplants::lcvp_match(
-#   try_species %>%
-#     filter(validEnc(AccSpeciesName),
-#            grepl(" ", AccSpeciesName, fixed = TRUE)) %>%
-#     pull(AccSpeciesName) %>%
-#     unique(),
-#   glonaf_list[["full_name"]]
-# )
+match_try_tnrs = readRDS("inst/cleaned_data/match_try_tnrs.Rds")
 
-# Match GloNAF list
-match_lcvp_glonaf = lcvplants::lcvp_search(glonaf_list[["full_name"]])
+match_glonaf_tnrs = readRDS("inst/cleaned_data/match_glonaf_tnrs.Rds")
 
-# Match TRY list
-match_lcvp_try = lcvplants::lcvp_search(try_list)
+sub_try = match_try_tnrs %>%
+  distinct(
+    name_init_try        = Name_submitted,
+    status_try           = Taxonomic_status,
+    name_accepted_try    = Accepted_name,
+    species_accepted_try = Accepted_species,
+    author_accepted_try  = Author_matched
+  )
 
+sub_glonaf = match_glonaf_tnrs %>%
+  distinct(
+    name_init_glonaf        = Name_submitted,
+    status_glonaf           = Taxonomic_status,
+    name_accepted_glonaf    = Accepted_name,
+    species_accepted_glonaf = Accepted_species,
+    author_accepted_glonaf  = Author_matched
+  )
+
+harmonized_try_glonaf = sub_try %>%
+  filter(species_accepted_try != "", author_accepted_try != "") %>%
+  inner_join(
+    sub_glonaf, by = c(species_accepted_try = "species_accepted_glonaf")
+  )
+
+# Exact matching between TRY and GloNAF ----------------------------------------
 
 # Proceeds with exact matching
 exact_try_glonaf = try_species %>%
