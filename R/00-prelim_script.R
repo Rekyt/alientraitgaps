@@ -92,10 +92,12 @@ saveRDS(match_glonaf_tnrs, "inst/cleaned_data/match_glonaf_tnrs.Rds")
 
 # Harmonize both taxonomies ----------------------------------------------------
 
+# Load Matched TNRS names
 match_try_tnrs = readRDS("inst/cleaned_data/match_try_tnrs.Rds")
 
 match_glonaf_tnrs = readRDS("inst/cleaned_data/match_glonaf_tnrs.Rds")
 
+# Subset most important columns
 sub_try = match_try_tnrs %>%
   distinct(
     name_init_try        = Name_submitted,
@@ -114,6 +116,7 @@ sub_glonaf = match_glonaf_tnrs %>%
     author_accepted_glonaf  = Author_matched
   )
 
+# Merge TRY and GloNAF accepted names
 harmonized_try_glonaf = sub_try %>%
   filter(species_accepted_try != "") %>%
   inner_join(
@@ -122,42 +125,31 @@ harmonized_try_glonaf = sub_try %>%
     by = c(species_accepted_try = "species_accepted_glonaf")
   )
 
-# Exact matching between TRY and GloNAF ----------------------------------------
-
-# Proceeds with exact matching
-exact_try_glonaf = try_species %>%
-  right_join(glonaf_species %>%
-              distinct(species_id, genus, epithet) %>%
-              transmute(species = paste(genus, epithet, sep = " ")),
-            by = c(AccSpeciesName = "species")) %>%
-  mutate(TraitNum = ifelse(is.na(TraitNum), 0, TraitNum))
-
-
-# Problematic harmonization with LCVP and GloNAF -------------------------------
-
-binomial_glonaf = glonaf_species %>%
-  distinct(taxon_corrected) %>%
-  mutate(n_spaces = stringr::str_count(taxon_corrected, " "))
-
-problematic_species = binomial_glonaf %>%
-  filter(n_spaces == 0) %>%
-  head() %>%
-  mutate(taxon_corrected = substr(taxon_corrected, 1, nchar(taxon_corrected) - 1))
-
-lcvplants::lcvp_search(problematic_species$taxon_corrected)
-
-match_glonaf_lcvp = lcvplants::lcvp_search(glonaf_species[["taxon_corrected"]])
-
-
 
 # Compute number of trait available --------------------------------------------
 
-fig_num_trait = exact_try_glonaf %>%
-  ggplot(aes(TraitNum)) +
+# Count number of traits per consolidated species
+try_number_trait = harmonized_try_glonaf %>%
+  # Getting back TRY species IDs
+  inner_join(try_species,
+             by = c(name_init_try = "AccSpeciesName")) %>%
+  # Regrouping species with similar harmonized names
+  group_by(species_accepted_try) %>%
+  summarise(
+    observation_number = sum(ObsNum),
+    trait_number       = sum(TraitNum),
+    measure_number     = sum(MeasNum),
+    georef_obs_number  = sum(ObsGRNum),
+    georef_measure_number = sum(MeasGRNum))
+
+
+fig_num_trait = try_number_trait %>%
+  ggplot(aes(trait_number)) +
   geom_histogram(color = "white") +
-  scale_x_log10(name = "Number of diff. Traits in TRY") +
-  scale_y_sqrt(name = "Number of species") +
-  labs(subtitle = "GloNAF aliens in TRY (19k / 21k)") +
+  scale_x_log10(name = "Number of ≠ traits in TRY") +
+  scale_y_continuous(name = "Number of species") +
+  labs(title = "GloNAF species in TRY (~15k)",
+       caption = "GloNAF species harmonized using TNRS") +
   theme_bw() +
   theme(aspect.ratio = 1,
         panel.grid = element_blank())
@@ -169,23 +161,34 @@ ggsave(
 )
 
 
-# What traits are available?
-fig_detail_traits = exact_try_glonaf %>%
-  filter(TraitNum != 0) %>%
-  distinct(AccSpeciesID) %>%
+# Which traits are available in TRY for GloNAF species -------------------------
+
+glonaf_try_traits_available = harmonized_try_glonaf %>%
+  # Getting back TRY species IDs
+  inner_join(try_species %>%
+               select(AccSpeciesID, AccSpeciesName),
+             by = c(name_init_try = "AccSpeciesName")) %>%
+  # Add TRY traits
   inner_join(try_df %>%
                filter(!is.na(TraitID)) %>%
-               collect(), by = "AccSpeciesID") %>%
-  distinct(AccSpeciesID, AccSpeciesName, TraitID, TraitName) %>%
+               collect(), by = "AccSpeciesID")
+
+# Count number of species per trait measured
+try_number_species_per_trait = glonaf_try_traits_available %>%
+  distinct(species_accepted_try, TraitID, TraitName) %>%
   count(TraitName, sort = TRUE, name = "n_sp") %>%
   mutate(TraitName = factor(TraitName) %>%
-           forcats::fct_reorder(n_sp)) %>%
+           forcats::fct_reorder(n_sp))
+
+# Show number of species per trait
+fig_detail_traits = try_number_species_per_trait %>%
   slice_max(n_sp, n = 15) %>%
   ggplot(aes(n_sp, TraitName)) +
   geom_point() +
   scale_x_log10(name = "Number of species measured") +
-  scale_y_discrete(labels = scales::wrap_format(20)) +
-  labs(y = "Trait name", subtitle = "Most measured trait on 19k GloNAF species",
+  scale_y_discrete(labels = scales::wrap_format(25)) +
+  labs(y = "Trait name",
+       title = "15 Most frequent trait in TRY from GloNAF species (15k)",
        caption = "TRY open data on a selected subset of traits") +
   theme_bw() +
   theme(aspect.ratio = 1)
@@ -193,20 +196,16 @@ fig_detail_traits = exact_try_glonaf %>%
 fig_detail_traits
 
 
+## Trait combination
 # What is the most commonly measured trait combination?
-try_traits = exact_try_glonaf %>%
-  filter(TraitNum != 0) %>%
-  distinct(AccSpeciesID) %>%
-  inner_join(try_df %>%
-               filter(!is.na(TraitID)) %>%
-               collect(), by = "AccSpeciesID") %>%
-  distinct(AccSpeciesID, AccSpeciesName, TraitID, TraitName)
-
-fig_glonaf_combine_traits = try_traits %>%
+try_trait_combination = glonaf_try_traits_available %>%
+  distinct(species_accepted_try, TraitID, TraitName) %>%
   tibble::as_tibble() %>%
-  select(-AccSpeciesID,-TraitID) %>%
-  group_by(AccSpeciesName) %>%
-  summarise(trait_names = list(TraitName)) %>%
+  select(-TraitID) %>%
+  group_by(species_accepted_try) %>%
+  summarise(trait_names = list(TraitName))
+
+fig_glonaf_combine_traits = try_trait_combination %>%
   ggplot(aes(x = trait_names)) +
   geom_bar() +
   geom_text(stat='count', aes(label = after_stat(count)), vjust = -1) +
