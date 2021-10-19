@@ -115,9 +115,11 @@ sub_glonaf = match_glonaf_tnrs %>%
   )
 
 harmonized_try_glonaf = sub_try %>%
-  filter(species_accepted_try != "", author_accepted_try != "") %>%
+  filter(species_accepted_try != "") %>%
   inner_join(
-    sub_glonaf, by = c(species_accepted_try = "species_accepted_glonaf")
+    sub_glonaf %>%
+      filter(species_accepted_glonaf != ""),
+    by = c(species_accepted_try = "species_accepted_glonaf")
   )
 
 # Exact matching between TRY and GloNAF ----------------------------------------
