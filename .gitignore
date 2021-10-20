@@ -2,3 +2,4 @@
 .Renviron
 *.DS_Store
 .Rhistory
+_targets/
