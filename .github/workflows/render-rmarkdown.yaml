@@ -23,6 +23,11 @@ jobs:
 
       - uses: r-lib/actions/setup-renv@v1
 
+      - name: Install packages
+        run: |
+          R -e 'install.packages(c("remotes"))'
+          R -e 'remotes::install_cran("rmarkdown")'
+
       - name: Render Rmarkdown files
         run: |
           RMD_PATH=($(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep 'README[.]Rmd$'))
