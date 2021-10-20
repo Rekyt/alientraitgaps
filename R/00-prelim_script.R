@@ -216,3 +216,15 @@ fig_glonaf_combine_traits = try_trait_combination %>%
 fig_glonaf_combine_traits
 
 # Location of trait measurements -----------------------------------------------
+
+
+# Querying traits from BIEN ----------------------------------------------------
+
+query_bien_traits = harmonized_try_glonaf %>%
+  pull(species_accepted_try) %>%
+  unique() %>%
+  BIEN::BIEN_trait_species()
+
+# Get InvaCost data ------------------------------------------------------------
+
+
