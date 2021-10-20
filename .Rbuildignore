@@ -1,2 +1,4 @@
 ^traitsampling\.Rproj$
 ^\.Rproj\.user$
+^README\.Rmd$
+^\.github$
