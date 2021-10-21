@@ -10,9 +10,11 @@ source("R/figure_functions.R")
 source("R/glonaf_db_functions.R")
 source("R/harmonize_try_glonaf.R")
 source("R/invacost_functions.R")
+source("R/tr8_functions.R")
 
 tar_option_set(
-  packages = c("data.table", "disk.frame", "dplyr", "ggplot2", "here", "TNRS")
+  packages = c("data.table", "disk.frame", "dplyr", "ggplot2", "here", "TNRS",
+               "TR8")
 )
 
 # Target factory ---------------------------------------------------------------
@@ -105,6 +107,13 @@ list(
   tar_target(
     glonaf_bien_traits,
     get_bien_traits(harmonized_try_glonaf)
+  ),
+
+
+  # Query all possible traits on many databases through TR8
+  tar_target(
+    glonaf_additional_traits,
+    get_all_tr8_traits(harmonized_try_glonaf)
   ),
 
   # Make figures
