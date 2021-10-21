@@ -25,7 +25,7 @@ jobs:
 
       - name: Install packages
         run: |
-          R -e 'remotes::install_cran(c("remotes"))'
+          R -e 'install.packages("remotes")'
           R -e 'remotes::install_cran("rmarkdown")'
 
       - name: Render Rmarkdown files
