@@ -111,10 +111,10 @@ list(
 
 
   # Query all possible traits on many databases through TR8
-  tar_target(
-    glonaf_additional_traits,
-    get_all_tr8_traits(harmonized_try_glonaf)
-  ),
+  # tar_target(
+  #   glonaf_additional_traits,
+  #   get_all_tr8_traits(harmonized_try_glonaf)
+  # ),
 
   # Make figures
   tar_target(
