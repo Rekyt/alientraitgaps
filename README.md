@@ -1,9 +1,10 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# alientraitgaps: Globlal Trait gaps in Alien Plants
+# `alientraitgaps` - Quantifying Global Trait Gaps in Alien Plants
 
 <!-- badges: start -->
+
 <!-- badges: end -->
 
 ## Goal
@@ -40,7 +41,7 @@ devtools::install_github("Rekyt/alientraitgaps")
 
 The workflow leverages the `targets` package to get reproducible
 analyses. To run the workflow, copy the repository then run
-`targets::tar_make()`. **/! WARNING: this can take a while to run
-depending on your computer**. You also need to have access to the GloNAF
-database and put the id and password as enviroment variable
+`targets::tar_make()`. **/\!\\ WARNING: this can take a while to run
+depending on your computer /\!\\**. You also need to have access to the
+GloNAF database and put the id and password as environment variable
 `GLONAF_USER` and `GLONAF_PASSWORD` respectively.
