@@ -1,0 +1,46 @@
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+# alientraitgaps: Globlal Trait gaps in Alien Plants
+
+<!-- badges: start -->
+<!-- badges: end -->
+
+## Goal
+
+This repository contains a full workflow to assess to what extent alien
+plants have gaps in their traits. At global scale we know very little
+about alien plants. Especially trait-based ecology can help us
+understand, among other things, the invasion successes of alien plants.
+To use this approach we first need to know which traits are available
+for alien plants.
+
+The goal of this project is to look into functional trait databases and
+quantify the number and type of traits available for alien plants
+globally. This is done comparing different global scale trait databases
+(TRY and BIEN).
+
+From this extensive analysis of data gaps, a list of priority species
+for which trait data is needed, is going to be generated to see where to
+focus the trait gathering efforts.
+
+## Installation
+
+The repository contain the full workflow to reproduce our analyses,
+including our figures.
+
+You can install it from GitHub using:
+
+``` r
+# install.packages("devtools")
+devtools::install_github("Rekyt/alientraitgaps")
+```
+
+## How to run
+
+The workflow leverages the `targets` package to get reproducible
+analyses. To run the workflow, copy the repository then run
+`targets::tar_make()`. **/! WARNING: this can take a while to run
+depending on your computer**. You also need to have access to the GloNAF
+database and put the id and password as enviroment variable
+`GLONAF_USER` and `GLONAF_PASSWORD` respectively.
