@@ -29,11 +29,14 @@ count_gbif_occurrences = function(gbif_ids_cleaned) {
         # Get occurrence count for each key
         # Consider all kinds of observation from GBIF
         ~purrr::cross(
-          .x,
-          c("HUMAN_OBSERVATION", "MACHINE_OBSERVATION", "OBSERVATION")
+          list(
+            .x,
+            c("HUMAN_OBSERVATION", "MACHINE_OBSERVATION", "OBSERVATION")
+          )
         ) %>%
-          purrr::map2_dbl(
-            function(x, y) rgbif::occ_count(x, basisOfRecord = y, to = 2021)
+          purrr::map_dbl(
+            function(x) rgbif::occ_count(x[[1]], basisOfRecord = x[[2]],
+                                         to = 2021)
           )
       ),
       # Sum all occurrences for each initial species name
