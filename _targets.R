@@ -7,6 +7,7 @@ library("magrittr")
 source("R/bien_functions.R")
 source("R/extract_try_list.R")
 source("R/figure_functions.R")
+source("R/gbif_functions.R")
 source("R/glonaf_db_functions.R")
 source("R/harmonize_try_glonaf.R")
 source("R/invacost_functions.R")
@@ -19,7 +20,7 @@ tar_option_set(
 
 # Target factory ---------------------------------------------------------------
 list(
-  # Load TRY data
+  # Load TRY data --------------------------------------------------------------
   tar_target(
     raw_try_df,
     here::here("inst", "exdata", "try", "12477.df"),
@@ -42,7 +43,7 @@ list(
     try_list, extract_try_list(try_species)
   ),
 
-  # Load GloNAF data
+  # Load GloNAF data -----------------------------------------------------------
   tar_target(
     glonaf_count_alien_status,
     get_glonaf_alien_species_count(connect_glonaf_db())
@@ -54,7 +55,7 @@ list(
     glonaf_list, extract_glonaf_list(glonaf_alien_species)
   ),
 
-  # Match databases against TNRS
+  # Match databases against TNRS -----------------------------------------------
   tar_target(
     match_try_tnrs, TNRS::TNRS(try_list)
   ),
@@ -62,13 +63,13 @@ list(
     match_glonaf_tnrs, TNRS::TNRS(glonaf_list)
   ),
 
-  # Harmonize TRY and GloNAF
+  # Harmonize TRY and GloNAF ---------------------------------------------------
   tar_target(
     harmonized_try_glonaf,
     harmonize_try_glonaf_species(match_try_tnrs, match_glonaf_tnrs)
   ),
 
-  # Query TRY traits for GloNAF species
+  # Query TRY traits for GloNAF species ----------------------------------------
   tar_target(
     try_total_number_trait, count_trait_try(harmonized_try_glonaf, try_species)
   ),
@@ -85,6 +86,7 @@ list(
     list_trait_combination_per_species(glonaf_try_traits_available)
   ),
 
+  # InvaCost -------------------------------------------------------------------
   # Get InvaCost data
   tar_target(
     invacost_data,
@@ -99,6 +101,7 @@ list(
 
   # Match InvaCost data
 
+  # BIEN traits ----------------------------------------------------------------
   # Query BIEN traits for GloNAF species
   tar_target(
     glonaf_bien_traits_count,
@@ -110,13 +113,32 @@ list(
   ),
 
 
+  # GBIF Occurrences -----------------------------------------------------------
+  # Get GBIF ids from species name
+  tar_target(
+    gbif_ids,
+    get_gbif_ids(harmonized_try_glonaf)
+  ),
+  tar_target(
+    gbif_ids_cleaned,
+    clean_gbif_ids(gbif_ids)
+  ),
+  # Get number of GBIF occurrence records
+  tar_target(
+    gbif_num_occ,
+    count_gbif_occurrences(gbif_ids_cleaned)
+  ),
+
+
+  # Other Trait Data -----------------------------------------------------------
   # Query all possible traits on many databases through TR8
   # tar_target(
   #   glonaf_additional_traits,
   #   get_all_tr8_traits(harmonized_try_glonaf)
   # ),
 
-  # Make figures
+
+  # Make figures ---------------------------------------------------------------
   tar_target(
     fig_glonaf_species_number_trait,
     plot_trait_number_try_glonaf_species(try_total_number_trait)
@@ -129,9 +151,8 @@ list(
     fig_trait_combination_frequency,
     plot_glonaf_try_trait_combination_frequency(try_trait_combination)
   )
-
-
 ) %>%
+  # Convert figures into ggplotGrob() to take less space
   tarchetypes::tar_hook_outer(
     ggplot2::ggplotGrob(.x),
     dplyr::starts_with("fig_")
