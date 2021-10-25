@@ -5,6 +5,7 @@ library("targets")
 library("magrittr")
 
 source("R/bien_functions.R")
+source("R/combined_trait_functions.R")
 source("R/extract_try_list.R")
 source("R/figure_functions.R")
 source("R/gbif_functions.R")
@@ -90,21 +91,6 @@ list(
     list_trait_combination_per_species(glonaf_try_traits_available)
   ),
 
-  # InvaCost -------------------------------------------------------------------
-  # Get InvaCost data
-  tar_target(
-    invacost_data,
-    download_invacost(),
-    format = "file"
-  ),
-  tar_target(
-    invacost_files,
-    unzip_invacost(invacost_data),
-    format = "file"
-  ),
-
-  # Match InvaCost data
-
   # BIEN traits ----------------------------------------------------------------
   # List BIEN traits
   tar_target(
@@ -127,6 +113,39 @@ list(
   ),
 
 
+  # Other Trait Data -----------------------------------------------------------
+  # Query all possible traits on many databases through TR8
+  # tar_target(
+  #   glonaf_additional_traits,
+  #   get_all_tr8_traits(harmonized_try_glonaf)
+  # ),
+
+
+  # Combine Trait Data ---------------------------------------------------------
+  # Rank species per trait number in each database
+  tar_target(
+    glonaf_trait_ranks,
+    rank_species_trait_number(
+      glonaf_bien_traits_count, try_total_number_trait,
+      glonaf_try_traits_available
+    )
+  ),
+
+  # InvaCost -------------------------------------------------------------------
+  # Get InvaCost data
+  tar_target(
+    invacost_data,
+    download_invacost(),
+    format = "file"
+  ),
+  tar_target(
+    invacost_files,
+    unzip_invacost(invacost_data),
+    format = "file"
+  ),
+
+  # Match InvaCost data
+
   # GBIF Occurrences -----------------------------------------------------------
   # Get GBIF ids from species name
   tar_target(
@@ -144,12 +163,6 @@ list(
   ),
 
 
-  # Other Trait Data -----------------------------------------------------------
-  # Query all possible traits on many databases through TR8
-  # tar_target(
-  #   glonaf_additional_traits,
-  #   get_all_tr8_traits(harmonized_try_glonaf)
-  # ),
 
 
   # Make figures ---------------------------------------------------------------
@@ -164,6 +177,10 @@ list(
   tar_target(
     fig_trait_combination_frequency,
     plot_glonaf_try_trait_combination_frequency(try_trait_combination)
+  ),
+  tar_target(
+    fig_trait_ranks_multi_db,
+    plot_trait_ranks_multi_db(glonaf_trait_ranks)
   )
 ) %>%
   # Convert figures into ggplotGrob() to take less space

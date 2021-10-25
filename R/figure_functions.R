@@ -34,3 +34,25 @@ plot_glonaf_try_trait_combination_frequency = function(try_trait_combination) {
     labs(caption = "TRY open data on a selected subset of traits",
          subtitle = "Most commonly measured combination of traits on aliens")
 }
+
+
+plot_trait_ranks_multi_db = function(glonaf_trait_ranks) {
+  glonaf_trait_ranks %>%
+    mutate(trait_db = factor(trait_db,
+                             levels = c("bien", "try_full", "try_extract"))
+           ) %>%
+    ggplot(aes(species_trait_number_rank, trait_number, color = trait_db)) +
+    geom_point(size = 2/3) +
+    scale_y_log10(name = "Number of traits") +
+    scale_color_brewer(
+      name = "Trait Database", palette = "Set2",
+      guide = guide_legend(override.aes = list(size = 2)),
+      labels = c(bien = "BIEN",
+                 try_full = "TRY (full)",
+                 try_extract = "TRY (extract)")
+    ) +
+    labs(x = "Rank of species",
+         title = "Number of trait per GloNAF species across databases") +
+    theme_bw() +
+    theme(aspect.ratio = 1)
+}

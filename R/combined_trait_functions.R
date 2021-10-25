@@ -1,0 +1,25 @@
+rank_species_trait_number = function(
+  glonaf_bien_traits_count, try_total_number_trait,
+  glonaf_try_traits_available) {
+
+  list(
+    bien = glonaf_bien_traits_count %>%
+      select(-count) %>%
+      group_by(species = scrubbed_species_binomial) %>%
+      summarise(trait_number = n()),
+
+    try_full = try_total_number_trait %>%
+      select(species = species_accepted_try, trait_number),
+
+    try_extract = glonaf_try_traits_available %>%
+      filter(!is.na(TraitID)) %>%
+      distinct(species = species_accepted_try, TraitID) %>%
+      group_by(species) %>%
+      summarise(trait_number = n())
+  ) %>%
+    bind_rows(.id = "trait_db") %>%
+    group_by(trait_db) %>%
+    arrange(desc(trait_number)) %>%
+    mutate(species_trait_number_rank = row_number()) %>%
+    ungroup()
+}
