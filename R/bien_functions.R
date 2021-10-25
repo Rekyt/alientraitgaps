@@ -11,3 +11,121 @@ get_bien_traits = function(harmonized_try_glonaf) {
     unique() %>%
     BIEN::BIEN_trait_species()
 }
+
+make_bien_try_correspond = function(bien_traits) {
+  bien_traits %>%
+    mutate(TraitIDs = lst(case_when(
+      # DBH
+      trait_name == "diameter at breast height (1.3 m)" ~ 21,
+      trait_name == "flower color" ~ 207,
+      trait_name == "flower pollination syndrome" ~ 29,
+      trait_name == "fruit type" ~ 99,
+      trait_name == "inflorescence length" ~ 2817,
+
+      ## Leafs
+      trait_name == "leaf area" ~ c(3108:3113),
+      trait_name == "leaf area per leaf dry mass" ~ c(3086, 3115:3117),
+      trait_name == "leaf carbon content per leaf area" ~ 570,
+      # leaf C/N ratio
+      trait_name == "leaf carbon content per leaf nitrogen content" ~ 146,
+      trait_name == "leaf compoundness" ~ 17,
+      trait_name == "leaf dry mass" ~ 55,
+      # LDMC
+      trait_name == "leaf dry mass per leaf fresh mass" ~ 47,
+      trait_name == "leaf fresh mass" ~ 163,
+      # Unsure? TRY trait is leaf texture (physical strength)
+      trait_name == "Leaf lamina fracture toughness" ~ 2,
+      trait_name == "leaf life span" ~ 12,
+      trait_name == "leaf nitrogen content per leaf area" ~ 50,
+      trait_name == "leaf nitrogen content per leaf dry mass" ~ 14,
+      trait_name == "leaf phosphorus content per leaf area" ~ 51,
+      trait_name == "leaf phosphorus content per leaf dry mass" ~ 15,
+      trait_name == "leaf photosynthetic rate per leaf area" ~ 53,
+      trait_name == "leaf photosynthetic rate per leaf dry mass" ~ 40,
+      # NO leaf relative growth rate in TRY?
+      trait_name == "leaf relative growth rate" ~ NA,
+      trait_name == "leaf stomatal conductance for H2O per leaf area" ~ 45,
+      # No difference in TRY between H2O or other conductance
+      trait_name == "leaf stomatal conductance per leaf area" ~ 45,
+      trait_name == "leaf thickness" ~ 46,
+
+      ## Maximums
+      # NOT maximum (what's the difference between maximum and longest?!)
+      trait_name == "longest whole plant longevity" ~ 59,
+      # NOT maximum 918: Fruit length; 27: Seed length
+      trait_name == "maximum fruit length" ~ 918,
+      # NOT maximum 144: Leaf length;
+      # 940: Leaf length excluding petiole (leaf lamina length)
+      trait_name == "maximum leaf length" ~ c(144, 940),
+      # NOT maximum
+      trait_name == "maximum leaf width" ~ 145,
+      # NOT maximum 3106: Plant height vegetative; 3107: Plant height generative
+      trait_name == "maximum whole plant height" ~ 3106
+      # NOT maximum
+      trait_name == "maximum whole plant longevity" ~ 59,
+
+      ## Minimums
+      # NOT minimum
+      trait_name == "minimum fruit length" ~ 27,
+      # NOT minimum 144: Leaf length;
+      # 940: Leaf length excluding petiole (leaf lamina length)
+      trait_name == "minimum leaf length" ~ c(144, 940),
+      # NOT minimum
+      trait_name == "minimum leaf width" ~ 145,
+      # NOT minimum 3106: Plant height vegetative; 3107: Plant height generative
+      trait_name == "minimum whole plant height" ~ 3106,
+
+      ## Phenology
+      # 335: Plant reproductive phenology timing?
+      # 155: Plant ontogeny: age of maturity (first flowering)
+      # 2956:	Flower onset of flowering (first flowering date,
+      #       flowering beginning)
+      # Flowering traits are in TOP-Thesaurus and in BIOLFLOR but not in TRY
+      trait_name == "plant flowering begin" ~ 2956,
+      trait_name == "plant flowering end" ~ NA,
+      trait_name == "plant flowering duration" ~ NA,
+
+      ## Roots
+      # 457:	Coarse root dry mass per ground area
+      # 798: Root dry mass per ground area
+      # 1795: Fine root dry mass per ground area
+      trait_name == "root dry mass" ~ c(457, 798, 1795),
+
+      ## Seeds
+      trait_name == "seed length" ~ 27,
+      trait_name == "seed mass" ~ 26,
+
+      ## Stem
+      # 128:	Plant biomass and allometry: Stem dry mass per plant
+      trait_name == "stem dry mass" ~ 128,
+      trait_name == "stem relative growth rate" ~ NA,
+      trait_name == "stem wood density" ~ 4,
+
+      ## Vessels
+      # 170:	Stem conduit cross-sectional area (vessels and tracheids)
+      trait_name == "vessel lumen area" ~ 170,
+      # Not number but density
+      # 169:	Stem conduit density (vessels and tracheids)
+      trait_name == "vessel number" ~ 169,
+
+      ## Whole Plant
+      trait_name == "whole plant dispersal syndrome" ~ 28,
+      # 42:	Plant growth form
+      # 3401:	Plant growth form detailed consolidated
+      # 3400:	Plant growth form simple consolidated
+      trait_name == "whole plant growth form" ~ c(42, 3400),
+      trait_name == "whole plant growth form diversity" ~ 3401,
+      trait_name == "whole plant height" ~ 3106,
+      # 155:	Plant ontogeny: age of maturity (first flowering)
+      trait_name == "whole plant primary juvenile period length" ~ 155,
+      # 347: Plant mating system
+      # see also 208:	Species reproduction type
+      trait_name == "whole plant sexual system" ~ 347,
+      # Should check meaning of trait
+      trait_name == "whole plant vegetative phenology" ~ NA,
+      trait_name == "whole plant woodiness" ~ 38,
+
+      ## Otherwise
+      TRUE ~ NA
+    )))
+}

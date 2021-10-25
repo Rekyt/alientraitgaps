@@ -9,7 +9,7 @@ source("R/extract_try_list.R")
 source("R/figure_functions.R")
 source("R/gbif_functions.R")
 source("R/glonaf_db_functions.R")
-source("R/harmonize_try_glonaf.R")
+source("R/harmonize_functions.R")
 source("R/invacost_functions.R")
 source("R/tr8_functions.R")
 
@@ -68,6 +68,10 @@ list(
     harmonized_try_glonaf,
     harmonize_try_glonaf_species(match_try_tnrs, match_glonaf_tnrs)
   ),
+  tar_target(
+    harmonized_try_ids,
+    get_try_ids_from_harmonized_species(harmonized_try_glonaf, try_species)
+  ),
 
   # Query TRY traits for GloNAF species ----------------------------------------
   tar_target(
@@ -102,6 +106,16 @@ list(
   # Match InvaCost data
 
   # BIEN traits ----------------------------------------------------------------
+  # List BIEN traits
+  tar_target(
+    bien_traits,
+    BIEN::BIEN_trait_list()
+  ),
+  tar_target(
+    bien_try_convert_df,
+    make_bien_try_correspond(bien_traits)
+  ),
+
   # Query BIEN traits for GloNAF species
   tar_target(
     glonaf_bien_traits_count,
