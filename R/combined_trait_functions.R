@@ -1,6 +1,6 @@
 rank_species_trait_number = function(
   glonaf_bien_traits_count, try_total_number_trait,
-  glonaf_try_traits_available) {
+  glonaf_try_traits_available, harmonized_try_glonaf) {
 
   list(
     bien = glonaf_bien_traits_count %>%
@@ -19,6 +19,15 @@ rank_species_trait_number = function(
   ) %>%
     bind_rows(.id = "trait_db") %>%
     group_by(trait_db) %>%
+    full_join(
+      harmonized_try_glonaf %>%
+        distinct(species = species_accepted_try) %>%
+        pull(species) %>%
+        expand.grid(trait_db = c("bien", "try_full", "try_extract")) %>%
+        rename(species = Var1),
+      by = c("trait_db", "species")
+    ) %>%
+    mutate(trait_number = ifelse(is.na(trait_number), 0, trait_number)) %>%
     arrange(desc(trait_number)) %>%
     mutate(species_trait_number_rank = row_number()) %>%
     ungroup()

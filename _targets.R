@@ -127,7 +127,7 @@ list(
     glonaf_trait_ranks,
     rank_species_trait_number(
       glonaf_bien_traits_count, try_total_number_trait,
-      glonaf_try_traits_available
+      glonaf_try_traits_available, harmonized_try_glonaf
     )
   ),
 

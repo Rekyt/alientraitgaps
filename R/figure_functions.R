@@ -38,6 +38,7 @@ plot_glonaf_try_trait_combination_frequency = function(try_trait_combination) {
 
 plot_trait_ranks_multi_db = function(glonaf_trait_ranks) {
   glonaf_trait_ranks %>%
+    filter(trait_number > 0) %>%
     mutate(trait_db = factor(trait_db,
                              levels = c("bien", "try_full", "try_extract"))
            ) %>%
