@@ -22,6 +22,7 @@ tar_option_set(
 # Target factory ---------------------------------------------------------------
 list(
   # Load TRY data --------------------------------------------------------------
+  # Load actual files
   tar_target(
     raw_try_df,
     here::here("inst", "exdata", "try", "12477.df"),
@@ -36,10 +37,28 @@ list(
     here::here("inst", "exdata", "try", "TryAccSpecies.txt"),
     format = "file"
   ),
+  # Full TRY extract
+  tar_target(
+    raw_full_try,
+    {
+      disk.frame::csv_to_disk.frame(
+        here::here("inst", "exdata", "try", "17144.txt"),
+        here::here("inst", "exdata", "try", "17144.df")
+      )
+      here::here("inst", "exdata", "try", "17144.df")
+    },
+    format = "file"
+  ),
+  tar_target(
+    full_try_df,
+    disk.frame::disk.frame(raw_full_try)
+  ),
+  # Load species file
   tar_target(
     try_species,
     data.table::fread(raw_try_species, encoding = "UTF-8")
   ),
+  # Get the name list
   tar_target(
     try_list, extract_try_list(try_species)
   ),
@@ -80,7 +99,7 @@ list(
   ),
   tar_target(
     glonaf_try_traits_available,
-    list_all_traits_glonaf(harmonized_try_glonaf, try_species, try_df)
+    list_all_traits_glonaf(harmonized_try_glonaf, try_species, full_try_df)
   ),
   tar_target(
     glonaf_species_per_trait,
@@ -90,6 +109,7 @@ list(
     try_trait_combination,
     list_trait_combination_per_species(glonaf_try_traits_available)
   ),
+
 
   # BIEN traits ----------------------------------------------------------------
   # List BIEN traits

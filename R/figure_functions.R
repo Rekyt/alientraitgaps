@@ -2,10 +2,10 @@ plot_trait_number_try_glonaf_species = function(try_number_trait) {
   try_number_trait %>%
     ggplot(aes(trait_number)) +
     geom_histogram(color = "white") +
-    scale_x_log10(name = "Number of ≠ traits in TRY") +
+    scale_x_log10(name = "Number of traits in TRY") +
     scale_y_continuous(name = "Number of species") +
-    labs(title = "GloNAF species in TRY (~15k)",
-         caption = "GloNAF species harmonized using TNRS") +
+    labs(title = "Traits of GloNAF species in TRY (~15k)",
+         caption = "GloNAF species harmonized using TNRS; All TRY open data") +
     theme_bw() +
     theme(aspect.ratio = 1,
           panel.grid = element_blank())
@@ -20,7 +20,7 @@ plot_number_species_per_try_trait = function(try_number_species_per_trait) {
     scale_y_discrete(labels = scales::wrap_format(25)) +
     labs(y = "Trait name",
          title = "15 Most frequent trait in TRY from GloNAF species (15k)",
-         caption = "TRY open data on a selected subset of traits") +
+         caption = "All TRY open data") +
     theme_bw() +
     theme(aspect.ratio = 1)
 }
@@ -31,7 +31,7 @@ plot_glonaf_try_trait_combination_frequency = function(try_trait_combination) {
     geom_bar() +
     geom_text(stat='count', aes(label = after_stat(count)), vjust = -1) +
     ggupset::scale_x_upset(n_intersections = 8) +
-    labs(caption = "TRY open data on a selected subset of traits",
+    labs(caption = "All TRY open data",
          subtitle = "Most commonly measured combination of traits on aliens")
 }
 
@@ -49,10 +49,10 @@ plot_trait_ranks_multi_db = function(glonaf_trait_ranks) {
       name = "Trait Database", palette = "Set2",
       guide = guide_legend(override.aes = list(size = 2)),
       labels = c(bien = "BIEN",
-                 try_full = "TRY (full)",
-                 try_extract = "TRY (extract)")
+                 try_full = "TRY (all data)",
+                 try_extract = "TRY (open data)")
     ) +
-    labs(x = "Rank of species",
+    labs(x = "Rank of species (out of 15k GloNAF species)",
          title = "Number of trait per GloNAF species across databases") +
     theme_bw() +
     theme(aspect.ratio = 1)
