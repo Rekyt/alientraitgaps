@@ -3,3 +3,4 @@
 *.DS_Store
 .Rhistory
 _targets/
+inst/exdata/try/17144.txt
