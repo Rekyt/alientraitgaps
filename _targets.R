@@ -106,7 +106,7 @@ list(
     count_species_per_trait(glonaf_try_traits_available)
   ),
   tar_target(
-    try_trait_combination,
+    try_trait_combinations,
     list_trait_combination_per_species(glonaf_try_traits_available)
   ),
 
@@ -135,6 +135,10 @@ list(
     glonaf_bien_species_per_trait,
     count_bien_species_per_trait(glonaf_bien_traits_count)
   ),
+  tar_target(
+    bien_trait_combinations,
+    list_bien_trait_combination_per_species(glonaf_bien_traits)
+  ),
 
 
   # Other Trait Data -----------------------------------------------------------
@@ -155,6 +159,7 @@ list(
     )
   ),
 
+
   # InvaCost -------------------------------------------------------------------
   # Get InvaCost data
   tar_target(
@@ -169,6 +174,7 @@ list(
   ),
 
   # Match InvaCost data
+
 
   # GBIF Occurrences -----------------------------------------------------------
   # Get GBIF ids from species name
@@ -187,8 +193,6 @@ list(
   ),
 
 
-
-
   # Make figures ---------------------------------------------------------------
   tar_target(
     fig_glonaf_species_number_trait,
@@ -202,7 +206,7 @@ list(
   ),
   tar_target(
     fig_trait_combination_frequency,
-    plot_glonaf_try_trait_combination_frequency(try_trait_combination)
+    plot_glonaf_try_trait_combination_frequency(try_trait_combinations)
   ),
   tar_target(
     fig_trait_ranks_multi_db,

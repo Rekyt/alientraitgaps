@@ -45,8 +45,9 @@ plot_glonaf_try_trait_combination_frequency = function(try_trait_combination) {
   try_trait_combination %>%
     ggplot(aes(x = trait_names)) +
     geom_bar() +
-    geom_text(stat='count', aes(label = after_stat(count)), vjust = -1) +
-    ggupset::scale_x_upset(n_intersections = 8) +
+    geom_text(stat = 'count', aes(label = after_stat(count)), vjust = 1,
+              size = rel(3), color = "white", face = "bold") +
+    ggupset::scale_x_upset(n_intersections = 15) +
     labs(caption = "All TRY open data",
          subtitle = "Most commonly measured combination of traits on aliens")
 }

@@ -79,3 +79,9 @@ list_trait_combination_per_species = function(glonaf_try_traits_available) {
     summarise(trait_names = list(TraitName))
 }
 
+list_bien_trait_combination_per_species = function(glonaf_bien_traits) {
+  glonaf_bien_traits %>%
+    distinct(species = scrubbed_species_binomial, trait_name) %>%
+    group_by(species) %>%
+    summarise(trait_names = list(trait_name))
+}
