@@ -41,17 +41,16 @@ plot_number_species_per_try_trait = function(
     theme(aspect.ratio = 1)
 }
 
-plot_glonaf_try_trait_combination_frequency = function(try_trait_combination) {
+plot_glonaf_trait_combination_frequency = function(try_trait_combination,
+                                                   title = "") {
   try_trait_combination %>%
     ggplot(aes(x = trait_names)) +
     geom_bar() +
     geom_text(stat = 'count', aes(label = after_stat(count)), vjust = 1,
               size = rel(3), color = "white", face = "bold") +
     ggupset::scale_x_upset(n_intersections = 15) +
-    labs(caption = "All TRY open data",
-         subtitle = "Most commonly measured combination of traits on aliens")
+    labs(title = title)
 }
-
 
 plot_trait_ranks_multi_db = function(glonaf_trait_ranks) {
   glonaf_trait_ranks %>%

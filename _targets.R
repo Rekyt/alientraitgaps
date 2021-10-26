@@ -205,8 +205,12 @@ list(
     )
   ),
   tar_target(
-    fig_trait_combination_frequency,
-    plot_glonaf_try_trait_combination_frequency(try_trait_combinations)
+    fig_try_trait_combination_frequency,
+    plot_glonaf_trait_combination_frequency(try_trait_combinations, "TRY (open)")
+  ),
+  tar_target(
+    fig_bien_trait_combination_frequency,
+    plot_glonaf_trait_combination_frequency(bien_trait_combinations, "BIEN")
   ),
   tar_target(
     fig_trait_ranks_multi_db,
