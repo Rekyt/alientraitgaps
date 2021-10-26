@@ -131,3 +131,11 @@ make_bien_try_correspond = function(bien_traits) {
     )) %>%
     as_tibble()
 }
+
+count_bien_species_per_trait = function(glonaf_bien_traits_count) {
+  glonaf_bien_traits_count %>%
+    distinct(species = scrubbed_species_binomial, trait_name) %>%
+    group_by(trait_name) %>%
+    summarise(n_sp = n()) %>%
+    arrange(desc(n_sp))
+}

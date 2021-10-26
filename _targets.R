@@ -131,6 +131,10 @@ list(
     glonaf_bien_traits,
     get_bien_traits(harmonized_try_glonaf)
   ),
+  tar_target(
+    glonaf_bien_species_per_trait,
+    count_bien_species_per_trait(glonaf_bien_traits_count)
+  ),
 
 
   # Other Trait Data -----------------------------------------------------------
@@ -192,7 +196,9 @@ list(
   ),
   tar_target(
     fig_glonaf_species_per_trait,
-    plot_number_species_per_try_trait(glonaf_species_per_trait)
+    plot_number_species_per_try_trait(
+      glonaf_species_per_trait, glonaf_bien_species_per_trait
+    )
   ),
   tar_target(
     fig_trait_combination_frequency,

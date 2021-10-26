@@ -11,16 +11,32 @@ plot_trait_number_try_glonaf_species = function(try_number_trait) {
           panel.grid = element_blank())
 }
 
-plot_number_species_per_try_trait = function(try_number_species_per_trait) {
-  try_number_species_per_trait %>%
+plot_number_species_per_try_trait = function(
+  try_number_species_per_trait,
+  bien_number_species_per_trait) {
+  list(
+    try_open = try_number_species_per_trait %>%
+      rename(trait_name = TraitName),
+    bien     = bien_number_species_per_trait
+  ) %>%
+    bind_rows(.id = "trait_db") %>%
+    group_by(trait_db) %>%
     slice_max(n_sp, n = 15) %>%
-    ggplot(aes(n_sp, TraitName)) +
+    ungroup() %>%
+    mutate(trait_name = forcats::fct_reorder(factor(trait_name), n_sp)) %>%
+    ggplot(aes(n_sp, trait_name)) +
     geom_point() +
+    facet_wrap(
+      vars(trait_db), scales = "free_y",
+      labeller = labeller(
+        trait_db = as_labeller(c(bien = "BIEN", try_open = "TRY (open)"))
+      )
+    ) +
     scale_x_log10(name = "Number of species measured") +
     scale_y_discrete(labels = scales::wrap_format(25)) +
     labs(y = "Trait name",
-         title = "15 Most frequent trait in TRY from GloNAF species (15k)",
-         caption = "All TRY open data") +
+         title = "15 most frequently measured trait",
+         caption = "All TRY open data; All BIEN trait data") +
     theme_bw() +
     theme(aspect.ratio = 1)
 }
