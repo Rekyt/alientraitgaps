@@ -119,6 +119,15 @@ list(
     try_trait_combinations,
     list_trait_combination_per_species(glonaf_try_traits_available)
   ),
+  tar_target(
+    try_top_traits,
+    select_most_measured_traits(glonaf_species_per_trait, 100)
+  ),
+  tar_target(
+    try_trait_combinations_top_traits,
+    semi_join(glonaf_try_traits_available, try_top_traits, by = "TraitName") %>%
+      list_trait_combination_per_species()
+  ),
 
 
   # BIEN traits ----------------------------------------------------------------
@@ -168,17 +177,26 @@ list(
       glonaf_try_traits_available, harmonized_try_glonaf
     )
   ),
-  # Number of tuples to consider
-  tar_target(
-    trait_tuples,
-    c(2:5)
-  ),
-  # Count number of tuples
-  tar_target(
-    trait_comb_number,
-    count_tuples_of_traits(bien_trait_combinations[["trait_names"]],
-                           trait_tuples),
-    pattern = map(trait_tuples)
+  # Count number of tuples among both trait datasets
+  tarchetypes::tar_map(
+    # Prepare data frame of parameters
+    values = tibble::tibble(
+      trait_comb = rlang::syms(
+        c("bien_trait_combinations", "try_trait_combinations_top_traits")
+      ),
+      trait_db = c("bien", "try_open")
+    ) %>%
+      tidyr::expand_grid(tuple_number = 2:5) %>%
+      # Remove cases where trait combinations are too numerous to count
+      dplyr::filter(!(trait_db == "try_open" & tuple_number >= 4)),
+    names = c("trait_db", "tuple_number"),
+    # Actual target
+    tar_target(
+      trait_comb_number,
+      count_tuples_of_traits(
+        trait_comb[["trait_names"]], tuple_number, trait_db
+      )
+    )
   ),
 
 
