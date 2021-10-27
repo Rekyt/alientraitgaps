@@ -53,6 +53,16 @@ list(
     full_try_df,
     disk.frame::disk.frame(raw_full_try)
   ),
+  # TRY trait number and trait id file
+  tar_target(
+    raw_try_traits,
+    here::here("inst", "exdata", "try", "try_trait_table_tde20211027142952.txt"),
+    format = "file"
+  ),
+  tar_target(
+    try_traits,
+    readr::read_delim(raw_try_traits, skip = 3, col_select = -6)
+  ),
   # Load species file
   tar_target(
     try_species,
@@ -157,6 +167,18 @@ list(
       glonaf_bien_traits_count, try_total_number_trait,
       glonaf_try_traits_available, harmonized_try_glonaf
     )
+  ),
+  # Number of tuples to consider
+  tar_target(
+    trait_tuples,
+    c(2:5)
+  ),
+  # Count number of tuples
+  tar_target(
+    trait_comb_number,
+    count_tuples_of_traits(bien_trait_combinations[["trait_names"]],
+                           trait_tuples),
+    pattern = map(trait_tuples)
   ),
 
 

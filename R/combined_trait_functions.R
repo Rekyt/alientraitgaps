@@ -32,3 +32,16 @@ rank_species_trait_number = function(
     mutate(species_trait_number_rank = row_number()) %>%
     ungroup()
 }
+
+count_tuples_of_traits = function(list_of_lists, number_of_traits) {
+  list_of_lists %>%
+    purrr::keep(~ length(.x) > (number_of_traits - 1)) %>%
+    purrr::map(~ combn(.x, number_of_traits, simplify = FALSE)) %>%
+    purrr::modify_depth(2, sort) %>%
+    purrr::flatten() %>%
+    purrr::map_chr(paste, collapse = " x ") %>%
+    table() %>%
+    sort(decreasing = TRUE) %>%
+    tibble::enframe(name = "trait_combination", value = "n_species") %>%
+    mutate(trait_number = number_of_traits)
+}
