@@ -204,6 +204,39 @@ list(
     command = dplyr::bind_rows(!!!.x)
   ),
 
+  tar_target(
+    try_diaz_combinations,
+    generate_all_possible_diaz_combinations(try_traits)
+  ),
+  tar_target(
+    try_lhs_combinations,
+    generate_all_possible_lhs_combinations(try_traits)
+  ),
+
+  # See if LHS and Diaz combinations of trait are there
+  trait_db_lhs_diaz_count <- tarchetypes::tar_map(
+    values = tibble::tibble(
+      trait_comb = rlang::syms(
+        c("bien_trait_combinations", "try_trait_combinations")
+      ),
+      db = c("bien", "try_open")
+    ),
+    names = "db",
+    tar_target(
+      lhs_diaz_count,
+      count_lhs_diaz_combination_trait(trait_comb, try_diaz_combinations,
+                                       try_lhs_combinations, db)
+    )
+  ),
+  tarchetypes::tar_combine(
+    lhs_diaz_count,
+    trait_db_lhs_diaz_count,
+    command = dplyr::bind_rows(!!!.x, .id = "db") %>%
+      select(-trait_names) %>%
+      group_by(db) %>%
+      summarise(n_sp = n(), contains_lhs = sum(contains_lhs), contains_diaz = sum(contains_diaz))
+  ),
+
 
   # InvaCost -------------------------------------------------------------------
   # Get InvaCost data

@@ -46,3 +46,86 @@ count_tuples_of_traits = function(list_of_lists, number_of_traits, trait_db) {
     mutate(trait_number = number_of_traits,
            trait_db     = trait_db)
 }
+
+generate_all_possible_diaz_combinations = function(try_traits) {
+
+  # List all possible combinations of traits that could be considered
+  # valid list of Diaz traits
+  try_diaz_comb = purrr::cross(
+    list(seed_mass = 26,
+         plant_height = 3106,
+         leaf_area = c(3108:3113),
+         leaf_mass_area = c(3086, 3115:3117),
+         leaf_nitrogen_mass = 14,
+         wood_density = 4)
+  ) %>%
+    purrr::map(
+      ~.x %>%
+        tibble::enframe("trait_code", "TraitID") %>%
+        mutate(TraitID = as.numeric(TraitID)) %>%
+        select(-trait_code) %>%
+        inner_join(try_traits %>%
+                     select(Trait, TraitID),
+                   by = "TraitID") %>%
+        pull(Trait)
+    )
+
+}
+
+generate_all_possible_lhs_combinations = function(try_traits) {
+
+  # List all possible combinations of traits that could be considered
+  # valid list of LHS traits
+  try_lhs_comb = purrr::cross(
+    list(seed_mass = 26,
+         plant_height = 3106,
+         leaf_mass_area = c(3086, 3115:3117))
+  ) %>%
+    purrr::map(
+      ~.x %>%
+        tibble::enframe("trait_code", "TraitID") %>%
+        mutate(TraitID = as.numeric(TraitID)) %>%
+        select(-trait_code) %>%
+        inner_join(try_traits %>%
+                     select(Trait, TraitID),
+                   by = "TraitID") %>%
+        pull(Trait)
+    )
+
+}
+
+count_lhs_diaz_combination_trait = function(trait_comb, try_diaz_combs,
+                                            try_lhs_combs, db) {
+  lhs = ifelse(
+    db == "bien",
+    list(c("leaf area per leaf dry mass", "seed mass", "whole plant height")),
+    # For TRY has to take into account the diversity of SLA types
+    try_lhs_combs
+  )
+
+
+  diaz = ifelse(
+    db == "bien",
+    list(c(
+      "leaf area per leaf dry mass", "seed mass", "whole plant height",
+      "leaf area", "stem wood density",
+      "leaf nitrogen content per leaf dry mass"
+    )),
+    try_diaz_combs
+  )
+
+  trait_comb %>%
+    mutate(
+      contains_lhs = purrr::map_lgl(
+        trait_names, # Apply function for each row
+        # Check that all traits in combination are in trait list
+        function(x) purrr::map_lgl(lhs, function(y) all(y %in% x)) %>%
+          any()  # If any combination matches
+      ),
+      contains_diaz = purrr::map_lgl(
+        trait_names,
+        function(x) purrr::map_lgl(diaz, function(y) all(y %in% x)) %>%
+          any()
+      )
+    )
+}
