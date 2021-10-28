@@ -178,7 +178,7 @@ list(
     )
   ),
   # Count number of tuples among both trait datasets
-  tarchetypes::tar_map(
+  trait_combs <- tarchetypes::tar_map(
     # Prepare data frame of parameters
     values = tibble::tibble(
       trait_comb = rlang::syms(
@@ -197,6 +197,11 @@ list(
         trait_comb[["trait_names"]], tuple_number, trait_db
       )
     )
+  ),
+  tarchetypes::tar_combine(
+    numbers_trait_combinations,
+    trait_combs,
+    command = dplyr::bind_rows(!!!.x)
   ),
 
 
@@ -255,6 +260,10 @@ list(
   tar_target(
     fig_trait_ranks_multi_db,
     plot_trait_ranks_multi_db(glonaf_trait_ranks)
+  ),
+  tar_target(
+    fig_species_per_trait_combinations_multi_db,
+    plot_species_trait_combinations(numbers_trait_combinations)
   )
 ) %>%
   # Convert figures into ggplotGrob() to take less space

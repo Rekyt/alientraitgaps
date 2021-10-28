@@ -73,3 +73,32 @@ plot_trait_ranks_multi_db = function(glonaf_trait_ranks) {
     theme_bw() +
     theme(aspect.ratio = 1)
 }
+
+plot_species_trait_combinations = function(numbers_trait_combinations,
+                                           n_rank = 1e3) {
+  numbers_trait_combinations %>%
+    group_by(trait_db, trait_number) %>%
+    arrange(desc(n_species)) %>%
+    mutate(n_group = row_number()) %>%
+    ungroup() %>%
+    filter(n_group <= n_rank) %>%
+    ggplot(aes(n_group, n_species, color = as.factor(trait_number))) +
+    geom_line(size = 1) +
+    geom_hline(yintercept = 1.5e4, linetype = 2, color = "darkred", size = 1) +
+    facet_grid(
+      cols = vars(trait_db),
+      labeller = labeller(trait_db = c(bien     = "BIEN",
+                                       try_open = "TRY (open)"))
+    ) +
+    scale_x_continuous(name = "Rank of combination of traits") +
+    scale_y_log10(name = "Number of species") +
+    scale_color_viridis_d(name = "Number of Traits") +
+    labs(
+      title = "Number of species per combinations of traits in both database",
+      caption = paste0("Showing the ", n_rank, " most numerous combinations;\n",
+                       "Dashed line indicates total species in GloNAF")
+    ) +
+    theme_bw() +
+    theme(aspect.ratio = 1,
+          legend.position = "top")
+}
