@@ -121,7 +121,7 @@ list(
   ),
   tar_target(
     try_top_traits,
-    select_most_measured_traits(glonaf_species_per_trait, 100)
+    select_most_measured_traits(glonaf_species_per_trait, 52)
   ),
   tar_target(
     try_trait_combinations_top_traits,
