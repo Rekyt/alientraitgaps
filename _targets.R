@@ -98,9 +98,16 @@ list(
     harmonized_try_glonaf,
     harmonize_try_glonaf_species(match_try_tnrs, match_glonaf_tnrs)
   ),
+  # Get back AccSpeciesID after matching
   tar_target(
     harmonized_try_ids,
     get_try_ids_from_harmonized_species(harmonized_try_glonaf, try_species)
+  ),
+
+  # Match TRY open data extract
+  tar_target(
+    try_open_species,
+    harmonize_try_open(full_try_df, harmonized_try_glonaf)
   ),
 
   # Query TRY traits for GloNAF species ----------------------------------------
