@@ -169,6 +169,16 @@ list(
 
 
   # Combine Trait Data ---------------------------------------------------------
+  # Combine both trait data from TRY and BIEN
+  tar_target(
+    consolidated_trait_names,
+    consolidate_trait_names(bien_try_convert_df, try_traits)
+  ),
+  tar_target(
+    combined_traits,
+    combine_bien_try_traits(consolidated_trait_names, glonaf_bien_traits,
+                            glonaf_try_traits_available)
+  ),
   # Rank species per trait number in each database
   tar_target(
     glonaf_trait_ranks,
@@ -234,7 +244,9 @@ list(
     command = dplyr::bind_rows(!!!.x, .id = "db") %>%
       select(-trait_names) %>%
       group_by(db) %>%
-      summarise(n_sp = n(), contains_lhs = sum(contains_lhs), contains_diaz = sum(contains_diaz))
+      summarise(n_sp          = n(),
+                contains_lhs  = sum(contains_lhs),
+                contains_diaz = sum(contains_diaz))
   ),
 
 
