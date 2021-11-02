@@ -128,7 +128,7 @@ list(
   ),
   tar_target(
     try_top_traits,
-    select_most_measured_traits(glonaf_species_per_trait, 52)
+    select_most_measured_traits(glonaf_species_per_trait, 15)
   ),
   tar_target(
     try_trait_combinations_top_traits,
@@ -203,9 +203,7 @@ list(
       ),
       trait_db = c("bien", "try_open")
     ) %>%
-      tidyr::expand_grid(tuple_number = 2:5) %>%
-      # Remove cases where trait combinations are too numerous to count
-      dplyr::filter(!(trait_db == "try_open" & tuple_number >= 4)),
+      tidyr::expand_grid(tuple_number = 2:5),
     names = c("trait_db", "tuple_number"),
     # Actual target
     tar_target(
