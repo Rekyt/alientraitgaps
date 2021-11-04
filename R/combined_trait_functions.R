@@ -134,36 +134,37 @@ generate_all_possible_lhs_combinations = function(try_traits) {
 
 count_lhs_diaz_combination_trait = function(trait_comb, try_diaz_combs,
                                             try_lhs_combs, db) {
-  lhs = ifelse(
-    db == "bien",
-    list(c("leaf area per leaf dry mass", "seed mass", "whole plant height")),
-    # For TRY has to take into account the diversity of SLA types
-    try_lhs_combs
-  )
 
+  # Define allowable LHS combinations
+  if(db == "bien") {
+    lhs = list(
+      c("leaf area per leaf dry mass", "seed mass", "whole plant height")
+    )
+  } else {
+    lhs = try_lhs_combs
+  }
 
-  diaz = ifelse(
-    db == "bien",
-    list(c(
-      "leaf area per leaf dry mass", "seed mass", "whole plant height",
-      "leaf area", "stem wood density",
-      "leaf nitrogen content per leaf dry mass"
-    )),
-    try_diaz_combs
-  )
+  # Define allowable Diaz traits combinations
+  if(db == "bien") {
+    diaz = list(
+      c(
+        "leaf area per leaf dry mass", "seed mass", "whole plant height",
+        "leaf area", "stem wood density",
+        "leaf nitrogen content per leaf dry mass"
+      )
+    )
+  } else {
+    diaz = try_diaz_combs
+  }
 
   trait_comb %>%
+    rowwise() %>%
     mutate(
-      contains_lhs = purrr::map_lgl(
-        trait_names, # Apply function for each row
-        # Check that all traits in combination are in trait list
-        function(x) purrr::map_lgl(lhs, function(y) all(y %in% x)) %>%
-          any()  # If any combination matches
-      ),
-      contains_diaz = purrr::map_lgl(
-        trait_names,
-        function(x) purrr::map_lgl(diaz, function(y) all(y %in% x)) %>%
-          any()
-      )
+      contains_lhs = lhs %>%  # For each LHS combination
+        purrr::map_lgl(~ all(.x %in% trait_names)) %>%  # Test if measured
+        any(),  # Any of them is fine
+      contains_diaz = diaz %>%  # For each Diaz combination
+        purrr::map_lgl(~ all(.x %in% trait_names)) %>%  # Test if measured
+        any()  # Any of them is fine
     )
 }
