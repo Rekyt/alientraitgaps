@@ -290,6 +290,13 @@ list(
 
   # Make figures ---------------------------------------------------------------
   tar_target(
+    pfig_euler_number_glonaf_species,
+    plot_euler_diagram_glonaf_species_in_databases(
+      match_glonaf_tnrs, harmonized_try_glonaf, try_open_species,
+      glonaf_bien_traits_count
+    )
+  ),
+  tar_target(
     fig_glonaf_species_number_trait,
     plot_trait_number_try_glonaf_species(try_total_number_trait)
   ),

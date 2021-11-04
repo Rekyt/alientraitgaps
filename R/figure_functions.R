@@ -1,3 +1,36 @@
+plot_euler_diagram_glonaf_species_in_databases = function(
+  match_glonaf_tnrs, harmonized_try_glonaf, try_open_species,
+  glonaf_bien_traits_count
+) {
+  glonaf_species = match_glonaf_tnrs %>%
+    distinct(Accepted_species) %>%
+    pull(Accepted_species)
+
+  try_full_species = harmonized_try_glonaf %>%
+    pull(species_accepted_try) %>%
+    unique()
+
+  try_open_species = try_open_species %>%
+    pull(species_accepted_try) %>%
+    unique()
+
+  bien_species = glonaf_bien_traits_count %>%
+    pull(scrubbed_species_binomial) %>%
+    unique()
+
+
+  full_list = list(
+    glonaf   = glonaf_species,
+    try_full = try_full_species,
+    try_open = try_open_species,
+    bien     = bien_species
+  )
+
+  euler_diagram = eulerr::euler(
+    full_list
+  )
+}
+
 plot_trait_number_try_glonaf_species = function(try_number_trait) {
   try_number_trait %>%
     ggplot(aes(trait_number)) +
