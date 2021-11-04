@@ -85,12 +85,30 @@ list(
     glonaf_list, extract_glonaf_list(glonaf_alien_species)
   ),
 
+
+  # Load AusTraits data --------------------------------------------------------
+  tar_target(
+    austraits,
+    austraits::load_austraits("inst/exdata/austraits")
+  ),
+  tar_target(
+    austraits_species,
+    austraits[["taxa"]]
+  ),
+  tar_target(
+    austraits_list,
+    unique(austraits_species[["taxon_name"]])
+  ),
+
   # Match databases against TNRS -----------------------------------------------
   tar_target(
     match_try_tnrs, TNRS::TNRS(try_list)
   ),
   tar_target(
     match_glonaf_tnrs, TNRS::TNRS(glonaf_list)
+  ),
+  tar_target(
+    match_austraits_tnrs, TNRS::TNRS(austraits_list),
   ),
 
   # Harmonize TRY and GloNAF ---------------------------------------------------
