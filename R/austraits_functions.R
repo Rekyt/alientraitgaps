@@ -38,3 +38,9 @@ get_austraits_trait_combinations = function(aus_traits) {
     dplyr::group_by(species = species_accepted_austraits) %>%
     dplyr::summarise(trait_names = list(trait_name))
 }
+
+get_austraits_top_trait_combinations = function(aus_traits, aus_top_traits) {
+  aus_traits %>%
+    semi_join(aus_top_traits, by = "trait_name") %>%
+    get_austraits_trait_combinations()
+}

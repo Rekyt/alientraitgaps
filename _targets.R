@@ -211,6 +211,14 @@ list(
     aus_trait_combinations,
     get_austraits_trait_combinations(aus_traits)
   ),
+  tar_target(
+    aus_top_traits,
+    dplyr::slice_max(aus_species_per_trait, n_sp, n = 20)
+  ),
+  tar_target(
+    aus_top_trait_combinations,
+    get_austraits_top_trait_combinations(aus_traits, aus_top_traits)
+  ),
 
 
   # Other Trait Data -----------------------------------------------------------
@@ -246,7 +254,7 @@ list(
     values = tibble::tibble(
       trait_comb = rlang::syms(
         c("bien_trait_combinations", "try_trait_combinations_top_traits",
-          "aus_trait_combinations")
+          "aus_top_trait_combinations")
       ),
       trait_db = c("bien", "try_open", "aus_traits")
     ) %>%
