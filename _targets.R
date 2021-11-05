@@ -1,9 +1,10 @@
-# Actual workflow file that describe all analyses
+# Actual workflow file to run all analyses
 
-# Initial options --------------------------------------------------------------
+# Packages and functions -------------------------------------------------------
 library("targets")
 library("magrittr")
 
+source("R/austraits_functions.R")
 source("R/bien_functions.R")
 source("R/combined_trait_functions.R")
 source("R/extract_try_list.R")
@@ -14,6 +15,7 @@ source("R/harmonize_functions.R")
 source("R/invacost_functions.R")
 source("R/tr8_functions.R")
 
+# Initial options --------------------------------------------------------------
 tar_option_set(
   packages = c("data.table", "disk.frame", "dplyr", "ggplot2", "here", "TNRS",
                "TR8")
@@ -184,6 +186,19 @@ list(
     list_bien_trait_combination_per_species(glonaf_bien_traits)
   ),
 
+
+  # AusTraits traits -----------------------------------------------------------
+  # Match GloNAF to AusTraits
+  tar_target(
+    harmonized_austraits_glonaf,
+    harmonize_austraits_glonaf(match_austraits_tnrs, match_glonaf_tnrs)
+  ),
+  tar_target(
+    austraits_traits,
+    get_austraits_traits_for_glonaf_species(
+      austraits, harmonized_austraits_glonaf
+    )
+  ),
 
   # Other Trait Data -----------------------------------------------------------
   # Query all possible traits on many databases through TR8
