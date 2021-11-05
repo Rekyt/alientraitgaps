@@ -120,8 +120,9 @@ plot_species_trait_combinations = function(numbers_trait_combinations,
     geom_hline(yintercept = 1.5e4, linetype = 2, color = "darkred", size = 1) +
     facet_grid(
       cols = vars(trait_db),
-      labeller = labeller(trait_db = c(bien     = "BIEN",
-                                       try_open = "TRY (open)"))
+      labeller = labeller(trait_db = c(bien      = "BIEN",
+                                       try_open  = "TRY (open)",
+                                       austraits = "AusTraits"))
     ) +
     scale_x_continuous(name = "Rank of combination of traits") +
     scale_y_log10(name = "Number of species") +

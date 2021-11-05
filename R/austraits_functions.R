@@ -21,3 +21,20 @@ get_austraits_traits_for_glonaf_species = function(
     arrange(species_accepted_austraits, trait_name) %>%
     filter(species_accepted_austraits != "")
 }
+
+
+count_austraits_species_per_trait = function(aus_traits) {
+  aus_traits %>%
+    dplyr::count(trait_name, sort = TRUE, name = "n_sp")
+}
+
+count_austraits_trait_per_species = function(aus_traits) {
+  aus_traits %>%
+    dplyr::count(species_accepted_austraits, sort = TRUE, name = "n_traits")
+}
+
+get_austraits_trait_combinations = function(aus_traits) {
+  aus_traits %>%
+    dplyr::group_by(species = species_accepted_austraits) %>%
+    dplyr::summarise(trait_names = list(trait_name))
+}

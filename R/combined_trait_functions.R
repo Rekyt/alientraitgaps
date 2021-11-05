@@ -140,6 +140,10 @@ count_lhs_diaz_combination_trait = function(trait_comb, try_diaz_combs,
     lhs = list(
       c("leaf area per leaf dry mass", "seed mass", "whole plant height")
     )
+  } else if (db == "austraits") {
+    lhs = list(
+      c("specific_leaf_area", "seed_mass", "plant_height")
+    )
   } else {
     lhs = try_lhs_combs
   }
@@ -152,6 +156,11 @@ count_lhs_diaz_combination_trait = function(trait_comb, try_diaz_combs,
         "leaf area", "stem wood density",
         "leaf nitrogen content per leaf dry mass"
       )
+    )
+  } else if (db == "austraits") {
+    diaz = list(
+      c("specific_leaf_area", "seed_mass", "plant_height", "leaf_area",
+        "wood_density", "leaf_N_per_dry_mass")
     )
   } else {
     diaz = try_diaz_combs

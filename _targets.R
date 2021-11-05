@@ -160,12 +160,12 @@ list(
   # BIEN traits ----------------------------------------------------------------
   # List BIEN traits
   tar_target(
-    bien_traits,
+    bien_trait_list,
     BIEN::BIEN_trait_list()
   ),
   tar_target(
     bien_try_convert_df,
-    make_bien_try_correspond(bien_traits)
+    make_bien_try_correspond(bien_trait_list)
   ),
 
   # Query BIEN traits for GloNAF species
@@ -194,11 +194,24 @@ list(
     harmonize_austraits_glonaf(match_austraits_tnrs, match_glonaf_tnrs)
   ),
   tar_target(
-    austraits_traits,
+    aus_traits,
     get_austraits_traits_for_glonaf_species(
       austraits, harmonized_austraits_glonaf
     )
   ),
+  tar_target(
+    aus_species_per_trait,
+    count_austraits_species_per_trait(aus_traits),
+  ),
+  tar_target(
+    aus_trait_per_species,
+    count_austraits_trait_per_species(aus_traits)
+  ),
+  tar_target(
+    aus_trait_combinations,
+    get_austraits_trait_combinations(aus_traits)
+  ),
+
 
   # Other Trait Data -----------------------------------------------------------
   # Query all possible traits on many databases through TR8
@@ -232,9 +245,10 @@ list(
     # Prepare data frame of parameters
     values = tibble::tibble(
       trait_comb = rlang::syms(
-        c("bien_trait_combinations", "try_trait_combinations_top_traits")
+        c("bien_trait_combinations", "try_trait_combinations_top_traits",
+          "aus_trait_combinations")
       ),
-      trait_db = c("bien", "try_open")
+      trait_db = c("bien", "try_open", "aus_traits")
     ) %>%
       tidyr::expand_grid(tuple_number = 2:5),
     names = c("trait_db", "tuple_number"),
@@ -265,9 +279,10 @@ list(
   trait_db_lhs_diaz_count <- tarchetypes::tar_map(
     values = tibble::tibble(
       trait_comb = rlang::syms(
-        c("bien_trait_combinations", "try_trait_combinations")
+        c("bien_trait_combinations", "try_trait_combinations",
+          "aus_trait_combinations")
       ),
-      db = c("bien", "try_open")
+      db = c("bien", "try_open", "austraits")
     ),
     names = "db",
     tar_target(
