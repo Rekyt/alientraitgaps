@@ -62,7 +62,8 @@ plot_number_species_per_try_trait = function(
     facet_wrap(
       vars(trait_db), scales = "free_y",
       labeller = labeller(
-        trait_db = as_labeller(c(bien = "BIEN", try_open = "TRY (open)"))
+        trait_db = c(bien = "BIEN", try_open = "TRY (open)",
+                     aus_traits = "AusTraits")
       )
     ) +
     scale_x_log10(name = "Number of species measured") +
@@ -90,7 +91,7 @@ plot_trait_ranks_multi_db = function(glonaf_trait_ranks) {
     filter(trait_number > 0) %>%
     mutate(trait_db = factor(trait_db,
                              levels = c("bien", "try_full", "try_extract"))
-           ) %>%
+    ) %>%
     ggplot(aes(species_trait_number_rank, trait_number, color = trait_db)) +
     geom_point(size = 2/3) +
     scale_y_log10(name = "Number of traits") +
@@ -122,7 +123,7 @@ plot_species_trait_combinations = function(numbers_trait_combinations,
       cols = vars(trait_db),
       labeller = labeller(trait_db = c(bien      = "BIEN",
                                        try_open  = "TRY (open)",
-                                       austraits = "AusTraits"))
+                                       aus_traits = "AusTraits"))
     ) +
     scale_x_continuous(name = "Rank of combination of traits") +
     scale_y_log10(name = "Number of species") +
