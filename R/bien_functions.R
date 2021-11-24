@@ -27,6 +27,7 @@ make_bien_try_correspond = function(bien_traits) {
       trait_name == "leaf area"                         ~ list(c(3108:3113)),
       trait_name == "leaf area per leaf dry mass" ~ list(c(3086, 3115:3117)),
       trait_name == "leaf carbon content per leaf area" ~ list(570),
+      trait_name == "leaf carbon content per leaf dry mass" ~ list(13),
       # leaf C/N ratio
       trait_name == "leaf carbon content per leaf nitrogen content" ~ list(146),
       trait_name == "leaf compoundness" ~ list(17),

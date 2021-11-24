@@ -12,11 +12,13 @@ harmonize_austraits_glonaf = function(match_austraits_tnrs, match_glonaf_tnrs) {
 make_austraits_try_traits_correspond = function(austraits_try_convert) {
   austraits_try_convert %>%
     filter(!is.na(trait_name)) %>%
-    select(trait_name, try_name = `TRY name`, trait_ids = `TRY number`) %>%
+    select(aus_trait_name = trait_name,
+           try_trait_name = `TRY name`,
+           try_trait_id   = `TRY number`) %>%
+    # Convert list of traits ids from character to actual list of integers
     mutate(
-      trait_ids = purrr::map(
-        trait_ids, function(trait_id_list) {
-
+      try_trait_id = purrr::map(
+        try_trait_id, function(trait_id_list) {
           if (!is.na(trait_id_list)) {
             # Split list by non words chararacters
             strsplit(trait_id_list, "\\W+") %>%
@@ -28,6 +30,16 @@ make_austraits_try_traits_correspond = function(austraits_try_convert) {
         }
       )
     )
+}
+
+make_austraits_bien_traits_correspond = function(
+  aus_try_convert_df, bien_try_convert_df) {
+
+  tibble::tribble(
+    ~bien_trait_name, ~aus_trait_name,
+    "plant flowering duration", "flowering_time",
+    "plant fruiting duration",  "fruiting_time"
+  )
 }
 
 get_austraits_traits_for_glonaf_species = function(

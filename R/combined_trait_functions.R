@@ -1,39 +1,76 @@
-consolidate_trait_names = function(bien_try_convert_df, try_traits) {
+consolidate_trait_names = function(bien_try_convert_df, aus_try_convert_df,
+                                   aus_bien_convert_df, try_traits) {
+
+  # Get BIEN <-> TRY traits tabke
   bien_try_convert_df %>%
-    rename(TraitID = trait_ids) %>%
-    tidyr::unnest(TraitID) %>%
-    full_join(try_traits %>%
-                select(TraitID, Trait),
-              by = "TraitID") %>%
-    mutate(consolidated_trait_name = case_when(
-      !is.na(trait_name) ~ trait_name,
-      TRUE ~ Trait
+    rename(
+      bien_trait_name = trait_name,
+      try_trait_id    = trait_ids) %>%
+    tidyr::unnest(try_trait_id) %>%
+    # Add all TRY traits (with corresponding full names)
+    full_join(
+      try_traits %>%
+        select(TraitID, try_trait_name = Trait),
+      by = c(try_trait_id = "TraitID")
+    ) %>%
+    # Add AusTrait with correspondence to TRY traits
+    full_join(
+      aus_try_convert_df %>%
+        tidyr::unnest(try_trait_id) %>%
+        filter(!is.na(try_trait_id)),
+      by = c("try_trait_name", "try_trait_id")
+    ) %>%
+    # Add AusTraits with no correspondence in TRY but in BIEN
+    bind_rows(
+      aus_bien_convert_df
+    ) %>%
+    # Add the rest of AusTraits (not in TRY nor in BIEN)
+    bind_rows(
+      aus_try_convert_df %>%
+        tidyr::unnest(try_trait_id) %>%
+        filter(is.na(try_trait_id)) %>%
+        anti_join(aus_bien_convert_df, by = "aus_trait_name")
+    ) %>%
+    # Consolidate all names
+    # Naming is BIEN > AusTraits > TRY
+    mutate(consolidated_name = case_when(
+      !is.na(bien_trait_name) ~ bien_trait_name,
+      !is.na(aus_trait_name) ~ aus_trait_name,
+      TRUE ~ try_trait_name
     )) %>%
-    rename(bien_trait_name = trait_name,
-           try_trait_id    = TraitID,
-           try_trait_name  = Trait)
+    select(bien_trait_name, aus_trait_name, try_trait_id, try_trait_name,
+           consolidated_name)
 }
 
-combine_bien_try_traits = function(consolidated_trait_names, glonaf_bien_traits,
-                                   glonaf_try_traits_available) {
+combine_bien_try_aus_traits = function(
+  consolidated_trait_names, glonaf_bien_traits, glonaf_try_traits_available,
+  aus_traits
+) {
   bien_distinct_traits = glonaf_bien_traits %>%
-    distinct(scrubbed_species_binomial, trait_name)
+    distinct(species = scrubbed_species_binomial, bien_trait_name = trait_name)
+
+  aus_distinct_traits = aus_traits %>%
+    distinct(species = species_accepted_austraits, aus_trait_name = trait_name)
 
   try_distinct_traits = glonaf_try_traits_available %>%
-    distinct(species_accepted_try, TraitName)
+    distinct(species = species_accepted_try, try_trait_id = TraitID)
 
   list(
+    # BIEN
     consolidated_trait_names %>%
       inner_join(bien_distinct_traits,
-                 by = c(bien_trait_name = "trait_name")) %>%
-      rename(species = scrubbed_species_binomial),
+                 by = "bien_trait_name"),
+    # AusTraits
+    consolidated_trait_names %>%
+      inner_join(aus_distinct_traits,
+                 by = "aus_trait_name"),
+    # TRY
     consolidated_trait_names %>%
       inner_join(try_distinct_traits,
-                 by = c(try_trait_name = "TraitName")) %>%
-      rename(species = species_accepted_try)
+                 by = "try_trait_id")
   ) %>%
     bind_rows() %>%
-    distinct(consolidated_trait_name, species)
+    distinct(consolidated_name, species)
 }
 
 rank_species_trait_number = function(

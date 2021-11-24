@@ -108,7 +108,7 @@ list(
   ),
   tar_target(
     austraits_try_convert,
-    readxl::read_xlsx(raw_austraits_try_convert_table)
+    readxl::read_xlsx(raw_austraits_try_convert_table, na = c("", "NA"))
   ),
 
   # Match databases against TNRS -----------------------------------------------
@@ -209,6 +209,14 @@ list(
     make_austraits_try_traits_correspond(austraits_try_convert)
   ),
 
+  # Make correspondance between AusTraits and BIEN (for the one not in TRY)
+  tar_target(
+      aus_bien_convert_df,
+    make_austraits_bien_traits_correspond(
+      aus_try_convert_df, bien_try_convert_df
+    )
+  ),
+
   # Get and count trait data
   tar_target(
     aus_traits,
@@ -247,15 +255,18 @@ list(
 
 
   # Combine Trait Data ---------------------------------------------------------
-  # Combine both trait data from TRY and BIEN
+  # Combine both trait data from BIEN, AusTraits, and TRY
   tar_target(
     consolidated_trait_names,
-    consolidate_trait_names(bien_try_convert_df, try_traits)
+    consolidate_trait_names(bien_try_convert_df, aus_try_convert_df,
+                            aus_bien_convert_df, try_traits)
   ),
   tar_target(
     combined_traits,
-    combine_bien_try_traits(consolidated_trait_names, glonaf_bien_traits,
-                            glonaf_try_traits_available)
+    combine_bien_try_aus_traits(
+      consolidated_trait_names, glonaf_bien_traits, glonaf_try_traits_available,
+      aus_traits
+    )
   ),
   # Rank species per trait number in each database
   tar_target(
