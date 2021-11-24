@@ -101,6 +101,15 @@ list(
     austraits_list,
     unique(austraits_species[["taxon_name"]])
   ),
+  tar_target(
+    raw_austraits_try_convert_table,
+    here("inst", "exdata", "austraits", "AusTraits-TRY matches.xlsx"),
+    format = "file"
+  ),
+  tar_target(
+    austraits_try_convert,
+    readxl::read_xlsx(raw_austraits_try_convert_table)
+  ),
 
   # Match databases against TNRS -----------------------------------------------
   tar_target(
@@ -193,6 +202,14 @@ list(
     harmonized_austraits_glonaf,
     harmonize_austraits_glonaf(match_austraits_tnrs, match_glonaf_tnrs)
   ),
+
+  # Make correspondance between AusTraits and TRY
+  tar_target(
+    aus_try_convert_df,
+    make_austraits_try_traits_correspond(austraits_try_convert)
+  ),
+
+  # Get and count trait data
   tar_target(
     aus_traits,
     get_austraits_traits_for_glonaf_species(

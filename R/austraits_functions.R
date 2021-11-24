@@ -9,6 +9,27 @@ harmonize_austraits_glonaf = function(match_austraits_tnrs, match_glonaf_tnrs) {
       by = c(species_accepted_austraits = "species_accepted_glonaf"))
 }
 
+make_austraits_try_traits_correspond = function(austraits_try_convert) {
+  austraits_try_convert %>%
+    filter(!is.na(trait_name)) %>%
+    select(trait_name, try_name = `TRY name`, trait_ids = `TRY number`) %>%
+    mutate(
+      trait_ids = purrr::map(
+        trait_ids, function(trait_id_list) {
+
+          if (!is.na(trait_id_list)) {
+            # Split list by non words chararacters
+            strsplit(trait_id_list, "\\W+") %>%
+              .[[1]] %>%
+              as.integer()
+          } else {
+            NA_integer_
+          }
+        }
+      )
+    )
+}
+
 get_austraits_traits_for_glonaf_species = function(
   austraits, harmonized_austraits_glonaf
 ) {
