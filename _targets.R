@@ -255,7 +255,7 @@ list(
 
 
   # Combine Trait Data ---------------------------------------------------------
-  # Combine both trait data from BIEN, AusTraits, and TRY
+  # Combine trait data from BIEN, AusTraits, and TRY under a common umbrella
   tar_target(
     consolidated_trait_names,
     consolidate_trait_names(bien_try_convert_df, aus_try_convert_df,
@@ -405,6 +405,10 @@ list(
   tar_target(
     fig_species_per_trait_combinations_multi_db,
     plot_species_trait_combinations(numbers_trait_combinations)
+  ),
+  tar_target(
+    fig_combined_trait_heatmap,
+    plot_combined_traits_heatmap(combined_traits)
   )
 ) %>%
   # Convert figures into ggplotGrob() to take less space

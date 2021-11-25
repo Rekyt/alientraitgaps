@@ -137,3 +137,32 @@ plot_species_trait_combinations = function(numbers_trait_combinations,
     theme(aspect.ratio = 1,
           legend.position = "top")
 }
+
+plot_combined_traits_heatmap = function(combined_traits) {
+
+  # Get combinations of trait measured by species ordered by frequency
+  combined_traits %>%
+    mutate(
+      species_fact = factor(species) %>%
+        forcats::fct_infreq(),
+      trait_fact  = factor(consolidated_name) %>%
+        forcats::fct_infreq(),
+      species_rank = as.numeric(species_fact),
+      trait_rank = as.numeric(trait_fact),
+      value = TRUE
+    ) %>%
+    select(species_rank, trait_rank, value) %>%
+    tidyr::complete(species_rank, trait_rank,
+                    fill = list(value = FALSE)) %>%
+    # Plot as a heatmap
+    ggplot(aes(trait_rank, species_rank, fill = value)) +
+    geom_raster() +
+    labs(x    = "Trait Rank (most to least measured)",
+         y    = "Species Rank (most to least measured)",
+         fill = "Does species has this trait?",
+         caption = paste0("Using consolidated trait data from AusTraits, ",
+                          "BIEN, and TRY")) +
+    scale_fill_viridis_d() +
+    theme_bw() +
+    theme(aspect.ratio = 1, legend.position = "top")
+}
