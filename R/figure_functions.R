@@ -1,6 +1,6 @@
 plot_euler_diagram_glonaf_species_in_databases = function(
   match_glonaf_tnrs, harmonized_try_glonaf, try_open_species,
-  glonaf_bien_traits_count
+  glonaf_bien_traits_count, match_austraits_tnrs
 ) {
   glonaf_species = match_glonaf_tnrs %>%
     distinct(Accepted_species) %>%
@@ -18,12 +18,16 @@ plot_euler_diagram_glonaf_species_in_databases = function(
     pull(scrubbed_species_binomial) %>%
     unique()
 
+  austraits_species = match_austraits_tnrs %>%
+    distinct(Accepted_species) %>%
+    pull(Accepted_species)
 
   full_list = list(
-    glonaf   = glonaf_species,
-    try_full = try_full_species,
-    try_open = try_open_species,
-    bien     = bien_species
+    glonaf    = glonaf_species,
+    try_full  = try_full_species,
+    try_open  = try_open_species,
+    bien      = bien_species,
+    austraits = austraits_species
   )
 
   euler_diagram = eulerr::euler(

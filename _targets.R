@@ -352,8 +352,6 @@ list(
     format = "file"
   ),
 
-  # Match InvaCost data
-
 
   # GBIF Occurrences -----------------------------------------------------------
   # Get GBIF ids from species name
@@ -377,7 +375,7 @@ list(
     pfig_euler_number_glonaf_species,
     plot_euler_diagram_glonaf_species_in_databases(
       match_glonaf_tnrs, harmonized_try_glonaf, try_open_species,
-      glonaf_bien_traits_count
+      glonaf_bien_traits_count, match_austraits_tnrs
     )
   ),
   tar_target(
