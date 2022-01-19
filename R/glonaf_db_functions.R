@@ -66,5 +66,6 @@ extract_glonaf_list = function(glonaf_alien_species) {
     distinct(genus, epithet, author_name) %>%
     mutate(full_name = paste(genus, epithet, author_name)) %>%
     pull(full_name) %>%
-    unique()
+    unique() %>%
+    iconv("latin1", "utf-8")
 }
