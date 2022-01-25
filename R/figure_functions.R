@@ -79,6 +79,19 @@ plot_number_species_per_try_trait = function(
     theme(aspect.ratio = 1)
 }
 
+plot_number_species_per_trait_combined = function(combined_traits) {
+  combined_traits %>%
+    count(consolidated_name, sort = TRUE, name = "n_species") %>%
+    slice_max(n_species, n = 20) %>%
+    ggplot(aes(n_species, forcats::fct_reorder(consolidated_name, n_species))) +
+    geom_point() +
+    scale_x_log10(name = "Number of species with traits") +
+    scale_y_discrete(name = "Trait name", labels = label_wrap_gen(20)) +
+    labs(title = "15 most frequently measured trait") +
+    theme_bw() +
+    theme(aspect.ratio = 1)
+}
+
 plot_glonaf_trait_combination_frequency = function(try_trait_combination,
                                                    title = "") {
   try_trait_combination %>%
@@ -169,4 +182,35 @@ plot_combined_traits_heatmap = function(combined_traits) {
     scale_fill_viridis_d() +
     theme_bw() +
     theme(aspect.ratio = 1, legend.position = "top")
+}
+
+plot_number_specific_trait_combination = function(contain_trait_combination) {
+  contain_trait_combination %>%
+    select(-traits) %>%
+    tidyr::pivot_longer(!species, names_to = "comb_name",
+                        values_to = "comb_value") %>%
+    filter(comb_value) %>%
+    count(comb_name, sort = TRUE, name = "n_species") %>%
+    ggplot(
+      aes(
+        n_species,
+        forcats::fct_relevel(comb_name, "has_bergmann", "has_diaz", "has_lhs",
+                             "has_at_least_one_trait", "in_glonaf")
+      )
+    ) +
+    geom_point(size = 2, color = "darkblue") +
+    scale_x_continuous(
+      sec.axis = sec_axis(~./16538, labels = scales::percent_format())
+    ) +
+    scale_y_discrete(
+      labels = c(in_glonaf = "In GloNAF",
+                 has_at_least_one_trait = "At least one trait",
+                 has_lhs   = "Leaf-Height-Seed\n(Westoby 1998)",
+                 has_diaz  = "Aboveground traits\n(Díaz et al., 2016)",
+                 has_bergmann = "Root traits\n(Bergmann et al., 2020)")
+    ) +
+    labs(x = "Number of species",
+         y = "Trait Combination") +
+    theme_bw() +
+    theme(aspect.ratio = 1)
 }

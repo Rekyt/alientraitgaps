@@ -214,3 +214,73 @@ count_lhs_diaz_combination_trait = function(trait_comb, try_diaz_combs,
         any()  # Any of them is fine
     )
 }
+
+get_bergmann_combs = function() {
+  # 4 traits Bergmann et al. 2020
+  # For the analysis we used four root traits:
+  # root average diameter (RAD; mm),
+  root_diameter = c(
+    "Fine root diameter" , "thickest_root_diameter",
+    "Fine root (absorptive) diameter", "Fine root (transport) diameter",
+    "Coarse root diameter"
+  )
+  # root tissue density (RTD; root DW per volume mg cm−3),
+  root_tissue_density = c(
+    "Fine root tissue density (fine root dry mass per fine root volume)",
+    "Fine root (absorptive) tissue density (absorptive fine root dry mass per absorptive fine root volume",
+    "Fine root (transport) tissue density (transport fine root dry mass per transport fine root volume)",
+    "Root dry mass per root volume (root density, root tissue density)",
+    "Coarse root tissue density (coarse root dry mass per coarse root volume)"
+  )
+  # specific root length (SRL; cm mg−1),
+  specific_root_length = c(
+    "Fine root length per fine root dry mass (specific fine root length, SRL)",
+    "specific_root_length",
+    "Fine root (absorptive) length per absorptive fine root dry mass (specific absorptive fine root lengt"
+  )
+  # Root nitrogen
+  root_nitrogen = c(
+    "Fine root nitrogen (N) content per fine root dry mass",
+    "Fine root (absorptive) nitrogen (N) content per absorptive fine root dry mass",
+    "Fine root (transport) nitrogen (N) content per transport fine root dry mass"
+  )
+
+  bergmann_combs = purrr::cross(
+    list(
+      root_diameter = root_diameter,
+      root_tissue_density = root_tissue_density,
+      specific_root_length = specific_root_length,
+      root_nitrogen = root_nitrogen
+    )
+  ) %>%
+    purrr::map(as.character)
+}
+
+count_specific_trait_combinations = function(combined_traits, match_glonaf_tnrs,
+                                             bergmann_comb_df) {
+  combined_traits %>%
+    group_by(species) %>%
+    summarise(traits = list(consolidated_name)) %>%
+    right_join(match_glonaf_tnrs %>%
+                 select(Name_matched),
+               by = c(species = "Name_matched")) %>%
+    rowwise() %>%
+    mutate(
+      in_glonaf              = TRUE,
+      has_at_least_one_trait = length(traits) > 0,
+      has_lhs                = all(
+        c("leaf area per leaf dry mass", "seed mass", "whole plant height") %in%
+          traits
+      ),
+      has_diaz               = all(
+        c(
+          "leaf area per leaf dry mass", "seed mass", "whole plant height",
+          "leaf area", "stem wood density",
+          "leaf nitrogen content per leaf dry mass"
+        ) %in% traits
+      ),
+      has_bergmann = bergmann_comb_df %>%
+        purrr::map_lgl(~ all(.x %in% traits)) %>%
+        any()
+    )
+}

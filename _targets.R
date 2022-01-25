@@ -337,6 +337,13 @@ list(
                 contains_lhs  = sum(contains_lhs),
                 contains_diaz = sum(contains_diaz))
   ),
+  tar_target(bergmann_comb_df, get_bergmann_combs()),
+  tar_target(
+    contain_trait_combination,
+    count_specific_trait_combinations(
+      combined_traits, match_glonaf_tnrs, bergmann_comb_df
+    )
+  ),
 
 
   # InvaCost -------------------------------------------------------------------
@@ -364,10 +371,10 @@ list(
     clean_gbif_ids(gbif_ids)
   ),
   # Get number of GBIF occurrence records
-  tar_target(
-    gbif_num_occ,
-    count_gbif_occurrences(gbif_ids_cleaned)
-  ),
+  # tar_target(
+  #   gbif_num_occ,
+  #   count_gbif_occurrences(gbif_ids_cleaned)
+  # ),
 
 
   # Make figures ---------------------------------------------------------------
@@ -389,6 +396,10 @@ list(
     )
   ),
   tar_target(
+    fig_species_per_trait_combined,
+    plot_number_species_per_trait_combined(combined_traits)
+  ),
+  tar_target(
     fig_try_trait_combination_frequency,
     plot_glonaf_trait_combination_frequency(try_trait_combinations, "TRY (open)")
   ),
@@ -407,6 +418,10 @@ list(
   tar_target(
     fig_combined_trait_heatmap,
     plot_combined_traits_heatmap(combined_traits)
+  ),
+  tar_target(
+    fig_number_species_specific_trait_comb,
+    plot_number_specific_trait_combination(contain_trait_combination)
   )
 ) %>%
   # Convert figures into ggplotGrob() to take less space
