@@ -69,3 +69,43 @@ extract_glonaf_list = function(glonaf_alien_species) {
     unique() %>%
     iconv("latin1", "utf-8")
 }
+
+get_glonaf_higher_taxonomy_combined_traits = function(
+  combined_traits, match_glonaf_tnrs, glonaf_alien_species
+) {
+
+  glonaf_con = connect_glonaf_db()
+
+  combined_traits %>%
+    distinct(species) %>%
+    right_join(
+      match_glonaf_tnrs %>%
+        select(Name_submitted, Name_matched),
+      by = c(species = "Name_matched")
+    ) %>%
+    right_join(
+      glonaf_alien_species %>%
+        select(tpl_id, genus, epithet, author_name) %>%
+        mutate(Name_submitted = paste(genus, epithet, author_name,
+                                      sep = " ")),
+      by = "Name_submitted"
+    ) %>%
+    right_join(
+      tbl(glonaf_con, "genus") %>%
+        select(genus_id = id, genus = name, family_tpl_id) %>%
+        collect(),
+      by = "genus"
+    ) %>%
+    right_join(
+      tbl(glonaf_con, "family_tpl") %>%
+        rename(family_tpl_id = id, family = name) %>%
+        collect(),
+      by = "family_tpl_id"
+    ) %>%
+    right_join(
+      tbl(glonaf_con, "family_apg") %>%
+        rename(family_apg_id = id, family_apg = name) %>%
+        collect(),
+      by = "family_apg_id"
+    )
+}

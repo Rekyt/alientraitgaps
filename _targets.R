@@ -18,7 +18,7 @@ source("R/tr8_functions.R")
 # Initial options --------------------------------------------------------------
 tar_option_set(
   packages = c("data.table", "disk.frame", "dplyr", "ggplot2", "here", "TNRS",
-               "TR8")
+               "TR8", "treemapify")
 )
 
 # Target factory ---------------------------------------------------------------
@@ -344,6 +344,12 @@ list(
       combined_traits, match_glonaf_tnrs, bergmann_comb_df
     )
   ),
+  tar_target(
+    combined_traits_taxonomy,
+    get_glonaf_higher_taxonomy_combined_traits(
+      combined_traits, match_glonaf_tnrs, glonaf_alien_species
+    )
+  ),
 
 
   # InvaCost -------------------------------------------------------------------
@@ -422,6 +428,12 @@ list(
   tar_target(
     fig_number_species_specific_trait_comb,
     plot_number_specific_trait_combination(contain_trait_combination)
+  ),
+  tar_target(
+    fig_trait_combination_taxonomy,
+    plot_taxonomy_treemap_trait_combination(
+      combined_traits_taxonomy, contain_trait_combination
+    )
   )
 ) %>%
   # Convert figures into ggplotGrob() to take less space

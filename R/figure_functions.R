@@ -214,3 +214,43 @@ plot_number_specific_trait_combination = function(contain_trait_combination) {
     theme_bw() +
     theme(aspect.ratio = 1)
 }
+
+plot_taxonomy_treemap_trait_combination = function(
+  combined_traits_taxonomy, contain_trait_combination
+) {
+  combined_traits_taxonomy %>%
+    mutate(species = ifelse(is.na(species), paste(genus, epithet), species)) %>%
+    distinct(species, genus, family) %>%
+    right_join(
+      contain_trait_combination %>%
+        select(-traits),
+      by = "species") %>%
+    filter(!is.na(genus)) %>%
+    ggplot(
+      aes(area = 1,
+          fill = interaction(in_glonaf, has_at_least_one_trait, has_lhs,
+                             has_diaz),
+          label = genus, subgroup = family)
+    ) +
+    treemapify::geom_treemap(color = NA) +
+    treemapify::geom_treemap_subgroup_border(size = 0.7, color = "white") +
+    treemapify::geom_treemap_subgroup_text(
+      place = "centre", grow = TRUE, alpha = 0.7, colour = "black",
+      fontface = "italic", min.size = 0) +
+    scale_fill_manual(
+      name = "Trait combination",
+      labels = c(
+        "TRUE.FALSE.FALSE.FALSE" = "No trait",
+        "TRUE.TRUE.FALSE.FALSE"  = "At least\none trait",
+        "TRUE.TRUE.TRUE.FALSE"   = "Leaf-Height-Seed\n(Westoby 1998)",
+        "TRUE.TRUE.TRUE.TRUE"    = "Aboveground traits\n(Díaz et al., 2016)"
+      ),
+      values = c(
+        "TRUE.FALSE.FALSE.FALSE" = "lightgray",
+        "TRUE.TRUE.FALSE.FALSE"  = "#b2df8a",
+        "TRUE.TRUE.TRUE.FALSE"   = "#a6cee3",
+        "TRUE.TRUE.TRUE.TRUE"    = "#1f78b4"
+      )
+    ) +
+    theme(legend.position = "top")
+}
