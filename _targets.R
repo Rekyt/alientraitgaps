@@ -434,6 +434,18 @@ list(
     plot_taxonomy_treemap_trait_combination(
       combined_traits_taxonomy, contain_trait_combination
     )
+  ),
+  tar_target(
+    fig_trait_combination_number_logged,
+    plot_taxonomy_treemap_number_traits(
+      combined_traits_taxonomy, contain_trait_combination, logged = TRUE
+    )
+  ),
+  tar_target(
+    fig_trait_combination_number_unlogged,
+    plot_taxonomy_treemap_number_traits(
+      combined_traits_taxonomy, contain_trait_combination, logged = FALSE
+    )
   )
 ) %>%
   # Convert figures into ggplotGrob() to take less space

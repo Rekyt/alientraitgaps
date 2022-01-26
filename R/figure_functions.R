@@ -254,3 +254,39 @@ plot_taxonomy_treemap_trait_combination = function(
     ) +
     theme(legend.position = "top")
 }
+
+plot_taxonomy_treemap_number_traits = function(
+  combined_traits_taxonomy, contain_trait_combination, logged = TRUE
+) {
+
+  if (logged) {
+    color_scale = scale_fill_viridis_c(
+      name = "Number of traits",
+      trans = scales::pseudo_log_trans(base = 10),
+      breaks = c(1, 10, 100, 1000)
+    )
+  } else {
+    color_scale = scale_fill_viridis_c(
+      name = "Number of traits"
+    )
+  }
+
+  combined_traits_taxonomy %>%
+    mutate(species = ifelse(is.na(species), paste(genus, epithet), species)) %>%
+    distinct(species, genus, family) %>%
+    right_join(contain_trait_combination, by = "species") %>%
+    mutate(number_of_traits = purrr::map_int(traits, length)) %>%
+    filter(!is.na(genus)) %>%
+    ggplot(
+      aes(area = 1, fill = number_of_traits + 1, label = genus,
+          subgroup = family)
+    ) +
+    treemapify::geom_treemap(color = NA) +
+    treemapify::geom_treemap_subgroup_border(size = 0.5, color = "white") +
+    treemapify::geom_treemap_subgroup_text(
+      place = "centre", grow = TRUE, alpha = 0.5, colour = "white",
+      fontface = "italic", min.size = 0
+    ) +
+    color_scale +
+    theme(legend.position = "top")
+}
