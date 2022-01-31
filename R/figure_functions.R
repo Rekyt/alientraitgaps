@@ -85,8 +85,12 @@ plot_number_species_per_trait_combined = function(combined_traits) {
     slice_max(n_species, n = 20) %>%
     ggplot(aes(n_species, forcats::fct_reorder(consolidated_name, n_species))) +
     geom_point() +
-    scale_x_log10(name = "Number of species with traits") +
-    scale_y_discrete(name = "Trait name", labels = label_wrap_gen(20)) +
+    geom_vline(xintercept = 16528, linetype = 2, color = "darkred", size = 1) +
+    scale_x_continuous(
+      name = "Number of species with traits",
+      sec.axis = sec_axis(trans = ~.x/16528, labels = scales::percent_format())
+    ) +
+    scale_y_discrete(name = "Trait name", labels = label_wrap_gen(30)) +
     labs(title = "15 most frequently measured trait") +
     theme_bw() +
     theme(aspect.ratio = 1)
@@ -191,6 +195,7 @@ plot_number_specific_trait_combination = function(contain_trait_combination) {
                         values_to = "comb_value") %>%
     filter(comb_value) %>%
     count(comb_name, sort = TRUE, name = "n_species") %>%
+    filter(comb_name != "in_glonaf") %>%
     ggplot(
       aes(
         n_species,
@@ -198,6 +203,7 @@ plot_number_specific_trait_combination = function(contain_trait_combination) {
                              "has_at_least_one_trait", "in_glonaf")
       )
     ) +
+    geom_vline(xintercept = 16538, linetype = 2, size = 1, color = "darkred") +
     geom_point(size = 2, color = "darkblue") +
     scale_x_continuous(
       sec.axis = sec_axis(~./16538, labels = scales::percent_format())

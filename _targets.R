@@ -87,7 +87,14 @@ list(
     glonaf_list, extract_glonaf_list(glonaf_alien_species)
   ),
   tar_target(
-    glonaf_regions, get_glonaf_region_correspondence(glonaf_alien_species)
+    glonaf_regions_list, get_glonaf_region_correspondence(glonaf_alien_species)
+  ),
+  tar_target(
+    glonaf_regions,
+    sf::read_sf(
+      here::here("inst", "exdata", "glonaf", "regions_2020-10-28",
+                 "regions_2020-10-28.shp")
+    )
   ),
 
 
