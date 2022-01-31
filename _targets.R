@@ -86,6 +86,9 @@ list(
   tar_target(
     glonaf_list, extract_glonaf_list(glonaf_alien_species)
   ),
+  tar_target(
+    glonaf_regions, get_glonaf_region_correspondence(glonaf_alien_species)
+  ),
 
 
   # Load AusTraits data --------------------------------------------------------

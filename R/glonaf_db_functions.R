@@ -32,10 +32,10 @@ get_glonaf_species_list = function(glonaf_con) {
     filter(status_id %in% c(2, 4, 5, 7)) %>%
     distinct(taxon_orig_id) %>%
     # Get species names and ids
-    inner_join(tbl(glonaf_con, "taxon_orig"), by = c("taxon_orig_id" = "id")) %>%
+    inner_join(tbl(glonaf_con, "taxon_orig"), by = c(taxon_orig_id = "id")) %>%
     # Corrected names after matching TPL
     distinct(species_id) %>%
-    inner_join(tbl(glonaf_con, "species"), by = c("species_id" = "id")) %>%
+    inner_join(tbl(glonaf_con, "species"), by = c(species_id = "id")) %>%
     select(-species_id) %>%
     # Add Name status from TPL
     inner_join(tbl(glonaf_con, "name_status"), by = c(name_status_id = "id")) %>%
@@ -115,5 +115,46 @@ get_glonaf_higher_taxonomy_combined_traits = function(
         collect(),
       by = "order_id"
     )
-  # Manually correct some taxonomy
+}
+
+
+get_glonaf_region_correspondence = function(glonaf_alien_species) {
+
+  glonaf_con = connect_glonaf_db()
+
+  ## Get a list of species <-> region ids
+  glonaf_con %>%
+    ## Get list of species
+    tbl("flora_orig") %>%
+    filter(status_id %in% c(2, 4, 5, 7)) %>%
+    distinct(taxon_orig_id) %>%
+    # Get species names and ids
+    inner_join(tbl(glonaf_con, "taxon_orig"), by = c(taxon_orig_id = "id")) %>%
+    collect() %>%
+    ## Merge extracted species
+    inner_join(
+      glonaf_alien_species,
+      by = c("genus", "epithet", "hybrid", "epithet_infra")
+    ) %>%
+    ## Get region ids
+    inner_join(
+      glonaf_con %>%
+        tbl("flora_orig") %>%
+        filter(status_id %in% c(2, 4, 5, 7)) %>%
+        distinct(list_id, taxon_orig_id) %>%
+        inner_join(
+          glonaf_con %>%
+            tbl("list") %>%
+            select(list_id = id, region_id),
+          by = "list_id"
+        ) %>%
+        inner_join(
+          glonaf_con %>%
+            tbl("region") %>%
+            distinct(region_id = id, region_name = name, OBJIDsic)
+        ) %>%
+        collect()
+    ) %>%
+    select(taxon_orig_id, taxon_orig, taxon_corrected, genus, epithet, hybrid,
+           author_name, OBJIDsic)
 }
