@@ -1,23 +1,43 @@
-# Script to extract taxonomic information back
-library("targets")
 library("dplyr")
+library("targets")
+library("sf")
+library("ggplot2")
 
-# Load database
+tar_load(c("glonaf_regions", "glonaf_regions_list"))
+
 glonaf_con = connect_glonaf_db()
 
-ko = sf::read_sf("../fdresistance/inst/exdata/glonaf/regions_2020-10-28/regions_2020-10-28.shp")
+fine_regions = tbl(glonaf_con, "region") %>%
+  # Get biggest
+  filter(finest_complete_resolution == 1 | OBJIDsic %in% c(1194)) %>%
+  distinct(id, code, name, parent_id, OBJIDsic) %>%
+  collect()
 
-tbl(glonaf_con, "flora_orig") %>%
-  filter(status_id %in% c(2, 4, 5, 7)) %>%
-  distinct(list_id, taxon_orig_id) %>%
-  inner_join(
-    glonaf_con %>%
-      tbl("list") %>%
-      select(list_id = id, region_id),
-    by = "list_id"
-  ) %>%
-  inner_join(
-    glonaf_con %>%
-      tbl("region") %>%
-      distinct(region_id = id, region_name = name, OBJIDisc)
-  )
+discon(glonaf_con)
+
+glonaf_regions %>%
+  semi_join(fine_regions, by = "OBJIDsic") %>%
+  .["OBJIDsic"] %>%
+  plot()
+
+fine_yes = glonaf_regions %>%
+  semi_join(
+    tbl(glonaf_con, "region") %>%
+      # Get biggest
+      filter(finest_complete_resolution == 1) %>%
+      collect(),
+  by = "OBJIDsic")
+
+fine_no = glonaf_regions %>%
+  semi_join(
+    tbl(glonaf_con, "region") %>%
+      # Get biggest
+      filter(finest_complete_resolution == 0) %>%
+      collect(),
+    by = "OBJIDsic")
+
+ko = fine_no %>%
+  sf::st_transform("+proj=eck4") %>%
+  st_join(fine_yes %>%
+            sf::st_transform("+proj=eck4"),
+          join = st_covers, left = TRUE)
