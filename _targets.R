@@ -11,6 +11,7 @@ source("R/extract_try_list.R")
 source("R/figure_functions.R")
 source("R/gbif_functions.R")
 source("R/glonaf_db_functions.R")
+source("R/gift_functions.R")
 source("R/harmonize_functions.R")
 source("R/invacost_functions.R")
 source("R/tr8_functions.R")
@@ -179,7 +180,7 @@ list(
     harmonize_try_open(full_try_df, harmonized_try_glonaf)
   ),
 
-  # Query TRY traits for GloNAF species ----------------------------------------
+  # TRY traits -----------------------------------------------------------------
   tar_target(
     try_total_number_trait, count_trait_try(harmonized_try_glonaf, try_species)
   ),
@@ -283,6 +284,13 @@ list(
   tar_target(
     aus_top_trait_combinations,
     get_austraits_top_trait_combinations(aus_traits, aus_top_traits)
+  ),
+
+
+  # GIFT traits ----------------------------------------------------------------
+  tar_target(
+    gift_try_convert_df,
+    make_gift_try_traits_correspond(gift_traits_meta)
   ),
 
 
