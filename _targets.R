@@ -121,6 +121,36 @@ list(
     readxl::read_xlsx(raw_austraits_try_convert_table, na = c("", "NA"))
   ),
 
+  # Load GIFT data -------------------------------------------------------------
+  tar_target(
+    gift_names,
+    read.csv(
+      here::here("inst", "exdata", "gift", "GIFT_names_matched.csv"),
+      fileEncoding = "utf-8"
+    )
+  ),
+  tar_target(
+    gift_traits,
+    read.csv(
+      here::here("inst", "exdata", "gift", "GIFT_traits_derived.csv"),
+      fileEncoding = "utf-8"
+    )
+  ),
+  tar_target(
+    gift_traits_final,
+    read.csv(
+      here::here("inst", "exdata", "gift", "GIFT_traits_final.csv"),
+      fileEncoding = "utf-8"
+    )
+  ),
+  tar_target(
+    gift_traits_meta,
+    read.csv(
+      here::here("inst", "exdata", "gift", "GIFT_traits_meta.csv"),
+      fileEncoding = "utf-8"
+    )
+  ),
+
   # Match databases against TNRS -----------------------------------------------
   tar_target(
     match_try_tnrs, TNRS::TNRS(try_list)
