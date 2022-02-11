@@ -124,7 +124,7 @@ make_bien_try_correspond = function(bien_traits) {
       # see also 208:	Species reproduction type
       trait_name == "whole plant sexual system" ~ list(347),
       # Should check meaning of trait
-      trait_name == "whole plant vegetative phenology" ~ list(NA_real_),
+      trait_name == "whole plant vegetative phenology" ~ list(1251),
       trait_name == "whole plant woodiness" ~ list(38),
 
       ## Otherwise
