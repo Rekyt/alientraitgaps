@@ -151,6 +151,10 @@ list(
       fileEncoding = "utf-8"
     )
   ),
+  tar_target(
+    gift_list,
+    extract_gift_species_names(gift_names)
+  ),
 
   # Match databases against TNRS -----------------------------------------------
   tar_target(
@@ -161,6 +165,9 @@ list(
   ),
   tar_target(
     match_austraits_tnrs, TNRS::TNRS(austraits_list),
+  ),
+  tar_target(
+    match_gift_tnrs, TNRS::TNRS(gift_list)
   ),
 
   # Harmonize TRY and GloNAF ---------------------------------------------------

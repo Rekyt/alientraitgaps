@@ -149,3 +149,10 @@ make_gift_try_traits_correspond = function(gift_traits_meta) {
         )
     )
 }
+
+extract_gift_species_names = function(gift_names) {
+  gift_names %>%
+    select(genus, species_epithet, subtaxon, author) %>%
+    mutate(full_name = paste(genus, species_epithet, author, subtaxon)) %>%
+    pull(full_name)
+}
