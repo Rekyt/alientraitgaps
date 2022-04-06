@@ -153,6 +153,22 @@ make_gift_try_traits_correspond = function(gift_traits_meta) {
 extract_gift_species_names = function(gift_names) {
   gift_names %>%
     select(genus, species_epithet, subtaxon, author) %>%
-    mutate(full_name = paste(genus, species_epithet, author, subtaxon)) %>%
-    pull(full_name)
+    mutate(full_name = paste(
+      genus, species_epithet,
+      ifelse(!is.na(author), author, ""),
+      ifelse(!is.na(subtaxon), subtaxon, "")
+    )) %>%
+    pull(full_name) %>%
+    unique()
+}
+
+extract_gift_names_with_traits = function(gift_traits_final, gift_names) {
+  gift_names %>%
+    semi_join(
+      gift_traits_final %>%
+        distinct(work_ID),
+      by = "work_ID"
+    ) %>%
+    pull(species) %>%
+    unique()
 }
