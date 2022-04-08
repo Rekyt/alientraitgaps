@@ -168,7 +168,5 @@ extract_gift_names_with_traits = function(gift_traits_final, gift_names) {
       gift_traits_final %>%
         distinct(work_ID),
       by = "work_ID"
-    ) %>%
-    pull(species) %>%
-    unique()
+    )
 }

@@ -152,12 +152,16 @@ list(
     )
   ),
   tar_target(
+    gift_names_traits,
+    extract_gift_names_with_traits(gift_traits_final, gift_names)
+  ),
+  tar_target(
     gift_list,
     extract_gift_species_names(gift_names)
   ),
   tar_target(
     gift_sublist,
-    extract_gift_names_with_traits(gift_traits_final, gift_names)
+    unique(gift_names_traits[["species"]])
   ),
 
   # Match databases against TNRS -----------------------------------------------
@@ -169,9 +173,6 @@ list(
   ),
   tar_target(
     match_austraits_tnrs, TNRS::TNRS(austraits_list),
-  ),
-  tar_target(
-    match_gift_tnrs, TNRS::TNRS(gift_sublist)
   ),
 
   # Harmonize TRY and GloNAF ---------------------------------------------------
