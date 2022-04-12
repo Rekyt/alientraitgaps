@@ -102,7 +102,7 @@ list(
   # Load AusTraits data --------------------------------------------------------
   tar_target(
     austraits,
-    austraits::load_austraits("inst/exdata/austraits")
+    austraits::load_austraits(version = "3.0.2", path = "inst/exdata/austraits")
   ),
   tar_target(
     austraits_species,
