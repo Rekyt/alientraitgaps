@@ -1,3 +1,21 @@
+remove_genus_only_names = function(species_list) {
+  species_list[grepl(" ", species_list)]
+}
+
+remove_hybrid_names = function(species_list) {
+  species_list[!grepl("^x .+", species_list, ignore.case = FALSE)]
+}
+
+match_with_lcvp = function(species_list) {
+  species_list %>%
+    unique() %>%
+    na.exclude() %>%  # Remove NAs
+    as.character() %>%
+    remove_genus_only_names() %>%
+    remove_hybrid_names() %>%
+    lcvplants::lcvp_search()
+}
+
 harmonize_try_glonaf_species = function(match_try_tnrs, match_glonaf_tnrs) {
   # Subset most important columns
   sub_try = match_try_tnrs %>%

@@ -166,13 +166,13 @@ list(
 
   # Match databases against TNRS -----------------------------------------------
   tar_target(
-    match_try_tnrs, TNRS::TNRS(try_list)
+    match_try_tnrs, match_with_lcvp(try_list)
   ),
   tar_target(
-    match_glonaf_tnrs, TNRS::TNRS(glonaf_list)
+    match_glonaf_tnrs, match_with_lcvp(glonaf_list)
   ),
   tar_target(
-    match_austraits_tnrs, TNRS::TNRS(austraits_list),
+    match_austraits_tnrs, match_with_lcvp(austraits_list),
   ),
 
   # Harmonize TRY and GloNAF ---------------------------------------------------
