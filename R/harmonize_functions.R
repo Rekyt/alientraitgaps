@@ -6,6 +6,10 @@ remove_hybrid_names = function(species_list) {
   species_list[!grepl("^x .+", species_list, ignore.case = FALSE)]
 }
 
+remove_problematic_ending = function(species_list) {
+  gsub(" var\\.$", "", species_list)
+}
+
 match_with_lcvp = function(species_list) {
   species_list %>%
     unique() %>%
@@ -13,6 +17,7 @@ match_with_lcvp = function(species_list) {
     as.character() %>%
     remove_genus_only_names() %>%
     remove_hybrid_names() %>%
+    remove_problematic_ending() %>%
     lcvplants::lcvp_search()
 }
 
