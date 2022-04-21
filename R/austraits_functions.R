@@ -1,11 +1,11 @@
 harmonize_austraits_glonaf = function(match_austraits_tnrs, match_glonaf_tnrs) {
   match_austraits_tnrs %>%
-    distinct(name_init_austraits        = Name_submitted,
-             species_accepted_austraits = Accepted_species) %>%
+    distinct(name_init_austraits        = Search,
+             species_accepted_austraits = Output.Taxon) %>%
     inner_join(
       match_glonaf_tnrs %>%
-        distinct(name_init_glonaf        = Name_submitted,
-                 species_accepted_glonaf = Accepted_species),
+        distinct(name_init_glonaf        = Search,
+                 species_accepted_glonaf = Output.Taxon),
       by = c(species_accepted_austraits = "species_accepted_glonaf"))
 }
 

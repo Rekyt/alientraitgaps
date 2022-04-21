@@ -164,21 +164,24 @@ list(
     unique(gift_names_traits[["species"]])
   ),
 
-  # Match databases against TNRS -----------------------------------------------
+  # Match databases against LCVP -----------------------------------------------
   tar_target(
-    match_try_tnrs, match_with_lcvp(try_list)
+    match_try_lcvp, match_with_lcvp(try_list)
   ),
   tar_target(
-    match_glonaf_tnrs, match_with_lcvp(glonaf_list)
+    match_glonaf_lcvp, match_with_lcvp(glonaf_list)
   ),
   tar_target(
-    match_austraits_tnrs, match_with_lcvp(austraits_list),
+    match_austraits_lcvp, match_with_lcvp(austraits_list),
+  ),
+  tar_target(
+    match_bien_lcvp, match_with_lcvp(bien_species[["species"]])
   ),
 
   # Harmonize TRY and GloNAF ---------------------------------------------------
   tar_target(
     harmonized_try_glonaf,
-    harmonize_try_glonaf_species(match_try_tnrs, match_glonaf_tnrs)
+    harmonize_try_glonaf_species(match_try_lcvp, match_glonaf_lcvp)
   ),
   # Get back AccSpeciesID after matching
   tar_target(
@@ -230,6 +233,13 @@ list(
     make_bien_try_correspond(bien_trait_list)
   ),
 
+  # Harmonize BIEN species with LCVP
+  tar_target(
+    bien_species,
+    BIEN::BIEN_list_all()
+  ),
+
+
   # Query BIEN traits for GloNAF species
   tar_target(
     glonaf_bien_traits_count,
@@ -253,7 +263,7 @@ list(
   # Match GloNAF to AusTraits
   tar_target(
     harmonized_austraits_glonaf,
-    harmonize_austraits_glonaf(match_austraits_tnrs, match_glonaf_tnrs)
+    harmonize_austraits_glonaf(match_austraits_lcvp, match_glonaf_lcvp)
   ),
 
   # Make correspondance between AusTraits and TRY
@@ -401,13 +411,13 @@ list(
   tar_target(
     contain_trait_combination,
     count_specific_trait_combinations(
-      combined_traits, match_glonaf_tnrs, bergmann_comb_df
+      combined_traits, match_glonaf_lcvp, bergmann_comb_df
     )
   ),
   tar_target(
     combined_traits_taxonomy,
     get_glonaf_higher_taxonomy_combined_traits(
-      combined_traits, match_glonaf_tnrs, glonaf_alien_species
+      combined_traits, match_glonaf_lcvp, glonaf_alien_species
     )
   ),
 
@@ -447,8 +457,8 @@ list(
   tar_target(
     pfig_euler_number_glonaf_species,
     plot_euler_diagram_glonaf_species_in_databases(
-      match_glonaf_tnrs, harmonized_try_glonaf, try_open_species,
-      glonaf_bien_traits_count, match_austraits_tnrs
+      match_glonaf_lcvp, harmonized_try_glonaf, try_open_species,
+      glonaf_bien_traits_count, match_austraits_lcvp
     )
   ),
   tar_target(

@@ -25,20 +25,16 @@ harmonize_try_glonaf_species = function(match_try_tnrs, match_glonaf_tnrs) {
   # Subset most important columns
   sub_try = match_try_tnrs %>%
     distinct(
-      name_init_try        = Name_submitted,
-      status_try           = Taxonomic_status,
-      name_accepted_try    = Accepted_name,
-      species_accepted_try = Accepted_species,
-      author_accepted_try  = Author_matched
+      name_init_try        = Search,
+      status_try           = Status,
+      species_accepted_try = Output.Taxon
     )
 
   sub_glonaf = match_glonaf_tnrs %>%
     distinct(
-      name_init_glonaf        = Name_submitted,
-      status_glonaf           = Taxonomic_status,
-      name_accepted_glonaf    = Accepted_name,
-      species_accepted_glonaf = Accepted_species,
-      author_accepted_glonaf  = Author_matched
+      name_init_glonaf        = Search,
+      status_glonaf           = Status,
+      species_accepted_glonaf = Output.Taxon
     )
 
   # Merge TRY and GloNAF accepted names
