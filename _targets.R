@@ -3,6 +3,9 @@
 # Packages and functions -------------------------------------------------------
 library("targets")
 library("magrittr")
+library(future)
+library(future.callr)
+plan(callr)
 
 source("R/austraits_functions.R")
 source("R/bien_functions.R")
@@ -165,8 +168,12 @@ list(
   ),
 
   # Match databases against LCVP -----------------------------------------------
+  tarchetypes::tar_group_size(
+    try_list_split, data.frame(species = try_list), 2e4
+  ),
   tar_target(
-    match_try_lcvp, match_with_lcvp(try_list)
+    match_try_lcvp, match_with_lcvp(try_list_split[["species"]]),
+    pattern = map(try_list_split)
   ),
   tar_target(
     match_glonaf_lcvp, match_with_lcvp(glonaf_list)
@@ -174,8 +181,10 @@ list(
   tar_target(
     match_austraits_lcvp, match_with_lcvp(austraits_list),
   ),
+  tarchetypes::tar_group_size(bien_species_split, bien_species, 5e3),
   tar_target(
-    match_bien_lcvp, match_with_lcvp(bien_species[["species"]])
+    match_bien_lcvp, match_with_lcvp(bien_species_split[["species"]]),
+    pattern = map(bien_species_split)
   ),
 
   # Harmonize TRY and GloNAF ---------------------------------------------------
