@@ -1,6 +1,12 @@
+keep_binomial_name = function(name_list) {
+  name_list %>%
+    stringr::str_extract("^\\w+ \\w+")
+}
+
 count_bien_traits_per_species = function(harmonized_try_glonaf) {
   harmonized_try_glonaf %>%
     pull(species_accepted_try) %>%
+    keep_binomial_name() %>%
     unique() %>%
     BIEN::BIEN_trait_traits_per_species()
 }
@@ -8,6 +14,7 @@ count_bien_traits_per_species = function(harmonized_try_glonaf) {
 get_bien_traits = function(harmonized_try_glonaf) {
   harmonized_try_glonaf %>%
     pull(species_accepted_try) %>%
+    keep_binomial_name() %>%
     unique() %>%
     BIEN::BIEN_trait_species()
 }
