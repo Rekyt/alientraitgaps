@@ -147,7 +147,8 @@ make_gift_try_traits_correspond = function(gift_traits_meta) {
           Trait2 == "Defense"                  ~ list(345:346),
           TRUE ~ list(NA_real_),
         )
-    )
+    ) %>%
+      select(Trait2, trait_ids)
 }
 
 extract_gift_species_names = function(gift_names) {
@@ -184,7 +185,8 @@ harmonize_gift_glonaf = function(match_gift_tnrs, match_glonaf_tnrs) {
 }
 
 get_gift_traits_for_glonaf_species = function(
-    gift_traits_final, gift_names_traits, harmonized_gift_glonaf
+    gift_traits_final, gift_names_traits, harmonized_gift_glonaf,
+    gift_traits_meta
 ) {
   gift_traits_final %>%
     inner_join(
@@ -197,12 +199,17 @@ get_gift_traits_for_glonaf_species = function(
         distinct(species = name_init_gift, species_accepted_gift),
       by = "species"
     ) %>%
-      distinct(species_accepted_gift, trait_ID)
+    inner_join(
+      gift_traits_meta %>%
+        distinct(trait_ID = Lvl3, Trait2),
+      by = "trait_ID"
+    ) %>%
+    distinct(species_accepted_gift, Trait2)
 }
 
 count_gift_species_per_trait = function(gift_glonaf_traits) {
   gift_glonaf_traits %>%
-    dplyr::count(trait_ID, sort = TRUE, name = "n_sp")
+    dplyr::count(Trait2, sort = TRUE, name = "n_sp")
 }
 
 count_gift_trait_per_species = function(gift_glonaf_traits) {
@@ -213,11 +220,11 @@ count_gift_trait_per_species = function(gift_glonaf_traits) {
 get_gift_trait_combinations = function(gift_glonaf_traits) {
   gift_glonaf_traits %>%
     dplyr::group_by(species = species_accepted_gift) %>%
-    dplyr::summarise(trait_names = list(trait_ID))
+    dplyr::summarise(trait_names = list(Trait2))
 }
 
 get_gift_top_trait_combinations = function(gift_glonaf_traits, aus_top_traits) {
   gift_glonaf_traits %>%
-    semi_join(aus_top_traits, by = "trait_ID") %>%
+    semi_join(aus_top_traits, by = "Trait2") %>%
     get_gift_trait_combinations()
 }

@@ -317,7 +317,8 @@ list(
   tar_target(
     gift_glonaf_traits,
     get_gift_traits_for_glonaf_species(
-      gift_traits_final, gift_names_traits, harmonized_gift_glonaf
+      gift_traits_final, gift_names_traits, harmonized_gift_glonaf,
+      gift_traits_meta
     )
   ),
   tar_target(
@@ -347,14 +348,16 @@ list(
   # Combine trait data from BIEN, AusTraits, and TRY under a common umbrella
   tar_target(
     consolidated_trait_names,
-    consolidate_trait_names(bien_try_convert_df, aus_try_convert_df,
-                            aus_bien_convert_df, try_traits)
+    consolidate_trait_names(
+      bien_try_convert_df, aus_try_convert_df, aus_bien_convert_df,
+      gift_try_convert_df, try_traits
+    )
   ),
   tar_target(
     combined_traits,
-    combine_bien_try_aus_traits(
+    combine_bien_try_aus_gift_traits(
       consolidated_trait_names, glonaf_bien_traits, glonaf_try_traits_available,
-      aus_traits
+      aus_traits, gift_glonaf_traits
     )
   ),
   # Rank species per trait number in each database
