@@ -232,6 +232,7 @@ plot_taxonomy_treemap_trait_combination = function(
         select(-traits),
       by = "species") %>%
     filter(!is.na(genus)) %>%
+    mutate(across(where(is.character), ~iconv(.x, "latin1", to = "UTF-8"))) %>%
     ggplot(
       aes(area = 1,
           fill = interaction(in_glonaf, has_at_least_one_trait, has_lhs,
@@ -283,6 +284,7 @@ plot_taxonomy_treemap_number_traits = function(
     right_join(contain_trait_combination, by = "species") %>%
     mutate(number_of_traits = purrr::map_int(traits, length)) %>%
     filter(!is.na(genus)) %>%
+    mutate(across(where(is.character), ~iconv(.x, "latin1", to = "UTF-8"))) %>%
     ggplot(
       aes(area = 1, fill = number_of_traits + 1, label = genus,
           subgroup = family)
