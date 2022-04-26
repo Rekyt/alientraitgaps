@@ -164,7 +164,7 @@ list(
     unique(gift_names_traits[["species"]])
   ),
 
-  # Match databases against TNRS -----------------------------------------------
+  # TNRS Matching: Harmonize Taxonomies against TNRS ---------------------------
   tar_target(
     match_try_tnrs, TNRS::TNRS(try_list)
   ),
@@ -173,6 +173,9 @@ list(
   ),
   tar_target(
     match_austraits_tnrs, TNRS::TNRS(austraits_list),
+  ),
+  tar_target(
+    match_gift_tnrs, TNRS::TNRS(gift_sublist)
   ),
 
   # Harmonize TRY and GloNAF ---------------------------------------------------
@@ -300,18 +303,44 @@ list(
 
 
   # GIFT traits ----------------------------------------------------------------
+  # Trait conversion table
   tar_target(
     gift_try_convert_df,
     make_gift_try_traits_correspond(gift_traits_meta)
   ),
+  # Match species names
+  tar_target(
+    harmonized_gift_glonaf,
+    harmonize_gift_glonaf(match_gift_tnrs, match_glonaf_tnrs)
+  ),
+  # GIFT traits for GloNAF species
+  tar_target(
+    gift_glonaf_traits,
+    get_gift_traits_for_glonaf_species(
+      gift_traits_final, gift_names_traits, harmonized_gift_glonaf
+    )
+  ),
+  tar_target(
+    gift_species_per_trait,
+    count_gift_species_per_trait(gift_glonaf_traits),
+  ),
+  tar_target(
+    gift_trait_per_species,
+    count_gift_trait_per_species(gift_glonaf_traits)
+  ),
+  tar_target(
+    gift_trait_combinations,
+    get_gift_trait_combinations(gift_glonaf_traits)
+  ),
+  tar_target(
+    gift_top_traits,
+    dplyr::slice_max(gift_species_per_trait, n_sp, n = 20)
+  ),
+  tar_target(
+    gift_top_trait_combinations,
+    get_gift_top_trait_combinations(gift_glonaf_traits, gift_top_traits)
+  ),
 
-
-  # Other Trait Data -----------------------------------------------------------
-  # Query all possible traits on many databases through TR8
-  # tar_target(
-  #   glonaf_additional_traits,
-  #   get_all_tr8_traits(harmonized_try_glonaf)
-  # ),
 
 
   # Combine Trait Data ---------------------------------------------------------

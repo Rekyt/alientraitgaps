@@ -6,7 +6,8 @@ harmonize_austraits_glonaf = function(match_austraits_tnrs, match_glonaf_tnrs) {
       match_glonaf_tnrs %>%
         distinct(name_init_glonaf        = Name_submitted,
                  species_accepted_glonaf = Accepted_species),
-      by = c(species_accepted_austraits = "species_accepted_glonaf"))
+      by = c(species_accepted_austraits = "species_accepted_glonaf")) %>%
+  filter(species_accepted_austraits != "")
 }
 
 make_austraits_try_traits_correspond = function(austraits_try_convert) {

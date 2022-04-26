@@ -170,3 +170,54 @@ extract_gift_names_with_traits = function(gift_traits_final, gift_names) {
       by = "work_ID"
     )
 }
+
+harmonize_gift_glonaf = function(match_gift_tnrs, match_glonaf_tnrs) {
+  match_gift_tnrs %>%
+    distinct(name_init_gift        = Name_submitted,
+             species_accepted_gift = Accepted_species) %>%
+    inner_join(
+      match_glonaf_tnrs %>%
+        distinct(name_init_glonaf        = Name_submitted,
+                 species_accepted_glonaf = Accepted_species),
+      by = c(species_accepted_gift = "species_accepted_glonaf")) %>%
+    filter(species_accepted_gift != "")
+}
+
+get_gift_traits_for_glonaf_species = function(
+    gift_traits_final, gift_names_traits, harmonized_gift_glonaf
+) {
+  gift_traits_final %>%
+    inner_join(
+      gift_names_traits %>%
+        distinct(work_ID, species),
+      by = "work_ID"
+    ) %>%
+    inner_join(
+      harmonized_gift_glonaf %>%
+        distinct(species = name_init_gift, species_accepted_gift),
+      by = "species"
+    ) %>%
+      distinct(species_accepted_gift, trait_ID)
+}
+
+count_gift_species_per_trait = function(gift_glonaf_traits) {
+  gift_glonaf_traits %>%
+    dplyr::count(trait_ID, sort = TRUE, name = "n_sp")
+}
+
+count_gift_trait_per_species = function(gift_glonaf_traits) {
+  gift_glonaf_traits %>%
+    dplyr::count(species_accepted_gift, sort = TRUE, name = "n_traits")
+}
+
+get_gift_trait_combinations = function(gift_glonaf_traits) {
+  gift_glonaf_traits %>%
+    dplyr::group_by(species = species_accepted_gift) %>%
+    dplyr::summarise(trait_names = list(trait_ID))
+}
+
+get_gift_top_trait_combinations = function(gift_glonaf_traits, aus_top_traits) {
+  gift_glonaf_traits %>%
+    semi_join(aus_top_traits, by = "trait_ID") %>%
+    get_gift_trait_combinations()
+}
