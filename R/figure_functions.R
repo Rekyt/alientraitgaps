@@ -292,7 +292,7 @@ plot_taxonomy_treemap_number_traits = function(
     treemapify::geom_treemap(color = NA) +
     treemapify::geom_treemap_subgroup_border(size = 0.5, color = "white") +
     treemapify::geom_treemap_subgroup_text(
-      place = "centre", grow = TRUE, alpha = 0.5, colour = "white",
+      place = "centre", grow = TRUE, alpha = 0.7, colour = "white",
       fontface = "italic", min.size = 0
     ) +
     color_scale +
