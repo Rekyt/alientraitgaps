@@ -235,7 +235,7 @@ make_gift_trait_category = function(gift_traits_meta) {
       trait_cat =
         case_when(
           # Morphological Traits
-          Trait2 == "Woodiness_1"              ~ "stem",
+          Trait2 == "Woodiness_1"              ~ "life_history",
           Trait2 == "Shoot_length_min"         ~ "height",
           Trait2 == "Shoot_length_max"         ~ "height",
           Trait2 == "Growth_form_1"            ~ "life_history",
@@ -299,7 +299,7 @@ make_gift_trait_category = function(gift_traits_meta) {
           Trait2 == "Seed_mass_max"            ~ "seed",
           Trait2 == "Seed_mass_mean"           ~ "seed",
           Trait2 == "Seed_mass_measured"       ~ "seed",
-          Trait2 == "Monocarpy"                ~ "seed",
+          Trait2 == "Monocarpy"                ~ "life_history",
           Trait2 == "Flower_colour"            ~ "flower",
           Trait2 == "Fruit_colour"             ~ "seed",
           Trait2 == "Inflorescence"            ~ "flower",
@@ -314,9 +314,9 @@ make_gift_trait_category = function(gift_traits_meta) {
           Trait2 == "Reproduction_sexual_1"    ~ "life_history",
           Trait2 == "Reproduction_asexual_1"   ~ "life_history",
           Trait2 == "Reproduction_asexual_2"   ~ "life_history",
-          Trait2 == "Pollination_syndrome_1"   ~ "life_history",
-          Trait2 == "Pollination_syndrome_2"   ~ "life_history",
-          Trait2 == "Pollination_syndrome_3"   ~ "life_history",
+          Trait2 == "Pollination_syndrome_1"   ~ "flower",
+          Trait2 == "Pollination_syndrome_2"   ~ "flower",
+          Trait2 == "Pollination_syndrome_3"   ~ "flower",
           Trait2 == "Flowering_start"          ~ "flower",
           Trait2 == "Flowering_end"            ~ "flower",
           Trait2 == "Fruiting_start"           ~ "seed",

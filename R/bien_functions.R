@@ -151,7 +151,7 @@ make_bien_trait_category = function(bien_trait_list) {
       trait_name == "flower color"                                  ~ "flower",
       trait_name == "flower pollination syndrome"                   ~ "flower",
       trait_name == "fruit type"                                    ~ "seed",
-      trait_name == "inflorescence length"                          ~ "shoot",
+      trait_name == "inflorescence length"                          ~ "flower",
 
       ## Leafs
       trait_name == "leaf area"                                     ~ "leaf",

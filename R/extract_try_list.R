@@ -1286,7 +1286,7 @@ make_try_trait_categories = function(consolidated_trait_names) {
         consolidated_name == 'Plant morphological adaptations: storage organs' ~ NA_character_,
         consolidated_name == 'Plant mortality rate' ~ "life_history",
         consolidated_name == 'Plant nitrogen (N) content per plant dry mass' ~ "stem",
-        consolidated_name == 'Plant nitrogen (N) uptake efficiency (plant nitrogen acquired per nitrogen available)' ~ "stel",
+        consolidated_name == 'Plant nitrogen (N) uptake efficiency (plant nitrogen acquired per nitrogen available)' ~ "stem",
         consolidated_name == 'Plant number of branches per tree' ~ "stem",
         consolidated_name == 'Plant number of offspring shoots per parent shoot per year' ~ "stem",
         consolidated_name == 'Plant ontogeny: time to emergence'  ~ "life_history",
