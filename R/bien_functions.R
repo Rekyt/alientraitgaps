@@ -199,6 +199,7 @@ make_bien_trait_category = function(bien_trait_list) {
       trait_name == "plant flowering begin"    ~ "flower",
       trait_name == "plant flowering end"      ~ "flower",
       trait_name == "plant flowering duration" ~ "flower",
+      trait_name == "plant fruiting duration"  ~ "life_history",
 
       ## Roots
       trait_name == "root dry mass" ~ "root",
