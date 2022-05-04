@@ -220,7 +220,10 @@ list(
     semi_join(glonaf_try_traits_available, try_top_traits, by = "TraitName") %>%
       list_trait_combination_per_species()
   ),
-
+  tar_target(
+    try_trait_categories,
+    make_try_trait_categories(consolidated_trait_names)
+  ),
 
   # BIEN traits ----------------------------------------------------------------
   # List BIEN traits
@@ -231,6 +234,10 @@ list(
   tar_target(
     bien_try_convert_df,
     make_bien_try_correspond(bien_trait_list)
+  ),
+  tar_target(
+    bien_trait_categories,
+    make_try_trait_categories(bien_traits)
   ),
 
   # Query BIEN traits for GloNAF species
@@ -272,6 +279,10 @@ list(
       aus_try_convert_df, bien_try_convert_df
     )
   ),
+  tar_target(
+    aus_trait_categories,
+    make_non_try_aus_traits_category(consolidated_trait_name)
+  ),
 
   # Get and count trait data
   tar_target(
@@ -308,11 +319,17 @@ list(
     gift_try_convert_df,
     make_gift_try_traits_correspond(gift_traits_meta)
   ),
+  tar_target(
+    gift_trait_categories,
+    make_gift_trait_category(gift_traits_meta)
+  ),
+
   # Match species names
   tar_target(
     harmonized_gift_glonaf,
     harmonize_gift_glonaf(match_gift_tnrs, match_glonaf_tnrs)
   ),
+
   # GIFT traits for GloNAF species
   tar_target(
     gift_glonaf_traits,

@@ -79,7 +79,7 @@ get_austraits_top_trait_combinations = function(aus_traits, aus_top_traits) {
     get_austraits_trait_combinations()
 }
 
-make_non_try_aus_traits_cat = function(consolidated_trait_names) {
+make_non_try_aus_traits_category = function(consolidated_trait_names) {
   consolidated_trait_names %>%
     filter(
       is.na(try_trait_id) & is.na(bien_trait_name) & !is.na(aus_trait_name)

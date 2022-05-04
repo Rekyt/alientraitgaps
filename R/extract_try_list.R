@@ -794,7 +794,7 @@ make_try_trait_categories = function(consolidated_trait_names) {
         consolidated_name == 'Leaf calcium (Ca) content per leaf' ~ "leaf",
         consolidated_name == 'Leaf carbon (C) content per dry mass (cotyledons)' ~ "leaf",
         consolidated_name == 'Leaf carbon (C) content per leaf area' ~ "leaf",
-        consolidated_name == 'Leaf carbon (C) isotope fractionation ('big' Delta 13C)' ~ "leaf",
+        consolidated_name == "Leaf carbon (C) isotope fractionation ('big' Delta 13C)" ~ "leaf",
         consolidated_name == 'Leaf carbon/phosphorus (C/P) ratio' ~ "leaf",
         consolidated_name == 'Leaf cell lumen area per leaf area' ~ "leaf",
         consolidated_name == 'Leaf cell lumen length' ~ "leaf",
