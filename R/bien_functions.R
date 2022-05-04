@@ -146,40 +146,40 @@ count_bien_species_per_trait = function(glonaf_bien_traits_count) {
 make_bien_trait_category = function(bien_traits) {
   bien_traits %>%
     filter(!is.na(trait_name)) %>%
-    mutate(trait_ids = case_when(
-      trait_name == "diameter at breast height (1.3 m)" ~ "stem",
-      trait_name == "flower color"                      ~ "flower",
-      trait_name == "flower pollination syndrome"       ~ "flower",
-      trait_name == "fruit type"                        ~ "seed",
-      trait_name == "inflorescence length"              ~ "shoot",
+    mutate(trait_cat = case_when(
+      trait_name == "diameter at breast height (1.3 m)"             ~ "stem",
+      trait_name == "flower color"                                  ~ "flower",
+      trait_name == "flower pollination syndrome"                   ~ "flower",
+      trait_name == "fruit type"                                    ~ "seed",
+      trait_name == "inflorescence length"                          ~ "shoot",
 
       ## Leafs
-      trait_name == "leaf area"                             ~ "leaf",
-      trait_name == "leaf area per leaf dry mass"           ~ "leaf",
-      trait_name == "leaf carbon content per leaf area"     ~ "leaf",
-      trait_name == "leaf carbon content per leaf dry mass" ~ "leaf",
+      trait_name == "leaf area"                                     ~ "leaf",
+      trait_name == "leaf area per leaf dry mass"                   ~ "leaf",
+      trait_name == "leaf carbon content per leaf area"             ~ "leaf",
+      trait_name == "leaf carbon content per leaf dry mass"         ~ "leaf",
       # leaf C/N ratio
       trait_name == "leaf carbon content per leaf nitrogen content" ~ "leaf",
-      trait_name == "leaf compoundness" ~ "leaf",
-      trait_name == "leaf dry mass"     ~ "leaf",
+      trait_name == "leaf compoundness"                             ~ "leaf",
+      trait_name == "leaf dry mass"                                 ~ "leaf",
       # LDMC
-      trait_name == "leaf dry mass per leaf fresh mass" ~ "leaf",
-      trait_name == "leaf fresh mass"                   ~ "leaf",
+      trait_name == "leaf dry mass per leaf fresh mass"             ~ "leaf",
+      trait_name == "leaf fresh mass"                               ~ "leaf",
       # Unsure? TRY trait is leaf texture (physical strength)
-      trait_name == "Leaf lamina fracture toughness"             ~ "leaf",
-      trait_name == "leaf life span"                             ~ "leaf",
-      trait_name == "leaf nitrogen content per leaf area"        ~ "leaf",
-      trait_name == "leaf nitrogen content per leaf dry mass"    ~ "leaf",
-      trait_name == "leaf phosphorus content per leaf area"      ~ "leaf",
-      trait_name == "leaf phosphorus content per leaf dry mass"  ~ "leaf",
-      trait_name == "leaf photosynthetic rate per leaf area"     ~ "leaf",
-      trait_name == "leaf photosynthetic rate per leaf dry mass" ~ "leaf",
+      trait_name == "Leaf lamina fracture toughness"                ~ "leaf",
+      trait_name == "leaf life span"                                ~ "leaf",
+      trait_name == "leaf nitrogen content per leaf area"           ~ "leaf",
+      trait_name == "leaf nitrogen content per leaf dry mass"       ~ "leaf",
+      trait_name == "leaf phosphorus content per leaf area"         ~ "leaf",
+      trait_name == "leaf phosphorus content per leaf dry mass"     ~ "leaf",
+      trait_name == "leaf photosynthetic rate per leaf area"        ~ "leaf",
+      trait_name == "leaf photosynthetic rate per leaf dry mass"    ~ "leaf",
       # NO leaf relative growth rate in TRY?
       trait_name == "leaf relative growth rate" ~ "leaf",
       trait_name == "leaf stomatal conductance for H2O per leaf area" ~ "leaf",
       # No difference in TRY between H2O or other conductance
-      trait_name == "leaf stomatal conductance per leaf area" ~ "leaf",
-      trait_name == "leaf thickness"                          ~ "leaf",
+      trait_name == "leaf stomatal conductance per leaf area"       ~ "leaf",
+      trait_name == "leaf thickness"                                ~ "leaf",
 
       ## Maximums
       trait_name == "longest whole plant longevity" ~ "life_history",
