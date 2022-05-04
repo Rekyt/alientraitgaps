@@ -377,6 +377,14 @@ list(
       aus_traits, gift_glonaf_traits
     )
   ),
+  tar_target(
+    combined_trait_categories,
+    combine_trait_categories(
+      consolidated_trait_names, gift_trait_categories, aus_trait_categories,
+      bien_trait_categories, try_trait_categories
+    )
+  ),
+
   # Rank species per trait number in each database
   tar_target(
     glonaf_trait_ranks,

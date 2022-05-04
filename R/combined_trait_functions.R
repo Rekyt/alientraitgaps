@@ -303,3 +303,48 @@ count_specific_trait_combinations = function(combined_traits, match_glonaf_tnrs,
         any()
     )
 }
+
+combine_trait_categories = function(
+  consolidated_trait_names, gift_trait_categories, aus_trait_categories,
+  bien_trait_categories, try_trait_categories
+) {
+  all_trait_categories = consolidated_trait_names %>%
+    full_join(
+      gift_trait_categories %>%
+        rename(gift_trait_name = Trait2, gift_trait_cat = trait_cat),
+      by = "gift_trait_name"
+    ) %>%
+    full_join(
+      aus_trait_categories %>%
+        rename(aus_trait_cat = trait_cat),
+      by = "aus_trait_name"
+    ) %>%
+    full_join(
+      bien_trait_categories %>%
+        rename(bien_trait_name = trait_name, bien_trait_cat = trait_cat),
+      by = "bien_trait_name"
+    ) %>%
+    full_join(
+      try_trait_categories %>%
+        rename(try_trait_cat = trait_cat),
+      by = "consolidated_name"
+    ) %>%
+    filter(!is.na(consolidated_name))
+
+  all_trait_categories %>%
+    select(consolidated_name, ends_with("trait_cat")) %>%
+    tidyr::nest(trait_cat_df = !consolidated_name) %>%
+    mutate(trait_cat_sum = purrr::map(trait_cat_df, distinct),
+           final_trait_cat = purrr::map(
+             trait_cat_sum,
+             ~.x %>%
+               unlist() %>%
+               unique() %>%
+               na.exclude() %>%
+               as.character()
+           ) %>%
+             purrr::modify_if(~ length(.) == 0, ~ NA_character_) %>%
+             as.character()
+    ) %>%
+    select(consolidated_name, trait_category = final_trait_cat)
+}
