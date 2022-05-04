@@ -461,20 +461,6 @@ list(
   ),
 
 
-  # InvaCost -------------------------------------------------------------------
-  # Get InvaCost data
-  tar_target(
-    invacost_data,
-    download_invacost(),
-    format = "file"
-  ),
-  tar_target(
-    invacost_files,
-    unzip_invacost(invacost_data),
-    format = "file"
-  ),
-
-
   # GBIF Occurrences -----------------------------------------------------------
   # Get GBIF ids from species name
   tar_target(
