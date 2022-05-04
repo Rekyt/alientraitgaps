@@ -261,7 +261,7 @@ make_gift_trait_category = function(gift_traits_meta) {
           Trait2 == "Lifespan_2"               ~ "life_history",
           Trait2 == "Life_form_1"              ~ "life_history",
           Trait2 == "Life_form_2"              ~ "life_history",
-          Trait2 == "Deciduousness_1"          ~ "life_history",
+          Trait2 == "Deciduousness_1"          ~ "leaf",
           # Reproduction traits
           Trait2 == "Self_fertilization_1"     ~ "life_history",
           Trait2 == "Seed_length_min"          ~ "seed",
@@ -369,9 +369,9 @@ make_gift_trait_category = function(gift_traits_meta) {
           Trait2 == "Elevational_range_mean"   ~ NA_character_,
           Trait2 == "Bedrock_1"                ~ NA_character_,
           Trait2 == "Habitat_1"                ~ NA_character_,
-          Trait2 == "Mycorrhiza_1"             ~ "life_history",
-          Trait2 == "Mycorrhiza_family"        ~ "life_history",
-          Trait2 == "Mycorrhiza_species"       ~ "life_history",
+          Trait2 == "Mycorrhiza_1"             ~ "root",
+          Trait2 == "Mycorrhiza_family"        ~ "root",
+          Trait2 == "Mycorrhiza_species"       ~ "root",
           Trait2 == "Defense"                  ~ "life_history",
           TRUE ~ NA_character_,
         )
