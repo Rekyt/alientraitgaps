@@ -376,5 +376,5 @@ make_gift_trait_category = function(gift_traits_meta) {
           TRUE ~ NA_character_,
         )
     ) %>%
-    select(Trait2, trait_ids)
+    select(Trait2, trait_cat)
 }

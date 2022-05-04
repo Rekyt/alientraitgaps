@@ -237,7 +237,7 @@ list(
   ),
   tar_target(
     bien_trait_categories,
-    make_try_trait_categories(bien_traits)
+    make_bien_trait_category(bien_trait_list)
   ),
 
   # Query BIEN traits for GloNAF species
@@ -281,7 +281,7 @@ list(
   ),
   tar_target(
     aus_trait_categories,
-    make_non_try_aus_traits_category(consolidated_trait_name)
+    make_non_try_aus_traits_category(consolidated_trait_names)
   ),
 
   # Get and count trait data

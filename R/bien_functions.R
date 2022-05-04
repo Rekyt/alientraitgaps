@@ -143,8 +143,8 @@ count_bien_species_per_trait = function(glonaf_bien_traits_count) {
 }
 
 
-make_bien_trait_category = function(bien_traits) {
-  bien_traits %>%
+make_bien_trait_category = function(bien_trait_list) {
+  bien_trait_list %>%
     filter(!is.na(trait_name)) %>%
     mutate(trait_cat = case_when(
       trait_name == "diameter at breast height (1.3 m)"             ~ "stem",
@@ -227,7 +227,7 @@ make_bien_trait_category = function(bien_traits) {
       trait_name == "whole plant woodiness"                       ~ "life_history",
 
       ## Otherwise
-      TRUE ~ list(NA_real_)
+      TRUE ~ NA_character_
     )) %>%
     as_tibble()
 }
