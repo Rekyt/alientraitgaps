@@ -564,6 +564,10 @@ list(
     fig_miss_trait_cat_species,
     plot_miss_trait_categories_per_species(species_trait_categories)
   ),
+  tar_target(
+    fig_count_trait_cat_species,
+    plot_number_trait_categories_per_species(species_trait_categories)
+  )
 ) %>%
   # Convert figures into ggplotGrob() to take less space
   tarchetypes::tar_hook_outer(

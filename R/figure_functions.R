@@ -311,3 +311,43 @@ plot_miss_trait_categories_per_species = function(species_trait_categories) {
     ) +
     labs(y = "Number of Species")
 }
+
+plot_number_trait_categories_per_species = function(species_trait_categories) {
+
+  # Order species by similar trait measurements
+  species_clust = species_trait_categories %>%
+    as.data.frame() %>%
+    tibble::column_to_rownames("species") %>%
+    scale() %>%
+    dist(method = "euclidean") %>%
+    hclust(method = "ward.D")
+
+  # Actual order
+  species_order = species_trait_categories$species[species_clust$order]
+
+  # Actual Figure
+  species_trait_categories %>%
+    tidyr::pivot_longer(
+      flower:root, names_to = "trait_category", values_to = "n_traits"
+    ) %>%
+    mutate(
+      # Order species by cluster order
+      species = factor(species, levels = species_order),
+      # Order trait category by number of measures of the trait
+      trait_category = factor(
+        trait_category,
+        levels = c("life_history", "leaf", "seed", "height", "flower", "root",
+                   "stem")
+      )
+    ) %>%
+    ggplot(aes(trait_category, species, fill = n_traits)) +
+    geom_raster() +
+    scale_x_discrete(
+      name = "Trait Category",
+      labels = function(x) janitor::make_clean_names(x, case = "title")
+    ) +
+    scale_y_discrete(name = "Species", labels = NULL) +
+    scale_fill_viridis_c(name = "Number of Traits Measured", trans = "log10") +
+    theme(axis.ticks.y = element_blank(),
+          legend.position = "top")
+}
