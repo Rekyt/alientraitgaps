@@ -348,3 +348,22 @@ combine_trait_categories = function(
     ) %>%
     select(consolidated_name, trait_category = final_trait_cat)
 }
+
+count_trait_categories_per_species = function(
+  combined_trait_categories_species, match_glonaf_tnrs
+) {
+  combined_trait_categories_species %>%
+    # Count number of traits for each category per sepcies
+    count(species, trait_category) %>%
+    # Remove NA categories
+    filter(!is.na(trait_category)) %>%
+    # Transform into a table where each category is a separate column
+    tidyr::pivot_wider(
+      names_from = trait_category, values_from = n, values_fill = 0
+    ) %>%
+    # Add back species with no trait values
+    full_join(match_glonaf_tnrs %>%
+                distinct(species = Accepted_name),
+              by = "species") %>%
+    mutate(across(where(is.numeric), ~ifelse(is.na(.x), 0, .x)))
+}

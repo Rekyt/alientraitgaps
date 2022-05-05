@@ -384,6 +384,11 @@ list(
       bien_trait_categories, try_trait_categories
     )
   ),
+  tar_target(
+    combined_trait_categories_species,
+    inner_join(combined_traits, combined_trait_categories,
+               by = "consolidated_name")
+  ),
 
   # Rank species per trait number in each database
   tar_target(
@@ -465,6 +470,12 @@ list(
     combined_traits_taxonomy,
     get_glonaf_higher_taxonomy_combined_traits(
       combined_traits, match_glonaf_tnrs, glonaf_alien_species
+    )
+  ),
+  tar_target(
+    species_trait_categories,
+    count_trait_categories_per_species(
+      combined_trait_categories_species, match_glonaf_tnrs
     )
   ),
 
