@@ -218,14 +218,14 @@ make_bien_trait_category = function(bien_trait_list) {
       trait_name == "vessel number"     ~ "stem",
 
       ## Whole Plant
-      trait_name == "whole plant dispersal syndrome"              ~ "seed",
-      trait_name == "whole plant growth form"                     ~ "life_history",
-      trait_name == "whole plant growth form diversity"           ~ "life_history",
-      trait_name == "whole plant height"                          ~ "height",
-      trait_name == "whole plant primary juvenile period length"  ~ "life_history",
-      trait_name == "whole plant sexual system"                   ~ "life_history",
-      trait_name == "whole plant vegetative phenology"            ~ "life_history",
-      trait_name == "whole plant woodiness"                       ~ "life_history",
+      trait_name == "whole plant dispersal syndrome"             ~ "seed",
+      trait_name == "whole plant growth form"                    ~ "life_history",
+      trait_name == "whole plant growth form diversity"          ~ "life_history",
+      trait_name == "whole plant height"                         ~ "height",
+      trait_name == "whole plant primary juvenile period length" ~ "life_history",
+      trait_name == "whole plant sexual system"                  ~ "life_history",
+      trait_name == "whole plant vegetative phenology"           ~ "life_history",
+      trait_name == "whole plant woodiness"                      ~ "life_history",
 
       ## Otherwise
       TRUE ~ NA_character_
