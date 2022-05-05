@@ -298,3 +298,16 @@ plot_taxonomy_treemap_number_traits = function(
     color_scale +
     theme(legend.position = "top")
 }
+
+plot_miss_trait_categories_per_species = function(species_trait_categories) {
+  species_trait_categories %>%
+    select(-species) %>%
+    mutate(across(where(is.numeric), ~ifelse(.x == 0, NA_integer_, 1L))) %>%
+    janitor::clean_names(case = "title") %>%
+    visdat::vis_miss(cluster = TRUE, sort_miss = TRUE) +
+    scale_fill_viridis_d(
+      direction = -1, name = NULL,
+      labels = c(`TRUE` = "Missing", `FALSE` = "Present")
+    ) +
+    labs(y = "Number of Species")
+}

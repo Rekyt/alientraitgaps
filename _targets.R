@@ -360,7 +360,6 @@ list(
   ),
 
 
-
   # Combine Trait Data ---------------------------------------------------------
   # Combine trait data from BIEN, AusTraits, and TRY under a common umbrella
   tar_target(
@@ -560,7 +559,11 @@ list(
     plot_taxonomy_treemap_number_traits(
       combined_traits_taxonomy, contain_trait_combination, logged = FALSE
     )
-  )
+  ),
+  tar_target(
+    fig_miss_trait_cat_species,
+    plot_miss_trait_categories_per_species(species_trait_categories)
+  ),
 ) %>%
   # Convert figures into ggplotGrob() to take less space
   tarchetypes::tar_hook_outer(
