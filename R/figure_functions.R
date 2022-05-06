@@ -312,6 +312,19 @@ plot_miss_trait_categories_per_species = function(species_trait_categories) {
     labs(y = "Number of Species")
 }
 
+plot_miss_trait_categories_per_species_summary = function(
+  species_trait_categories
+) {
+  species_trait_categories %>%
+    mutate(across(where(is.numeric), ~ifelse(.x == 0, NA_real_, .x))) %>%
+    select(-species) %>%
+    janitor::clean_names("upper_camel") %>%
+    ggmice::plot_pattern(rotate = TRUE) +
+    theme(text = element_text(size = 10),
+          axis.text.x.top = element_text(angle = 0, hjust = 0.5, vjust = 0.5),
+          axis.text.x.bottom = element_text(angle = 0, hjust = 0.5))
+}
+
 plot_number_trait_categories_per_species = function(species_trait_categories) {
 
   # Order species by similar trait measurements

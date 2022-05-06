@@ -565,6 +565,10 @@ list(
     plot_miss_trait_categories_per_species(species_trait_categories)
   ),
   tar_target(
+    fig_miss_trait_cat_species_summary,
+    plot_miss_trait_categories_per_species_summary(species_trait_categories)
+  ),
+  tar_target(
     fig_count_trait_cat_species,
     plot_number_trait_categories_per_species(species_trait_categories)
   )
