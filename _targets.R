@@ -406,80 +406,15 @@ list(
       glonaf_try_traits_available, harmonized_try_glonaf
     )
   ),
-  # Count number of tuples among both trait datasets
-  trait_combs <- tarchetypes::tar_map(
-    # Prepare data frame of parameters
-    values = tibble::tibble(
-      trait_comb = rlang::syms(
-        c("bien_trait_combinations", "try_trait_combinations_top_traits",
-          "aus_top_trait_combinations")
-      ),
-      trait_db = c("bien", "try_open", "aus_traits")
-    ) %>%
-      tidyr::expand_grid(tuple_number = 2:5),
-    names = c("trait_db", "tuple_number"),
-    # Actual target
-    tar_target(
-      trait_comb_number,
-      count_tuples_of_traits(
-        trait_comb[["trait_names"]], tuple_number, trait_db
-      )
-    )
-  ),
-  tarchetypes::tar_combine(
-    numbers_trait_combinations,
-    trait_combs,
-    command = dplyr::bind_rows(!!!.x)
-  ),
 
-  tar_target(
-    try_diaz_combinations,
-    generate_all_possible_diaz_combinations(try_traits)
-  ),
-  tar_target(
-    try_lhs_combinations,
-    generate_all_possible_lhs_combinations(try_traits)
-  ),
-
-  # See if LHS and Diaz combinations of trait are there
-  trait_db_lhs_diaz_count <- tarchetypes::tar_map(
-    values = tibble::tibble(
-      trait_comb = rlang::syms(
-        c("bien_trait_combinations", "try_trait_combinations",
-          "aus_trait_combinations")
-      ),
-      db = c("bien", "try_open", "austraits")
-    ),
-    names = "db",
-    tar_target(
-      lhs_diaz_count,
-      count_lhs_diaz_combination_trait(trait_comb, try_diaz_combinations,
-                                       try_lhs_combinations, db)
-    )
-  ),
-  tarchetypes::tar_combine(
-    lhs_diaz_count,
-    trait_db_lhs_diaz_count,
-    command = dplyr::bind_rows(!!!.x, .id = "db") %>%
-      select(-trait_names) %>%
-      group_by(db) %>%
-      summarise(n_sp          = n(),
-                contains_lhs  = sum(contains_lhs),
-                contains_diaz = sum(contains_diaz))
-  ),
-  tar_target(bergmann_comb_df, get_bergmann_combs()),
-  tar_target(
-    contain_trait_combination,
-    count_specific_trait_combinations(
-      combined_traits, match_glonaf_tnrs, bergmann_comb_df
-    )
-  ),
+  # Get higher taxonomy for combined traits
   tar_target(
     combined_traits_taxonomy,
     get_glonaf_higher_taxonomy_combined_traits(
       combined_traits, match_glonaf_tnrs, glonaf_alien_species
     )
   ),
+  # Get for each species the number of traits in each category
   tar_target(
     species_trait_categories,
     count_trait_categories_per_species(
@@ -487,22 +422,14 @@ list(
     )
   ),
 
-
-  # GBIF Occurrences -----------------------------------------------------------
-  # Get GBIF ids from species name
+  # Trait Combinations ---------------------------------------------------------
+  tar_target(bergmann_comb_df, get_bergmann_combs()),
   tar_target(
-    gbif_ids,
-    get_gbif_ids(harmonized_try_glonaf)
+    contain_trait_combination,
+    count_specific_trait_combinations(
+      combined_traits, match_glonaf_tnrs, bergmann_comb_df
+    )
   ),
-  tar_target(
-    gbif_ids_cleaned,
-    clean_gbif_ids(gbif_ids)
-  ),
-  # Get number of GBIF occurrence records
-  # tar_target(
-  #   gbif_num_occ,
-  #   count_gbif_occurrences(gbif_ids_cleaned)
-  # ),
 
 
   # Make figures ---------------------------------------------------------------
