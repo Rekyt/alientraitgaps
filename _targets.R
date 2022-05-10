@@ -394,7 +394,7 @@ list(
     combined_growth_form,
     extract_growth_form(
       combined_traits, glonaf_bien_traits, gift_traits_final, gift_names_traits,
-      harmonized_gift_glonaf
+      harmonized_gift_glonaf, match_glonaf_tnrs
     )
   ),
 
@@ -507,7 +507,7 @@ list(
 
   # Make figures ---------------------------------------------------------------
   tar_target(
-    pfig_euler_number_glonaf_species,
+    ofig_euler_number_glonaf_species,
     plot_euler_diagram_glonaf_species_in_databases(
       match_glonaf_tnrs, harmonized_try_glonaf, try_open_species,
       glonaf_bien_traits_count, match_austraits_tnrs
@@ -574,6 +574,12 @@ list(
     plot_miss_trait_categories_per_species(species_trait_categories)
   ),
   tar_target(
+    pfig_miss_trait_cat_species_growth_form,
+    plot_miss_trait_categories_per_species_per_growth_form(
+      species_trait_categories, combined_growth_form
+    )
+  ),
+  tar_target(
     fig_miss_trait_cat_species_summary,
     plot_miss_trait_categories_per_species_summary(species_trait_categories)
   ),
@@ -586,4 +592,9 @@ list(
   tarchetypes::tar_hook_outer(
     ggplot2::ggplotGrob(.x),
     dplyr::starts_with("fig_")
+  ) %>%
+  # Convert patchwork figures into patchworkGrob()
+  tarchetypes::tar_hook_outer(
+    patchwork::patchworkGrob(.x),
+    dplyr::starts_with("pfig_")
   )

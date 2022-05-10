@@ -312,6 +312,42 @@ plot_miss_trait_categories_per_species = function(species_trait_categories) {
     labs(y = "Number of Species")
 }
 
+plot_miss_trait_categories_per_species_per_growth_form = function(
+  species_trait_categories, combined_growth_form
+) {
+  species_trait_categories %>%
+    mutate(across(where(is.numeric), ~ifelse(.x == 0, NA_integer_, 1L))) %>%
+    janitor::clean_names(case = "title") %>%
+    full_join(combined_growth_form, by = c(Species = "species")) %>%
+    select(-Species) %>%
+    mutate(
+      growth_form = growth_form %>%
+             stringr::str_to_title() %>%
+        factor() %>%
+        forcats::fct_infreq()
+    ) %>%
+    tidyr::nest(trait_cat_df = !growth_form) %>%
+    arrange(growth_form) %>%
+    mutate(
+      trait_miss_cat_plot = purrr::map2(
+        growth_form, trait_cat_df,
+        ~.y %>%
+          visdat::vis_miss(cluster = TRUE, sort_miss = TRUE) +
+          labs(
+            title = paste0(.x, "s (n=", nrow(.y), ")"),
+            y = "Number of Species"
+          ) +
+          scale_fill_viridis_d(
+            direction = -1, name = NULL,
+            labels = c(`TRUE` = "Missing", `FALSE` = "Present")
+          )
+        )
+    ) %>%
+    pull(trait_miss_cat_plot) %>%
+    patchwork::wrap_plots(tag_level = "new") +
+    patchwork::plot_annotation(tag_levels = "A")
+}
+
 plot_miss_trait_categories_per_species_summary = function(
   species_trait_categories
 ) {

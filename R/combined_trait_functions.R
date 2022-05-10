@@ -371,7 +371,7 @@ count_trait_categories_per_species = function(
 # Function to create a unified growth form dataset to use downstream
 extract_growth_form = function(
   combined_traits, glonaf_bien_traits, gift_traits_final, gift_names_traits,
-  harmonized_gift_glonaf
+  harmonized_gift_glonaf, match_glonaf_tnrs
 ) {
   # Extract growth form data from BIEN
   bien_growth_form = glonaf_bien_traits %>%
@@ -434,6 +434,13 @@ extract_growth_form = function(
 
   combined_traits %>%
     distinct(species) %>%
+    # Add GloNAF species that show NO trait data
+    full_join(
+      match_glonaf_tnrs %>%
+        distinct(species = Accepted_name),
+      by = "species"
+    ) %>%
+    # Add growth trait datasets
     left_join(
       list(
         gift_growth_form %>%
@@ -443,5 +450,6 @@ extract_growth_form = function(
         bind_rows(),
       by = "species"
     ) %>%
+    # Any species without growth form should be labelled "unknown"
     mutate(growth_form = ifelse(is.na(growth_form), "unknown", growth_form))
 }
