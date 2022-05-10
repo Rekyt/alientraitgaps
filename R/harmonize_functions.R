@@ -80,20 +80,3 @@ count_species_per_trait = function(glonaf_try_traits_available) {
     mutate(TraitName = factor(TraitName) %>%
              forcats::fct_reorder(n_sp))
 }
-
-list_trait_combination_per_species = function(glonaf_try_traits_available) {
-  glonaf_try_traits_available %>%
-    distinct(species_accepted_try, TraitID, TraitName) %>%
-    tibble::as_tibble() %>%
-    select(-TraitID) %>%
-    group_by(species_accepted_try) %>%
-    summarise(trait_names = list(TraitName))
-}
-
-list_bien_trait_combination_per_species = function(glonaf_bien_traits) {
-  glonaf_bien_traits %>%
-    filter(!is.na(trait_name)) %>%
-    distinct(species = scrubbed_species_binomial, trait_name) %>%
-    group_by(species) %>%
-    summarise(trait_names = list(trait_name))
-}

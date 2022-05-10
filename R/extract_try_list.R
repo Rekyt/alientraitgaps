@@ -5,12 +5,6 @@ extract_try_list = function(try_species) {
     pull(AccSpeciesName)
 }
 
-select_most_measured_traits = function(glonaf_species_per_trait, n = 200) {
-  glonaf_species_per_trait %>%
-    arrange(desc(n_sp)) %>%
-    slice_max(n_sp, n = n)
-}
-
 make_try_trait_categories = function(consolidated_trait_names) {
   consolidated_trait_names %>%
     filter(

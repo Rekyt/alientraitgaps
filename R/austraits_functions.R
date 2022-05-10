@@ -67,18 +67,6 @@ count_austraits_trait_per_species = function(aus_traits) {
     dplyr::count(species_accepted_austraits, sort = TRUE, name = "n_traits")
 }
 
-get_austraits_trait_combinations = function(aus_traits) {
-  aus_traits %>%
-    dplyr::group_by(species = species_accepted_austraits) %>%
-    dplyr::summarise(trait_names = list(trait_name))
-}
-
-get_austraits_top_trait_combinations = function(aus_traits, aus_top_traits) {
-  aus_traits %>%
-    semi_join(aus_top_traits, by = "trait_name") %>%
-    get_austraits_trait_combinations()
-}
-
 make_non_try_aus_traits_category = function(consolidated_trait_names) {
   consolidated_trait_names %>%
     filter(

@@ -217,18 +217,6 @@ count_gift_trait_per_species = function(gift_glonaf_traits) {
     dplyr::count(species_accepted_gift, sort = TRUE, name = "n_traits")
 }
 
-get_gift_trait_combinations = function(gift_glonaf_traits) {
-  gift_glonaf_traits %>%
-    dplyr::group_by(species = species_accepted_gift) %>%
-    dplyr::summarise(trait_names = list(Trait2))
-}
-
-get_gift_top_trait_combinations = function(gift_glonaf_traits, aus_top_traits) {
-  gift_glonaf_traits %>%
-    semi_join(aus_top_traits, by = "Trait2") %>%
-    get_gift_trait_combinations()
-}
-
 make_gift_trait_category = function(gift_traits_meta) {
   gift_traits_meta %>%
     mutate(

@@ -9,12 +9,9 @@ source("R/bien_functions.R")
 source("R/combined_trait_functions.R")
 source("R/extract_try_list.R")
 source("R/figure_functions.R")
-source("R/gbif_functions.R")
 source("R/glonaf_db_functions.R")
 source("R/gift_functions.R")
 source("R/harmonize_functions.R")
-source("R/invacost_functions.R")
-source("R/tr8_functions.R")
 
 # Initial options --------------------------------------------------------------
 tar_option_set(
@@ -26,15 +23,6 @@ tar_option_set(
 list(
   # Load TRY data --------------------------------------------------------------
   # Load actual files
-  tar_target(
-    raw_try_df,
-    here::here("inst", "exdata", "try", "12477.df"),
-    format = "file"
-  ),
-  tar_target(
-    try_df,
-    disk.frame::disk.frame(raw_try_df)
-  ),
   tar_target(
     raw_try_species,
     here::here("inst", "exdata", "try", "TryAccSpecies.txt"),
@@ -208,22 +196,10 @@ list(
     count_species_per_trait(glonaf_try_traits_available)
   ),
   tar_target(
-    try_trait_combinations,
-    list_trait_combination_per_species(glonaf_try_traits_available)
-  ),
-  tar_target(
-    try_top_traits,
-    select_most_measured_traits(glonaf_species_per_trait, 15)
-  ),
-  tar_target(
-    try_trait_combinations_top_traits,
-    semi_join(glonaf_try_traits_available, try_top_traits, by = "TraitName") %>%
-      list_trait_combination_per_species()
-  ),
-  tar_target(
     try_trait_categories,
     make_try_trait_categories(consolidated_trait_names)
   ),
+
 
   # BIEN traits ----------------------------------------------------------------
   # List BIEN traits
@@ -253,10 +229,6 @@ list(
     glonaf_bien_species_per_trait,
     count_bien_species_per_trait(glonaf_bien_traits_count)
   ),
-  tar_target(
-    bien_trait_combinations,
-    list_bien_trait_combination_per_species(glonaf_bien_traits)
-  ),
 
 
   # AusTraits traits -----------------------------------------------------------
@@ -279,6 +251,7 @@ list(
       aus_try_convert_df, bien_try_convert_df
     )
   ),
+  # Non-TRY traits categories
   tar_target(
     aus_trait_categories,
     make_non_try_aus_traits_category(consolidated_trait_names)
@@ -298,18 +271,6 @@ list(
   tar_target(
     aus_trait_per_species,
     count_austraits_trait_per_species(aus_traits)
-  ),
-  tar_target(
-    aus_trait_combinations,
-    get_austraits_trait_combinations(aus_traits)
-  ),
-  tar_target(
-    aus_top_traits,
-    dplyr::slice_max(aus_species_per_trait, n_sp, n = 20)
-  ),
-  tar_target(
-    aus_top_trait_combinations,
-    get_austraits_top_trait_combinations(aus_traits, aus_top_traits)
   ),
 
 
@@ -346,18 +307,6 @@ list(
     gift_trait_per_species,
     count_gift_trait_per_species(gift_glonaf_traits)
   ),
-  tar_target(
-    gift_trait_combinations,
-    get_gift_trait_combinations(gift_glonaf_traits)
-  ),
-  tar_target(
-    gift_top_traits,
-    dplyr::slice_max(gift_species_per_trait, n_sp, n = 20)
-  ),
-  tar_target(
-    gift_top_trait_combinations,
-    get_gift_top_trait_combinations(gift_glonaf_traits, gift_top_traits)
-  ),
 
 
   # Combine Trait Data ---------------------------------------------------------
@@ -376,7 +325,7 @@ list(
       aus_traits, gift_glonaf_traits
     )
   ),
-  # Add trait categories
+  # Add trait categories to traits
   tar_target(
     combined_trait_categories,
     combine_trait_categories(
