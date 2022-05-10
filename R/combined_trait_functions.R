@@ -55,8 +55,8 @@ consolidate_trait_names = function(bien_try_convert_df, aus_try_convert_df,
 }
 
 combine_bien_try_aus_gift_traits = function(
-    consolidated_trait_names, glonaf_bien_traits, glonaf_try_traits_available,
-    aus_traits, gift_glonaf_traits
+  consolidated_trait_names, glonaf_bien_traits, glonaf_try_traits_available,
+  aus_traits, gift_glonaf_traits
 ) {
   bien_distinct_traits = glonaf_bien_traits %>%
     distinct(species = scrubbed_species_binomial, bien_trait_name = trait_name)
@@ -85,16 +85,16 @@ combine_bien_try_aus_gift_traits = function(
                  by = "try_trait_id"),
     # GIFT
     consolidated_trait_names %>%
-    inner_join(gift_distinct_traits,
-               by = "gift_trait_name")
+      inner_join(gift_distinct_traits,
+                 by = "gift_trait_name")
   ) %>%
     bind_rows() %>%
     distinct(consolidated_name, species)
 }
 
 rank_species_trait_number = function(
-    glonaf_bien_traits_count, try_total_number_trait,
-    glonaf_try_traits_available, harmonized_try_glonaf) {
+  glonaf_bien_traits_count, try_total_number_trait,
+  glonaf_try_traits_available, harmonized_try_glonaf) {
 
   list(
     bien = glonaf_bien_traits_count %>%
@@ -366,4 +366,82 @@ count_trait_categories_per_species = function(
                 distinct(species = Accepted_name),
               by = "species") %>%
     mutate(across(where(is.numeric), ~ifelse(is.na(.x), 0, .x)))
+}
+
+# Function to create a unified growth form dataset to use downstream
+extract_growth_form = function(
+  combined_traits, glonaf_bien_traits, gift_traits_final, gift_names_traits,
+  harmonized_gift_glonaf
+) {
+  # Extract growth form data from BIEN
+  bien_growth_form = glonaf_bien_traits %>%
+    filter(grepl("whole plant growth form",trait_name)) %>%
+    distinct(
+      species = scrubbed_species_binomial, trait_name, growth_form = trait_value
+    )
+
+  # Extract growth form data from GIFT
+  gift_growth_form = gift_traits_final %>%
+    filter(trait_ID == "1.2.1") %>%
+    distinct(work_ID, trait_value) %>%
+    # Add back species names
+    inner_join(
+      gift_names_traits %>%
+        distinct(work_ID, species),
+      by = "work_ID"
+    ) %>%
+    # Re-add harmonized species names
+    inner_join(
+      harmonized_gift_glonaf %>%
+        distinct(species = name_init_gift, species_accepted_gift),
+      by = "species"
+    ) %>%
+    # Keep only harmonized species names and growth form value
+    distinct(species = species_accepted_gift, trait_value) %>%
+    select(species, growth_form = trait_value)
+
+  # Species without growth form in GIFT
+  species_missing_growth_form = combined_traits %>%
+    distinct(species) %>%
+    anti_join(
+      gift_growth_form %>%
+        filter(!is.na(growth_form)),
+      by = "species"
+    )
+
+  # Unify growth forms in BIEN for missing species of GIFT
+  miss_species_growth_bien = bien_growth_form %>%
+    semi_join(
+      species_missing_growth_form, by = "species"
+    ) %>%
+    filter(trait_name == "whole plant growth form") %>%
+    mutate(
+      growth_form = growth_form %>%
+        stringr::str_to_title() %>%
+        stringr::str_replace(stringr::fixed("*"), "")
+    ) %>%
+    mutate(
+      growth_form =
+        case_when(
+          growth_form %in% c("Shrub", "Tree", "Herb") ~ growth_form,
+          growth_form %in% c("Forb", "Grass", "Fern") ~ "Herb",
+          growth_form == "Small_tree"                 ~ "Tree",
+          TRUE                                        ~ "Other"
+        ) %>%
+        tolower()
+    ) %>%
+    distinct(species, growth_form)
+
+  combined_traits %>%
+    distinct(species) %>%
+    left_join(
+      list(
+        gift_growth_form %>%
+          filter(!is.na(growth_form)),
+        miss_species_growth_bien
+      ) %>%
+        bind_rows(),
+      by = "species"
+    ) %>%
+    mutate(growth_form = ifelse(is.na(growth_form), "unknown", growth_form))
 }

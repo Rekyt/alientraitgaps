@@ -370,12 +370,13 @@ list(
     )
   ),
   tar_target(
-    combined_traits,
+    combined_traits,  # Actual table with species names and trait names
     combine_bien_try_aus_gift_traits(
       consolidated_trait_names, glonaf_bien_traits, glonaf_try_traits_available,
       aus_traits, gift_glonaf_traits
     )
   ),
+  # Add trait categories
   tar_target(
     combined_trait_categories,
     combine_trait_categories(
@@ -387,6 +388,14 @@ list(
     combined_trait_categories_species,
     inner_join(combined_traits, combined_trait_categories,
                by = "consolidated_name")
+  ),
+  # Add growth form groups
+  tar_target(
+    combined_growth_form,
+    extract_growth_form(
+      combined_traits, glonaf_bien_traits, gift_traits_final, gift_names_traits,
+      harmonized_gift_glonaf
+    )
   ),
 
   # Rank species per trait number in each database
