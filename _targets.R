@@ -518,30 +518,8 @@ list(
     plot_trait_number_try_glonaf_species(try_total_number_trait)
   ),
   tar_target(
-    fig_glonaf_species_per_trait,
-    plot_number_species_per_try_trait(
-      glonaf_species_per_trait, glonaf_bien_species_per_trait
-    )
-  ),
-  tar_target(
     fig_species_per_trait_combined,
     plot_number_species_per_trait_combined(combined_traits)
-  ),
-  tar_target(
-    fig_try_trait_combination_frequency,
-    plot_glonaf_trait_combination_frequency(try_trait_combinations, "TRY (open)")
-  ),
-  tar_target(
-    fig_bien_trait_combination_frequency,
-    plot_glonaf_trait_combination_frequency(bien_trait_combinations, "BIEN")
-  ),
-  tar_target(
-    fig_trait_ranks_multi_db,
-    plot_trait_ranks_multi_db(glonaf_trait_ranks)
-  ),
-  tar_target(
-    fig_species_per_trait_combinations_multi_db,
-    plot_species_trait_combinations(numbers_trait_combinations)
   ),
   tar_target(
     fig_combined_trait_heatmap,
