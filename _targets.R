@@ -166,7 +166,8 @@ list(
     match_gift_tnrs, TNRS::TNRS(gift_sublist)
   ),
 
-  # Harmonize TRY and GloNAF ---------------------------------------------------
+  # TRY traits -----------------------------------------------------------------
+  # Harmonize TRY and GloNAF
   tar_target(
     harmonized_try_glonaf,
     harmonize_try_glonaf_species(match_try_tnrs, match_glonaf_tnrs)
@@ -183,7 +184,6 @@ list(
     harmonize_try_open(full_try_df, harmonized_try_glonaf)
   ),
 
-  # TRY traits -----------------------------------------------------------------
   tar_target(
     try_total_number_trait, count_trait_try(harmonized_try_glonaf, try_species)
   ),
@@ -310,7 +310,7 @@ list(
 
 
   # Combine Trait Data ---------------------------------------------------------
-  # Combine trait data from BIEN, AusTraits, and TRY under a common umbrella
+  # Combine trait names from BIEN, AusTraits, and TRY under a common umbrella
   tar_target(
     consolidated_trait_names,
     consolidate_trait_names(
@@ -318,27 +318,30 @@ list(
       gift_try_convert_df, try_traits
     )
   ),
-  tar_target(
-    combined_traits,  # Actual table with species names and trait names
-    combine_bien_try_aus_gift_traits(
-      consolidated_trait_names, glonaf_bien_traits, glonaf_try_traits_available,
-      aus_traits, gift_glonaf_traits
-    )
-  ),
   # Add trait categories to traits
   tar_target(
-    combined_trait_categories,
+    consolidated_trait_categories,
     combine_trait_categories(
       consolidated_trait_names, gift_trait_categories, aus_trait_categories,
       bien_trait_categories, try_trait_categories
     )
   ),
+  ## Actual tables with trait names
+  # Actual table with species names and trait names
+  tar_target(
+    combined_traits,
+    combine_bien_try_aus_gift_traits(
+      consolidated_trait_names, glonaf_bien_traits, glonaf_try_traits_available,
+      aus_traits, gift_glonaf_traits
+    )
+  ),
+  # Add trait categories
   tar_target(
     combined_trait_categories_species,
-    inner_join(combined_traits, combined_trait_categories,
+    inner_join(combined_traits, consolidated_trait_categories,
                by = "consolidated_name")
   ),
-  # Add growth form groups
+  # Growth form table per species
   tar_target(
     combined_growth_form,
     extract_growth_form(
