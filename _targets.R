@@ -384,6 +384,13 @@ list(
   ),
 
 
+  # World Regions --------------------------------------------------------------
+  tar_target(
+    unified_glonaf_regions,
+    unify_glonaf_regions(glonaf_regions)
+  ),
+
+
   # Make figures ---------------------------------------------------------------
   tar_target(
     ofig_euler_number_glonaf_species,
@@ -443,6 +450,10 @@ list(
   tar_target(
     fig_count_trait_cat_species,
     plot_number_trait_categories_per_species(species_trait_categories)
+  ),
+  tar_target(
+    fig_map_glonaf_regions,
+    plot_map_glonaf_regions(unified_glonaf_regions)
   )
 ) %>%
   # Convert figures into ggplotGrob() to take less space

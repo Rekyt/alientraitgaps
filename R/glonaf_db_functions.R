@@ -158,3 +158,57 @@ get_glonaf_region_correspondence = function(glonaf_alien_species) {
     select(taxon_orig_id, taxon_orig, taxon_corrected, genus, epithet, hybrid,
            author_name, OBJIDsic)
 }
+
+#' Create a unified regions sf object
+#'
+#' There are no standard ways of creating maps in GloNAF. So we decided it
+#' to unify a dataset ourself. Specifically when considering finnest possible
+#' regions some regions are missing. This function takes into input the sf data
+#' of spatial regions with some selections from the GloNAF database to obtain
+#' a list of actual regions used for mapping.
+#'
+#' @noRd
+unify_glonaf_regions = function(glonaf_regions) {
+
+  glonaf_con = connect_glonaf_db()
+
+  # Keep all referenced regions from the spatial file given the database
+  all_referenced_regions = glonaf_regions %>%
+    inner_join(
+      glonaf_con %>%
+        tbl("region") %>%
+        collect(),
+      by = c("OBJIDsic", "name")
+    ) %>%
+    sf::st_transform(crs = "+proj=eqearth")
+
+  discon(glonaf_con)
+
+  # Selected regions
+  all_referenced_regions %>%
+    filter(
+      # Keep finest regions
+      finest_complete_resolution == 1 |
+        # Add missing countries
+        OBJIDsic %in% c(
+            25,  # Argentina
+            52,  # Brazil
+            85,  # Chile
+           329,  # Oman
+           354,  # Paraguay
+           377,  # European Part of Russia
+           439,  # Syria
+           662,  # Bolivia
+           815,  # Colombia
+           831,  # Ecuador
+           925,  # Japan
+          1068,  # Peru
+          1194,  # Sudan
+          1203,  # Somalia
+          1267   # Uruguay
+        ) |
+        # Add all regions from country mostly empty
+        grepl("^NOR", IDregion) |  # Keep all regions of Norway
+        grepl("^PAN", IDregion)    # Keep all regions of Panama
+    )
+}

@@ -306,3 +306,21 @@ plot_number_trait_categories_per_species = function(species_trait_categories) {
     theme(axis.ticks.y = element_blank(),
           legend.position = "top")
 }
+
+plot_map_glonaf_regions = function(unified_glonaf_regions) {
+
+  # Background map
+  world_sf = rnaturalearth::ne_countries(returnclass = "sf") %>%
+    sf::st_transform(crs = "+proj=eqearth")
+
+  # Actual plot
+  unified_glonaf_regions %>%
+    ggplot() +
+    geom_sf(data = world_sf, fill = "gray85", color = "gray55", size = 1/2) +
+    geom_sf(fill = "darkblue", alpha = 1/3, size = 1/5) +
+    labs(title = "Map of GloNAF regions of the world",
+         subtitle = "Darker regions means overlapping selected regions") +
+    theme_void() +
+    theme(plot.title = element_text(hjust = 0.5),
+          plot.subtitle = element_text(hjust = 0.5))
+}
