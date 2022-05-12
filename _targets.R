@@ -383,6 +383,10 @@ list(
     unified_glonaf_regions,
     unify_glonaf_regions(glonaf_regions)
   ),
+  tar_target(
+    glonaf_species_regions,
+    extract_species_regions_table(connect_glonaf_db(), match_glonaf_tnrs)
+  ),
 
 
   # Make figures ---------------------------------------------------------------

@@ -212,3 +212,62 @@ unify_glonaf_regions = function(glonaf_regions) {
         grepl("^PAN", IDregion)    # Keep all regions of Panama
     )
 }
+
+extract_species_regions_table = function(glonaf_con, match_glonaf_tnrs) {
+  species_regions = tbl(glonaf_con, "flora_orig") %>%
+    # Get taxa that are referenced as naturalized, alien, or invasive
+    filter(status_id %in% c(2, 4, 5, 7)) %>%
+    distinct(taxon_orig_id, list_id) %>%
+    inner_join(
+      tbl(glonaf_con, "list") %>%
+        rename(list_id = id) %>%
+        distinct(list_id, region_id),
+      by = "list_id"
+    ) %>%
+    inner_join(
+      tbl(glonaf_con, "region") %>%
+        rename(region_id = id) %>%
+        distinct(region_id, OBJIDsic),
+      by = "region_id"
+    ) %>%
+    distinct(taxon_orig_id, OBJIDsic) %>%
+    # Get species names and ids
+    inner_join(tbl(glonaf_con, "taxon_orig"), by = c(taxon_orig_id = "id")) %>%
+    # Corrected names after matching TPL
+    distinct(species_id, taxon_orig_id, OBJIDsic) %>%
+    inner_join(tbl(glonaf_con, "species"), by = c(species_id = "id")) %>%
+    select(-species_id) %>%
+    # Add Name status from TPL
+    inner_join(tbl(glonaf_con, "name_status"), by = c(name_status_id = "id")) %>%
+    select(-name_status_id) %>%
+    # Get only binomial name
+    filter(infra_rank_id == 4) %>%
+    # Add full genus name
+    inner_join(glonaf_con %>%
+                 tbl("genus") %>%
+                 select(genus_id = id, genus = name), by = "genus_id") %>%
+    select(-genus_id) %>%
+    # Add author name
+    inner_join(glonaf_con  %>%
+                 tbl("author") %>%
+                 select(author_id = id, author_name = name),
+               by = "author_id") %>%
+    select(-author_id) %>%
+    collect()
+
+  discon(glonaf_con)
+
+  species_regions %>%
+    distinct(OBJIDsic, genus, epithet, author_name) %>%
+    mutate(
+      full_name = paste(genus, epithet, author_name) %>%
+             iconv("utf-8", "latin1")
+    ) %>%
+    inner_join(
+      match_glonaf_tnrs %>%
+        distinct(Name_submitted, species = Accepted_name),
+      by = c(full_name = "Name_submitted")
+    ) %>%
+    distinct(species, OBJIDsic) %>%
+    select(OBJIDsic, species)
+}
