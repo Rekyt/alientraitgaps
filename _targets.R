@@ -1,4 +1,4 @@
-# Actual workflow file to run all analyses
+# Workflow file to run all analyses
 
 # Packages and functions -------------------------------------------------------
 library("targets")
@@ -10,7 +10,7 @@ source("R/combined_trait_functions.R")
 source("R/figure_functions.R")
 source("R/glonaf_functions.R")
 source("R/gift_functions.R")
-source("R/harmonize_functions.R")
+source("R/harmonize_taxonomy_functions.R")
 source("R/try_functions.R")
 
 # Initial options --------------------------------------------------------------
