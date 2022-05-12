@@ -287,3 +287,23 @@ plot_map_glonaf_regions = function(unified_glonaf_regions) {
     theme(plot.title = element_text(hjust = 0.5),
           plot.subtitle = element_text(hjust = 0.5))
 }
+
+plot_map_proprotion_trait_by_region = function(
+  regions_trait_prop, unified_glonaf_regions
+) {
+  # Background map
+  world_sf = rnaturalearth::ne_countries(returnclass = "sf") %>%
+    sf::st_transform(crs = "+proj=eqearth")
+
+  # Actual plot
+  regions_trait_prop %>%
+    select(OBJIDsic, prop_with_any_trait:has_bergmann_prop) %>%
+    tidyr::pivot_longer(!OBJIDsic, names_to = "prop_name", values_to = "prop_value") %>%
+    {inner_join(unified_glonaf_regions, ., by = "OBJIDsic")} %>%
+    ggplot(aes(fill = prop_value)) +
+    geom_sf(data = world_sf, fill = "gray85", color = "gray55") +
+    geom_sf() +
+    facet_wrap(vars(prop_name)) +
+    scale_fill_viridis_c(name = "Proportion (%)") +
+    theme_bw()
+}

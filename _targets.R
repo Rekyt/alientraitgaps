@@ -452,6 +452,12 @@ list(
   tar_target(
     fig_map_glonaf_regions,
     plot_map_glonaf_regions(unified_glonaf_regions)
+  ),
+  tar_target(
+    fig_map_prop_trait_regions,
+    plot_map_proprotion_trait_by_region(
+      regions_trait_prop, unified_glonaf_regions
+    )
   )
 ) %>%
   # Convert figures into ggplotGrob() to take less space
