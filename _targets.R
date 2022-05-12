@@ -387,6 +387,13 @@ list(
     glonaf_species_regions,
     extract_species_regions_table(connect_glonaf_db(), match_glonaf_tnrs)
   ),
+  tar_target(
+    regions_trait_prop,
+    count_species_proportion_trait_by_region(
+      glonaf_species_regions, species_trait_categories,
+      contain_trait_combination
+    )
+  ),
 
 
   # Make figures ---------------------------------------------------------------
