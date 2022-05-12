@@ -7,11 +7,11 @@ library("magrittr")
 source("R/austraits_functions.R")
 source("R/bien_functions.R")
 source("R/combined_trait_functions.R")
-source("R/extract_try_list.R")
 source("R/figure_functions.R")
-source("R/glonaf_db_functions.R")
+source("R/glonaf_functions.R")
 source("R/gift_functions.R")
 source("R/harmonize_functions.R")
+source("R/try_functions.R")
 
 # Initial options --------------------------------------------------------------
 tar_option_set(
@@ -176,12 +176,6 @@ list(
   tar_target(
     harmonized_try_ids,
     get_try_ids_from_harmonized_species(harmonized_try_glonaf, try_species)
-  ),
-
-  # Match TRY open data extract
-  tar_target(
-    try_open_species,
-    harmonize_try_open(full_try_df, harmonized_try_glonaf)
   ),
 
   tar_target(
@@ -392,13 +386,6 @@ list(
 
 
   # Make figures ---------------------------------------------------------------
-  tar_target(
-    ofig_euler_number_glonaf_species,
-    plot_euler_diagram_glonaf_species_in_databases(
-      match_glonaf_tnrs, harmonized_try_glonaf, try_open_species,
-      glonaf_bien_traits_count, match_austraits_tnrs
-    )
-  ),
   tar_target(
     fig_glonaf_species_number_trait,
     plot_trait_number_try_glonaf_species(try_total_number_trait)

@@ -37,17 +37,6 @@ get_try_ids_from_harmonized_species = function(
                by = c(name_init_try = "AccSpeciesName"))
 }
 
-
-harmonize_try_open = function(full_try_df, harmonized_try_glonaf) {
-  harmonized_try_glonaf %>%
-    inner_join(full_try_df %>%
-    disk.frame::chunk_distinct(AccSpeciesName) %>%
-    collect() %>%
-    distinct(AccSpeciesName),
-    by = c(name_init_try = "AccSpeciesName"))
-}
-
-
 count_trait_try = function(harmonized_try_glonaf, try_species) {
   harmonized_try_glonaf %>%
     get_try_ids_from_harmonized_species(try_species) %>%
