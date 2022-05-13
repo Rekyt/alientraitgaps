@@ -299,11 +299,33 @@ plot_map_proprotion_trait_by_region = function(
   regions_trait_prop %>%
     select(OBJIDsic, prop_with_any_trait:has_bergmann_prop) %>%
     tidyr::pivot_longer(!OBJIDsic, names_to = "prop_name", values_to = "prop_value") %>%
+    mutate(
+      prop_name = factor(
+        prop_name,
+        levels = c("prop_with_any_trait", "has_lhs_prop", "has_diaz_prop",
+                   "has_bergmann_prop")
+      )
+    ) %>%
     {inner_join(unified_glonaf_regions, ., by = "OBJIDsic")} %>%
     ggplot(aes(fill = prop_value)) +
-    geom_sf(data = world_sf, fill = "gray85", color = "gray55") +
-    geom_sf() +
-    facet_wrap(vars(prop_name)) +
-    scale_fill_viridis_c(name = "Proportion (%)") +
-    theme_bw()
+    geom_sf(data = world_sf, fill = "gray85", color = "gray65", size = 1/100) +
+    geom_sf(color = "gray65", size = 1/100) +
+    facet_wrap(
+      vars(prop_name),
+      labeller = labeller(
+        prop_name = c(
+          has_bergmann_prop = "Root Traits\n(Bergmann et al.)",
+          has_diaz_prop     = "Aboveground traits\n(Díaz et al.)",
+          has_lhs_prop      = "LHS (Westoby)",
+          prop_with_any_trait = "Any trait"
+        )
+      )
+    ) +
+    scale_fill_viridis_c(
+      name = "Proportion of aliens species\nwith specified trait combination",
+      labels = scales::percent_format()
+    ) +
+    ylim(-5747986, NA) +  # Remove whatever is below 60°S
+    theme_void() +
+    theme(legend.position = "top", strip.background = element_blank())
 }

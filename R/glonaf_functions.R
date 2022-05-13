@@ -300,6 +300,7 @@ count_species_proportion_trait_by_region = function(
   comb_prop = glonaf_species_regions %>%
     full_join(
       contain_trait_combination %>%
+        ungroup() %>%
         filter(species != "") %>%
         select(species, has_lhs:has_bergmann),
       by = "species"
@@ -311,7 +312,7 @@ count_species_proportion_trait_by_region = function(
     group_by(OBJIDsic) %>%
     summarise(
       # Proportion of species with given combination
-      across(where(is.logical), list(prop = ~sum(isTRUE(.x), na.rm = TRUE)/n()))
+      across(where(is.logical), list(prop = ~sum(.x, na.rm = TRUE)/n()))
     )
 
   full_join(trait_prop, comb_prop, by = "OBJIDsic")
