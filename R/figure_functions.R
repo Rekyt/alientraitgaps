@@ -295,8 +295,18 @@ plot_map_proprotion_trait_by_region = function(
   world_sf = rnaturalearth::ne_countries(returnclass = "sf") %>%
     sf::st_transform(crs = "+proj=eqearth")
 
+  # Convert small islands to points
+  glonaf_small_islands = unified_glonaf_regions %>%
+    filter(island == 1, GeodAREA <= 2.5e3) %>%
+    sf::st_centroid()
+
+  # Keep non-small or non-islands split
+  glonaf_not_small_islands = unified_glonaf_regions %>%
+    filter(island != 1 | GeodAREA > 2.5e3)
+
+
   # Actual plot
-  regions_trait_prop %>%
+  pivoted_data = regions_trait_prop %>%
     select(OBJIDsic, prop_with_any_trait:has_bergmann_prop) %>%
     tidyr::pivot_longer(!OBJIDsic, names_to = "prop_name", values_to = "prop_value") %>%
     mutate(
@@ -305,11 +315,22 @@ plot_map_proprotion_trait_by_region = function(
         levels = c("prop_with_any_trait", "has_lhs_prop", "has_diaz_prop",
                    "has_bergmann_prop")
       )
-    ) %>%
-    {inner_join(unified_glonaf_regions, ., by = "OBJIDsic")} %>%
+    )
+
+  glonaf_not_small_islands %>%
+    inner_join(pivoted_data, by = "OBJIDsic") %>%
     ggplot(aes(fill = prop_value)) +
     geom_sf(data = world_sf, fill = "gray85", color = "gray65", size = 1/100) +
+    # Non-small islands and mainlands
     geom_sf(color = "gray65", size = 1/100) +
+    # Small islands
+    geom_sf(
+      aes(color = prop_value),
+      fill = NA,
+      data = glonaf_small_islands %>%
+        inner_join(pivoted_data, by = "OBJIDsic"),
+      size = 2.5, shape = 21, stroke = 1.5
+    ) +
     facet_wrap(
       vars(prop_name),
       labeller = labeller(
@@ -322,6 +343,10 @@ plot_map_proprotion_trait_by_region = function(
       )
     ) +
     scale_fill_viridis_c(
+      name = "Proportion of aliens species\nwith specified trait combination",
+      labels = scales::percent_format()
+    ) +
+    scale_color_viridis_c(
       name = "Proportion of aliens species\nwith specified trait combination",
       labels = scales::percent_format()
     ) +
