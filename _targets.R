@@ -460,6 +460,10 @@ list(
     plot_number_trait_categories_per_species(species_trait_categories)
   ),
   tar_target(
+    fig_rich_prop_trait,
+    plot_prop_trait_per_richness(regions_trait_prop, unified_glonaf_regions)
+  ),
+  tar_target(
     fig_map_glonaf_regions,
     plot_map_glonaf_regions(unified_glonaf_regions)
   ),

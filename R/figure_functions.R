@@ -270,6 +270,63 @@ plot_number_trait_categories_per_species = function(species_trait_categories) {
           legend.position = "top")
 }
 
+
+plot_prop_trait_per_richness = function(
+    regions_trait_prop, unified_glonaf_regions
+) {
+  regions_trait_prop %>%
+    tidyr::pivot_longer(
+      !c(n_species, OBJIDsic), names_to = "prop_name", values_to = "prop_value"
+    ) %>%
+    # Add if region is island or not
+    inner_join(
+      unified_glonaf_regions %>%
+        as.data.frame() %>%
+        select(OBJIDsic, island),
+      by = "OBJIDsic") %>%
+    select(-OBJIDsic) %>%
+    mutate(
+      prop_name = gsub("_prop(_trait)?", "", prop_name) %>%
+        factor(
+          levels = c("life_history", "leaf", "seed", "height", "flower", "root",
+                     "stem", "prop_with_any_trait", "has_lhs", "has_diaz",
+                     "has_bergmann")
+        )
+    ) %>%
+    ggplot(aes(n_species, prop_value, color = island == 1)) +
+    geom_point(size = 1/2, alpha = 1/3) +
+    facet_wrap(
+      vars(prop_name),
+      labeller = labeller(
+        prop_name = c(
+          has_bergmann     = "Root Traits\n(4 traits, Bergmann et al. 2020)",
+          has_diaz         = "Aboveground traits\n(6 traits, Díaz et al. 2016)",
+          has_lhs          = "Leaf-Height-Seed mass\n(3 traits, Westoby 2002)",
+          prop_with_any_trait = "Any trait",
+          flower              = "Flower",
+          height              = "Height",
+          leaf                = "Leaf",
+          life_history        = "Life History",
+          root                = "Root",
+          seed                = "Seed",
+          stem                = "Stem"
+        )
+      )
+    ) +
+    scale_x_log10("Alien Species Richness") +
+    scale_y_continuous(
+      "Proportion Trait(s)", labels = scales::percent_format()
+    ) +
+    scale_color_discrete(
+      NULL,
+      guide = guide_legend(override.aes = list(size = 1, alpha = 1)),
+      labels = c(`TRUE` = "Island", `FALSE` = "Not Island")
+    ) +
+    theme_bw() +
+    theme(aspect.ratio = 1, strip.background = element_blank(),
+          legend.position = "top")
+}
+
 plot_map_glonaf_regions = function(unified_glonaf_regions) {
 
   # Background map
@@ -391,5 +448,6 @@ plot_map_alien_richness_region = function(
     ) +
     ylim(-5747986, NA) +  # Remove whatever is below 60°S
     theme_void() +
-    theme(legend.position = "top")
+    theme(legend.position = "top",
+          legend.key.width = unit(2, "lines"))
 }
