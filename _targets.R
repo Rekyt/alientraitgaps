@@ -465,7 +465,13 @@ list(
   ),
   tar_target(
     fig_map_prop_trait_regions,
-    plot_map_proprotion_trait_by_region(
+    plot_map_proportion_trait_by_region(
+      regions_trait_prop, glonaf_small_islands, glonaf_mainland_large_islands
+    )
+  ),
+  tar_target(
+    fig_map_alien_richness,
+    plot_map_alien_richness_region(
       regions_trait_prop, glonaf_small_islands, glonaf_mainland_large_islands
     )
   )

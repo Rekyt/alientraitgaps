@@ -288,17 +288,19 @@ plot_map_glonaf_regions = function(unified_glonaf_regions) {
           plot.subtitle = element_text(hjust = 0.5))
 }
 
-plot_map_proprotion_trait_by_region = function(
+plot_map_proportion_trait_by_region = function(
   regions_trait_prop, glonaf_small_islands, glonaf_mainland_large_islands
 ) {
   # Background map
   world_sf = rnaturalearth::ne_countries(returnclass = "sf") %>%
     sf::st_transform(crs = "+proj=eqearth")
 
-  # Actual plot
+  # Pivot trait data to be usable across facets
   pivoted_data = regions_trait_prop %>%
     select(OBJIDsic, prop_with_any_trait:has_bergmann_prop) %>%
-    tidyr::pivot_longer(!OBJIDsic, names_to = "prop_name", values_to = "prop_value") %>%
+    tidyr::pivot_longer(
+      !OBJIDsic, names_to = "prop_name", values_to = "prop_value"
+    ) %>%
     mutate(
       prop_name = factor(
         prop_name,
@@ -307,6 +309,7 @@ plot_map_proprotion_trait_by_region = function(
       )
     )
 
+  # Actual plot
   glonaf_mainland_large_islands %>%
     inner_join(pivoted_data, by = "OBJIDsic") %>%
     ggplot(aes(fill = prop_value)) +
@@ -325,22 +328,68 @@ plot_map_proprotion_trait_by_region = function(
       vars(prop_name),
       labeller = labeller(
         prop_name = c(
-          has_bergmann_prop = "Root Traits\n(Bergmann et al.)",
-          has_diaz_prop     = "Aboveground traits\n(Díaz et al.)",
-          has_lhs_prop      = "LHS (Westoby)",
+          has_bergmann_prop = "Root Traits\n(4 traits, Bergmann et al. 2020)",
+          has_diaz_prop     = "Aboveground traits\n(6 traits, Díaz et al. 2016)",
+          has_lhs_prop      = "Leaf-Height-Seed mass\n(3 traits, Westoby 2002)",
           prop_with_any_trait = "Any trait"
         )
       )
     ) +
     scale_fill_viridis_c(
-      name = "Proportion of aliens species\nwith specified trait combination",
+      name = "Prop. of aliens species\nwith trait combination",
       labels = scales::percent_format()
     ) +
     scale_color_viridis_c(
-      name = "Proportion of aliens species\nwith specified trait combination",
+      name = "Prop. of aliens species\nwith trait combination",
       labels = scales::percent_format()
     ) +
     ylim(-5747986, NA) +  # Remove whatever is below 60°S
     theme_void() +
     theme(legend.position = "top", strip.background = element_blank())
+}
+
+#' Plot a map of alien species richness per region
+#'
+#' @noRd
+plot_map_alien_richness_region = function(
+  regions_trait_prop, glonaf_small_islands,
+  glonaf_mainland_large_islands
+) {
+  # Background map
+  world_sf = rnaturalearth::ne_countries(returnclass = "sf") %>%
+    sf::st_transform(crs = "+proj=eqearth")
+
+  region_richness = regions_trait_prop %>%
+    select(OBJIDsic, n_species)
+
+  # Actual plot
+  glonaf_mainland_large_islands %>%
+    inner_join(region_richness, by = "OBJIDsic") %>%
+    ggplot(aes(fill = n_species)) +
+    geom_sf(data = world_sf, fill = "gray85", size = 1/100) +
+    # Non-small islands and mainlands
+    geom_sf() +
+    # Small islands
+    geom_sf(
+      aes(color = n_species),
+      fill = NA,
+      data = glonaf_small_islands %>%
+        inner_join(region_richness, by = "OBJIDsic"),
+      size = 2.5, shape = 21, stroke = 1.5
+    ) +
+    scale_fill_viridis_b(
+      name = "Alien Species Richness", trans = "log10", n.breaks = 5,
+      show.limits = TRUE,
+      # Force limit to merge axes
+      limits = range(region_richness[["n_species"]])
+    ) +
+    scale_color_viridis_b(
+      name = "Alien Species Richness", trans = "log10", n.breaks = 5,
+      show.limits = TRUE,
+      # Force limit to merge axes
+      limits = range(region_richness[["n_species"]])
+    ) +
+    ylim(-5747986, NA) +  # Remove whatever is below 60°S
+    theme_void() +
+    theme(legend.position = "top")
 }
