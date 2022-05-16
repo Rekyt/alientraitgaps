@@ -289,21 +289,11 @@ plot_map_glonaf_regions = function(unified_glonaf_regions) {
 }
 
 plot_map_proprotion_trait_by_region = function(
-  regions_trait_prop, unified_glonaf_regions
+  regions_trait_prop, glonaf_small_islands, glonaf_mainland_large_islands
 ) {
   # Background map
   world_sf = rnaturalearth::ne_countries(returnclass = "sf") %>%
     sf::st_transform(crs = "+proj=eqearth")
-
-  # Convert small islands to points
-  glonaf_small_islands = unified_glonaf_regions %>%
-    filter(island == 1, GeodAREA <= 2.5e3) %>%
-    sf::st_centroid()
-
-  # Keep non-small or non-islands split
-  glonaf_not_small_islands = unified_glonaf_regions %>%
-    filter(island != 1 | GeodAREA > 2.5e3)
-
 
   # Actual plot
   pivoted_data = regions_trait_prop %>%
@@ -317,7 +307,7 @@ plot_map_proprotion_trait_by_region = function(
       )
     )
 
-  glonaf_not_small_islands %>%
+  glonaf_mainland_large_islands %>%
     inner_join(pivoted_data, by = "OBJIDsic") %>%
     ggplot(aes(fill = prop_value)) +
     geom_sf(data = world_sf, fill = "gray85", color = "gray65", size = 1/100) +

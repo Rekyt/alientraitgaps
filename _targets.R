@@ -16,7 +16,7 @@ source("R/try_functions.R")
 # Initial options --------------------------------------------------------------
 tar_option_set(
   packages = c("data.table", "disk.frame", "dplyr", "ggplot2", "here", "TNRS",
-               "TR8", "treemapify")
+               "TR8", "treemapify", "sf")
 )
 
 # Target factory ---------------------------------------------------------------
@@ -384,6 +384,16 @@ list(
     unify_glonaf_regions(glonaf_regions)
   ),
   tar_target(
+    glonaf_small_islands,
+    select_glonaf_small_islands(unified_glonaf_regions, area = 2e3)
+  ),
+  tar_target(
+    glonaf_mainland_large_islands,
+    select_glonaf_mainland_large_islands(
+      unified_glonaf_regions, glonaf_small_islands
+    )
+  ),
+  tar_target(
     glonaf_species_regions,
     extract_species_regions_table(connect_glonaf_db(), match_glonaf_tnrs)
   ),
@@ -456,7 +466,7 @@ list(
   tar_target(
     fig_map_prop_trait_regions,
     plot_map_proprotion_trait_by_region(
-      regions_trait_prop, unified_glonaf_regions
+      regions_trait_prop, glonaf_small_islands, glonaf_mainland_large_islands
     )
   )
 ) %>%

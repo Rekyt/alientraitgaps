@@ -213,6 +213,24 @@ unify_glonaf_regions = function(glonaf_regions) {
     )
 }
 
+select_glonaf_small_islands = function(unified_glonaf_regions, area = 2.5e3) {
+  unified_glonaf_regions %>%
+    filter(island == 1, GeodAREA <= area) %>%
+    sf::st_centroid()
+}
+
+select_glonaf_mainland_large_islands = function(
+  unified_glonaf_regions, glonaf_small_islands
+) {
+  unified_glonaf_regions %>%
+    anti_join(
+      glonaf_small_islands %>%
+        as.data.frame() %>%
+        select(OBJIDsic),
+      by = "OBJIDsic"
+    )
+}
+
 extract_species_regions_table = function(glonaf_con, match_glonaf_tnrs) {
   species_regions = tbl(glonaf_con, "flora_orig") %>%
     # Get taxa that are referenced as naturalized, alien, or invasive
