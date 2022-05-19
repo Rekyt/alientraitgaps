@@ -394,8 +394,12 @@ list(
     )
   ),
   tar_target(
-    glonaf_species_regions,
+    glonaf_species_regions_status,
     extract_species_regions_table(connect_glonaf_db(), match_glonaf_tnrs)
+  ),
+  tar_target(
+    glonaf_species_regions,
+    distinct(select(glonaf_species_regions_status, -status_name))
   ),
   tar_target(
     regions_trait_prop,

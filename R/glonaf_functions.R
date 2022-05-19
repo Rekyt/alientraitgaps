@@ -71,7 +71,7 @@ extract_glonaf_list = function(glonaf_alien_species) {
 }
 
 get_glonaf_higher_taxonomy_combined_traits = function(
-  combined_traits, match_glonaf_tnrs, glonaf_alien_species
+    combined_traits, match_glonaf_tnrs, glonaf_alien_species
 ) {
 
   glonaf_con = connect_glonaf_db()
@@ -191,17 +191,17 @@ unify_glonaf_regions = function(glonaf_regions) {
       finest_complete_resolution == 1 |
         # Add missing countries
         OBJIDsic %in% c(
-            25,  # Argentina
-            52,  # Brazil
-            85,  # Chile
-           329,  # Oman
-           354,  # Paraguay
-           377,  # European Part of Russia
-           439,  # Syria
-           662,  # Bolivia
-           815,  # Colombia
-           831,  # Ecuador
-           925,  # Japan
+          25,  # Argentina
+          52,  # Brazil
+          85,  # Chile
+          329,  # Oman
+          354,  # Paraguay
+          377,  # European Part of Russia
+          439,  # Syria
+          662,  # Bolivia
+          815,  # Colombia
+          831,  # Ecuador
+          925,  # Japan
           1068,  # Peru
           1194,  # Sudan
           1203,  # Somalia
@@ -220,7 +220,7 @@ select_glonaf_small_islands = function(unified_glonaf_regions, area = 2.5e3) {
 }
 
 select_glonaf_mainland_large_islands = function(
-  unified_glonaf_regions, glonaf_small_islands
+    unified_glonaf_regions, glonaf_small_islands
 ) {
   unified_glonaf_regions %>%
     anti_join(
@@ -235,24 +235,36 @@ extract_species_regions_table = function(glonaf_con, match_glonaf_tnrs) {
   species_regions = tbl(glonaf_con, "flora_orig") %>%
     # Get taxa that are referenced as naturalized, alien, or invasive
     filter(status_id %in% c(2, 4, 5, 7)) %>%
-    distinct(taxon_orig_id, list_id) %>%
+    distinct(taxon_orig_id, list_id, status_id) %>%
+    # Add status name
+    inner_join(
+      tbl(glonaf_con, "status") %>%
+        rename(status_id = id,
+               status_name = name),
+      by = "status_id"
+    ) %>%
+    select(-status_id) %>%
+    # Get list-correspondence
     inner_join(
       tbl(glonaf_con, "list") %>%
         rename(list_id = id) %>%
         distinct(list_id, region_id),
       by = "list_id"
     ) %>%
+    select(-list_id) %>%
+    distinct() %>%
+    # Get region-shapefile polygon correspondence
     inner_join(
       tbl(glonaf_con, "region") %>%
         rename(region_id = id) %>%
         distinct(region_id, OBJIDsic),
       by = "region_id"
     ) %>%
-    distinct(taxon_orig_id, OBJIDsic) %>%
+    distinct(taxon_orig_id, status_name, OBJIDsic) %>%
     # Get species names and ids
     inner_join(tbl(glonaf_con, "taxon_orig"), by = c(taxon_orig_id = "id")) %>%
     # Corrected names after matching TPL
-    distinct(species_id, taxon_orig_id, OBJIDsic) %>%
+    distinct(species_id, taxon_orig_id, status_name, OBJIDsic) %>%
     inner_join(tbl(glonaf_con, "species"), by = c(species_id = "id")) %>%
     select(-species_id) %>%
     # Add Name status from TPL
@@ -261,38 +273,42 @@ extract_species_regions_table = function(glonaf_con, match_glonaf_tnrs) {
     # Get only binomial name
     filter(infra_rank_id == 4) %>%
     # Add full genus name
-    inner_join(glonaf_con %>%
-                 tbl("genus") %>%
-                 select(genus_id = id, genus = name), by = "genus_id") %>%
+    inner_join(
+      glonaf_con %>%
+        tbl("genus") %>%
+        select(genus_id = id, genus = name), by = "genus_id"
+    ) %>%
     select(-genus_id) %>%
     # Add author name
-    inner_join(glonaf_con  %>%
-                 tbl("author") %>%
-                 select(author_id = id, author_name = name),
-               by = "author_id") %>%
+    inner_join(
+      glonaf_con  %>%
+        tbl("author") %>%
+        select(author_id = id, author_name = name),
+      by = "author_id"
+    ) %>%
     select(-author_id) %>%
     collect()
 
   discon(glonaf_con)
 
   species_regions %>%
-    distinct(OBJIDsic, genus, epithet, author_name) %>%
+    distinct(OBJIDsic, status_name, genus, epithet, author_name) %>%
     mutate(
       full_name = paste(genus, epithet, author_name) %>%
-             iconv("utf-8", "latin1")
+        iconv("utf-8", "latin1")
     ) %>%
     inner_join(
       match_glonaf_tnrs %>%
         distinct(Name_submitted, species = Accepted_name),
       by = c(full_name = "Name_submitted")
     ) %>%
-    distinct(species, OBJIDsic) %>%
-    select(OBJIDsic, species) %>%
+    distinct(species, status_name, OBJIDsic) %>%
+    select(OBJIDsic, status_name, species) %>%
     filter(species != "")
 }
 
 count_species_proportion_trait_by_region = function(
-  glonaf_species_regions, species_trait_categories, contain_trait_combination
+    glonaf_species_regions, species_trait_categories, contain_trait_combination
 ) {
   trait_prop = glonaf_species_regions %>%
     full_join(
