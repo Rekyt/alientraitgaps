@@ -421,6 +421,10 @@ list(
       glonaf_species_regions, unified_glonaf_regions
     )
   ),
+  tar_target(
+    glonaf_most_distributed_species,
+    count_most_distributed_species_and_bootstrap(glonaf_species_area, 100, 100)
+  ),
 
 
   # Make figures ---------------------------------------------------------------

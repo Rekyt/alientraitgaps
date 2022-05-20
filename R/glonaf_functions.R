@@ -357,8 +357,8 @@ count_species_proportion_trait_by_region = function(
 #'
 #' @noRd
 get_trait_combinations_and_cat_per_invasion_status = function(
-  glonaf_species_regions_status, species_trait_categories,
-  contain_trait_combination
+    glonaf_species_regions_status, species_trait_categories,
+    contain_trait_combination
 ) {
   glonaf_species_regions_status %>%
     distinct(species, status_name) %>%
@@ -373,7 +373,7 @@ get_trait_combinations_and_cat_per_invasion_status = function(
 }
 
 count_number_of_regions_and_area = function(
-  glonaf_species_regions, unified_glonaf_regions
+    glonaf_species_regions, unified_glonaf_regions
 ) {
   glonaf_species_regions %>%
     inner_join(
@@ -384,4 +384,31 @@ count_number_of_regions_and_area = function(
     ) %>%
     group_by(species) %>%
     summarise(n_regions = n(), total_area = sum(GeodAREA))
+}
+
+count_most_distributed_species_and_bootstrap = function(
+    glonaf_species_area, n_top = 100, n_bootstrap = 100
+) {
+
+  glonaf_species_area %>%
+    tidyr::pivot_longer(
+      !species, names_to = "area_type", values_to = "area_value"
+    ) %>%
+    tidyr::nest(area_df = !area_type) %>%
+    mutate(
+      top_species = purrr::map(
+        area_df, ~slice_max(.x, area_value, n = n_top) %>%
+          mutate(boot_name = "top")
+      ),
+      rest_df = purrr::map2(
+        area_df, top_species, ~anti_join(.x, .y, by = "species")
+      ),
+      bootstrap_df = purrr::map(
+        rest_df,
+        ~lapply(seq(n_bootstrap), function(x) slice_sample(.x, n = n_top)) %>%
+          bind_rows() %>%
+          mutate(boot_name = "bootstrap")
+      )
+    ) %>%
+    select(-area_df, -rest_df)
 }
