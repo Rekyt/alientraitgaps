@@ -65,6 +65,46 @@ plot_number_specific_trait_combination = function(contain_trait_combination) {
     theme(aspect.ratio = 1)
 }
 
+plot_number_trait_categories_per_invasion_status = function(
+  glonaf_status_trait_cat
+) {
+
+  status_count = glonaf_status_trait_cat %>%
+    count(status_name) %>%
+    mutate(
+      new_name = ifelse(status_name == "aliens", "unsure", status_name),
+      label = paste0(tools::toTitleCase(status_name), "\n(n=", n, ")")
+    ) %>%
+    select(status_name, label) %>%
+    tibble::deframe()
+
+  glonaf_status_trait_cat %>%
+    select(-has_at_least_one_trait:has_lhs) %>%
+    tidyr::pivot_longer(
+      leaf:root, names_to = "cat_name", values_to = "cat_value"
+    ) %>%
+    mutate(
+      status_name = factor(
+        status_name, level = c("alien", "naturalized", "invasive")
+      ),
+      cat_name = janitor::make_clean_names(cat_name, case = "title")
+    ) %>%
+    ggplot(aes(cat_value, status_name)) +
+    ggridges::geom_density_ridges(
+      scale = 0.95, quantile_lines = TRUE, quantiles = 4
+    ) +
+    facet_wrap(
+      vars(cat_name), scales = "free_x"
+    ) +
+    scale_y_discrete(labels = status_count) +
+    # scale_fill_viridis_d(name = "Quartiles") +
+    theme_bw() +
+    theme(
+      strip.background = element_blank(),
+      axis.text.y = element_text(vjust = 0)
+    )
+}
+
 
 # Taxonomic Treemaps -----------------------------------------------------------
 

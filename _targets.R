@@ -489,6 +489,10 @@ list(
     plot_map_alien_richness_region(
       regions_trait_prop, glonaf_small_islands, glonaf_mainland_large_islands
     )
+  ),
+  tar_target(
+    fig_status_number_trait_cat,
+    plot_number_trait_categories_per_invasion_status(glonaf_status_trait_cat)
   )
 ) %>%
   # Convert figures into ggplotGrob() to take less space
