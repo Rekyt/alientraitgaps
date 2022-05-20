@@ -79,22 +79,24 @@ plot_number_trait_categories_per_invasion_status = function(
     tibble::deframe()
 
   glonaf_status_trait_cat %>%
-    select(-has_at_least_one_trait:has_lhs) %>%
+    select(-c(has_at_least_one_trait:has_bergmann)) %>%
     tidyr::pivot_longer(
       leaf:root, names_to = "cat_name", values_to = "cat_value"
     ) %>%
     mutate(
       status_name = factor(
         status_name, level = c("alien", "naturalized", "invasive")
-      ),
-      cat_name = janitor::make_clean_names(cat_name, case = "title")
+      )
     ) %>%
     ggplot(aes(cat_value, status_name)) +
     ggridges::geom_density_ridges(
       scale = 0.95, quantile_lines = TRUE, quantiles = 4
     ) +
     facet_wrap(
-      vars(cat_name), scales = "free_x"
+      vars(cat_name), scales = "free_x",
+      labeller = list(
+        cat_name = function(x) snakecase::to_any_case(x, case = "title")
+      )
     ) +
     scale_y_discrete(labels = status_count) +
     # scale_fill_viridis_d(name = "Quartiles") +
