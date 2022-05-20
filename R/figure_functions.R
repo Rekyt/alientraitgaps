@@ -1,3 +1,5 @@
+# Functions to plot figures
+# Trait Counts -----------------------------------------------------------------
 plot_trait_number_try_glonaf_species = function(try_number_trait) {
   try_number_trait %>%
     ggplot(aes(trait_number)) +
@@ -28,34 +30,7 @@ plot_number_species_per_trait_combined = function(combined_traits) {
     theme(aspect.ratio = 1)
 }
 
-plot_combined_traits_heatmap = function(combined_traits) {
 
-  # Get combinations of trait measured by species ordered by frequency
-  combined_traits %>%
-    mutate(
-      species_fact = factor(species) %>%
-        forcats::fct_infreq(),
-      trait_fact  = factor(consolidated_name) %>%
-        forcats::fct_infreq(),
-      species_rank = as.numeric(species_fact),
-      trait_rank = as.numeric(trait_fact),
-      value = TRUE
-    ) %>%
-    select(species_rank, trait_rank, value) %>%
-    tidyr::complete(species_rank, trait_rank,
-                    fill = list(value = FALSE)) %>%
-    # Plot as a heatmap
-    ggplot(aes(trait_rank, species_rank, fill = value)) +
-    geom_raster() +
-    labs(x    = "Trait Rank (most to least measured)",
-         y    = "Species Rank (most to least measured)",
-         fill = "Does species has this trait?",
-         caption = paste0("Using consolidated trait data from AusTraits, ",
-                          "BIEN, and TRY")) +
-    scale_fill_viridis_d() +
-    theme_bw() +
-    theme(aspect.ratio = 1, legend.position = "top")
-}
 
 plot_number_specific_trait_combination = function(contain_trait_combination) {
   contain_trait_combination %>%
@@ -89,6 +64,9 @@ plot_number_specific_trait_combination = function(contain_trait_combination) {
     theme_bw() +
     theme(aspect.ratio = 1)
 }
+
+
+# Taxonomic Treemaps -----------------------------------------------------------
 
 plot_taxonomy_treemap_trait_combination = function(
   combined_traits_taxonomy, contain_trait_combination
@@ -168,6 +146,39 @@ plot_taxonomy_treemap_number_traits = function(
     theme(legend.position = "top")
 }
 
+
+# Missing Traits ---------------------------------------------------------------
+
+plot_combined_traits_heatmap = function(combined_traits) {
+
+  # Get combinations of trait measured by species ordered by frequency
+  combined_traits %>%
+    mutate(
+      species_fact = factor(species) %>%
+        forcats::fct_infreq(),
+      trait_fact  = factor(consolidated_name) %>%
+        forcats::fct_infreq(),
+      species_rank = as.numeric(species_fact),
+      trait_rank = as.numeric(trait_fact),
+      value = TRUE
+    ) %>%
+    select(species_rank, trait_rank, value) %>%
+    tidyr::complete(species_rank, trait_rank,
+                    fill = list(value = FALSE)) %>%
+    # Plot as a heatmap
+    ggplot(aes(trait_rank, species_rank, fill = value)) +
+    geom_raster() +
+    labs(
+      x    = "Trait Rank (most to least measured)",
+      y    = "Species Rank (most to least measured)",
+      fill = "Does species has this trait?"
+    ) +
+    scale_fill_viridis_d() +
+    theme_bw() +
+    theme(aspect.ratio = 1, legend.position = "top")
+}
+
+
 plot_miss_trait_categories_per_species = function(species_trait_categories) {
   species_trait_categories %>%
     select(-species) %>%
@@ -191,7 +202,7 @@ plot_miss_trait_categories_per_species_per_growth_form = function(
     select(-Species) %>%
     mutate(
       growth_form = growth_form %>%
-             stringr::str_to_title() %>%
+        stringr::str_to_title() %>%
         factor() %>%
         forcats::fct_infreq()
     ) %>%
@@ -210,7 +221,7 @@ plot_miss_trait_categories_per_species_per_growth_form = function(
             direction = -1, name = NULL,
             labels = c(`TRUE` = "Missing", `FALSE` = "Present")
           )
-        )
+      )
     ) %>%
     pull(trait_miss_cat_plot) %>%
     patchwork::wrap_plots(tag_level = "new") +
@@ -272,7 +283,7 @@ plot_number_trait_categories_per_species = function(species_trait_categories) {
 
 
 plot_prop_trait_per_richness = function(
-    regions_trait_prop, unified_glonaf_regions
+  regions_trait_prop, unified_glonaf_regions
 ) {
   regions_trait_prop %>%
     tidyr::pivot_longer(
@@ -326,6 +337,9 @@ plot_prop_trait_per_richness = function(
     theme(aspect.ratio = 1, strip.background = element_blank(),
           legend.position = "top")
 }
+
+
+# Maps -------------------------------------------------------------------------
 
 plot_map_glonaf_regions = function(unified_glonaf_regions) {
 
