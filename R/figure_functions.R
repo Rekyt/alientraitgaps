@@ -90,16 +90,16 @@ plot_number_trait_categories_per_invasion_status = function(
     ) %>%
     ggplot(aes(cat_value, status_name)) +
     ggridges::geom_density_ridges(
-      scale = 0.95, quantile_lines = TRUE, quantiles = 4
+      scale = 0.95, quantile_lines = TRUE, quantiles = 4, calc_ecdf = TRUE
     ) +
     facet_wrap(
       vars(cat_name), scales = "free_x",
-      labeller = list(
+      labeller = labeller(
         cat_name = function(x) snakecase::to_any_case(x, case = "title")
       )
     ) +
-    scale_y_discrete(labels = status_count) +
-    # scale_fill_viridis_d(name = "Quartiles") +
+    scale_y_discrete("Invasion Status", labels = status_count) +
+    scale_fill_viridis_d(name = "Quartiles") +
     theme_bw() +
     theme(
       strip.background = element_blank(),
@@ -107,6 +107,62 @@ plot_number_trait_categories_per_invasion_status = function(
     )
 }
 
+plot_trait_comb_proportion_per_invasion_status = function(
+    glonaf_status_trait_cat
+) {
+  # Axis label with number of species per invasion status
+  status_count = glonaf_status_trait_cat %>%
+    count(status_name) %>%
+    mutate(
+      new_name = ifelse(status_name == "aliens", "unsure", status_name),
+      label = paste0(tools::toTitleCase(status_name), "\n(n=", n, ")")
+    ) %>%
+    select(status_name, label) %>%
+    tibble::deframe()
+
+  glonaf_status_trait_cat %>%
+    select(status_name, species, has_at_least_one_trait:has_bergmann) %>%
+    tidyr::pivot_longer(
+      has_at_least_one_trait:has_bergmann, names_to = "comb_name",
+      values_to = "comb_value"
+    ) %>%
+    mutate(
+      status_name = factor(
+        status_name, level = c("alien", "naturalized", "invasive")
+      ),
+      comb_name = factor(
+        comb_name,
+        levels = c("has_at_least_one_trait", "has_lhs", "has_diaz",
+                   "has_bergmann")
+      )
+    ) %>%
+    ggplot(aes(y = status_name, fill = comb_value)) +
+    geom_bar(position = "fill", width = 2/3) +
+    facet_wrap(
+      vars(comb_name), scales = "free_x",
+      labeller = labeller(
+        comb_name = c(
+          has_bergmann     = "Root Traits\n(4 traits, Bergmann et al. 2020)",
+          has_diaz         = "Aboveground traits\n(6 traits, Díaz et al. 2016)",
+          has_lhs          = "Leaf-Height-Seed mass\n(3 traits, Westoby 2002)",
+          has_at_least_one_trait = "At least one trait"
+        )
+      )
+    ) +
+    scale_x_continuous(
+      "Proportion of species", labels = scales::label_percent()
+    ) +
+    scale_y_discrete("Invasion Status", labels = status_count) +
+    scale_fill_brewer(
+      "Known Trait Combination?", palette = "Set1",
+      labels = c(`FALSE` = "No", `TRUE` = "Yes")
+    ) +
+    theme_bw() +
+    theme(
+      strip.background = element_blank(),
+      legend.position = "top"
+    )
+}
 
 # Taxonomic Treemaps -----------------------------------------------------------
 

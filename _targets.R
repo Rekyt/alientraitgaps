@@ -493,8 +493,13 @@ list(
   tar_target(
     fig_status_number_trait_cat,
     plot_number_trait_categories_per_invasion_status(glonaf_status_trait_cat)
+  ),
+  tar_target(
+    fig_status_prop_comb,
+    plot_trait_comb_proportion_per_invasion_status(glonaf_status_trait_cat)
   )
 ) %>%
+  # Post-processing Hooks ------------------------------------------------------
   # Convert figures into ggplotGrob() to take less space
   tarchetypes::tar_hook_outer(
     ggplot2::ggplotGrob(.x),
