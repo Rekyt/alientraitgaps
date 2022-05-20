@@ -351,3 +351,23 @@ count_species_proportion_trait_by_region = function(
 
   full_join(trait_prop, comb_prop, by = "OBJIDsic")
 }
+
+
+#' Merge GloNAF status with trait categories and combinations
+#'
+#' @noRd
+get_trait_combinations_and_cat_per_invasion_status = function(
+  glonaf_species_regions_status, species_trait_categories,
+  contain_trait_combination
+) {
+  glonaf_species_regions_status %>%
+    distinct(species, status_name) %>%
+    mutate(status_name = ifelse(
+      status_name == "naturalized_archeophyte", "naturalized", status_name)
+    ) %>%
+    inner_join(species_trait_categories, by = "species") %>%
+    inner_join(
+      contain_trait_combination %>%
+        select(-traits, -in_glonaf),
+      by = "species")
+}

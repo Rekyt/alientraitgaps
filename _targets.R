@@ -408,6 +408,13 @@ list(
       contain_trait_combination
     )
   ),
+  tar_target(
+    glonaf_status_trait_cat,
+    get_trait_combinations_and_cat_per_invasion_status(
+      glonaf_species_regions_status, species_trait_categories,
+      contain_trait_combination
+    )
+  ),
 
 
   # Make figures ---------------------------------------------------------------
