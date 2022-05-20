@@ -507,6 +507,18 @@ list(
   tar_target(
     fig_status_prop_comb,
     plot_trait_comb_proportion_per_invasion_status(glonaf_status_trait_cat)
+  ),
+  tar_target(
+    fig_widest_range_number_trait_cat,
+    plot_number_trait_categories_per_range_size(
+      glonaf_most_distributed_species, species_trait_categories
+    )
+  ),
+  tar_target(
+    fig_widest_range_trait_comb_prop,
+    plot_trait_combination_per_range_size(
+      glonaf_most_distributed_species, contain_trait_combination
+    )
   )
 ) %>%
   # Post-processing Hooks ------------------------------------------------------

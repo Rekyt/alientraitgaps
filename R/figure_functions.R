@@ -66,13 +66,13 @@ plot_number_specific_trait_combination = function(contain_trait_combination) {
 }
 
 plot_number_trait_categories_per_invasion_status = function(
-  glonaf_status_trait_cat
+    glonaf_status_trait_cat
 ) {
 
   status_count = glonaf_status_trait_cat %>%
     count(status_name) %>%
     mutate(
-      new_name = ifelse(status_name == "aliens", "unsure", status_name),
+      new_name = ifelse(status_name == "aliens", "unspecified", status_name),
       label = paste0(tools::toTitleCase(status_name), "\n(n=", n, ")")
     ) %>%
     select(status_name, label) %>%
@@ -114,7 +114,7 @@ plot_trait_comb_proportion_per_invasion_status = function(
   status_count = glonaf_status_trait_cat %>%
     count(status_name) %>%
     mutate(
-      new_name = ifelse(status_name == "aliens", "unsure", status_name),
+      new_name = ifelse(status_name == "aliens", "unspecified", status_name),
       label = paste0(tools::toTitleCase(status_name), "\n(n=", n, ")")
     ) %>%
     select(status_name, label) %>%
@@ -164,10 +164,110 @@ plot_trait_comb_proportion_per_invasion_status = function(
     )
 }
 
+
+plot_number_trait_categories_per_range_size = function(
+    glonaf_most_distributed_species, species_trait_categories
+) {
+
+  list(
+    top = glonaf_most_distributed_species %>%
+      select(-bootstrap_df) %>%
+      tidyr::unnest(top_species),
+    bootstrap = glonaf_most_distributed_species %>%
+      select(-top_species) %>%
+      tidyr::unnest(bootstrap_df)
+  ) %>%
+    bind_rows(.id = "boot_name") %>%
+    inner_join(
+      species_trait_categories, by = "species"
+    ) %>%
+    tidyr::pivot_longer(
+      leaf:root, names_to = "cat_name", values_to = "cat_value"
+    ) %>%
+    ggplot(aes(cat_value, area_type, fill = boot_name)) +
+    geom_violin(position = position_dodge(width = 0.75)) +
+    facet_wrap(
+      vars(cat_name), scales = "free_x",
+      labeller = labeller(cat_name = snakecase::to_title_case)
+    ) +
+    labs(x = "Number of traits", y = NULL, fill = "Distribution type") +
+    scale_fill_discrete(
+      labels = c(top = "Top Species", bootstrap = "Bootstrap")
+    ) +
+    scale_y_discrete(
+      labels = c(total_area = "Total Area", n_regions = "# Regions")
+    ) +
+    theme_bw() +
+    theme(
+      strip.background = element_blank(),
+      legend.position = "top"
+    )
+
+}
+
+plot_trait_combination_per_range_size = function(
+    glonaf_most_distributed_species, contain_trait_combination
+) {
+  list(
+    top = glonaf_most_distributed_species %>%
+      select(-bootstrap_df) %>%
+      tidyr::unnest(top_species),
+    bootstrap = glonaf_most_distributed_species %>%
+      select(-top_species) %>%
+      tidyr::unnest(bootstrap_df)
+  ) %>%
+    bind_rows(.id = "boot_name") %>%
+    select(-area_value) %>%
+    inner_join(
+      contain_trait_combination %>%
+        select(-traits, -in_glonaf),
+      by = "species"
+    ) %>%
+    tidyr::pivot_longer(
+      has_at_least_one_trait:has_bergmann, names_to = "comb_name",
+      values_to = "comb_value"
+    ) %>%
+    mutate(
+      comb_name = factor(
+        comb_name,
+        levels = c("has_at_least_one_trait", "has_lhs", "has_diaz",
+                   "has_bergmann")
+      )
+    ) %>%
+    ggplot(aes(y = interaction(boot_name, area_type), fill = comb_value)) +
+    geom_bar(position = "fill", width = 2/3) +
+    facet_wrap(
+      vars(comb_name),
+      labeller = labeller(
+        comb_name = c(
+          has_bergmann     = "Root Traits\n(4 traits, Bergmann et al. 2020)",
+          has_diaz         = "Aboveground traits\n(6 traits, Díaz et al. 2016)",
+          has_lhs          = "Leaf-Height-Seed mass\n(3 traits, Westoby 2002)",
+          has_at_least_one_trait = "At least one trait"
+        )
+      )
+    ) +
+    scale_x_continuous(labels = scales::label_percent()) +
+    scale_y_discrete(
+      NULL,
+      labels = c("top.total_area" = "Area (Top)",
+                 "bootstrap.total_area" = "Area (Bootstrap)",
+                 "top.n_regions"  = "# Regions (Top)",
+                 "bootstrap.n_regions" = "# Regions (Bootstrap)")
+    ) +
+    scale_fill_brewer(
+      "Known Trait Combination?", palette = "Set1",
+      labels = c(`FALSE` = "No", `TRUE` = "Yes")
+    ) +
+    theme_bw() +
+    theme(legend.position = "top",
+          strip.background = element_blank())
+}
+
 # Taxonomic Treemaps -----------------------------------------------------------
 
 plot_taxonomy_treemap_trait_combination = function(
-  combined_traits_taxonomy, contain_trait_combination
+    combined_traits_taxonomy, contain_trait_combination
 ) {
   combined_traits_taxonomy %>%
     mutate(species = ifelse(is.na(species), paste(genus, epithet), species)) %>%
@@ -208,7 +308,7 @@ plot_taxonomy_treemap_trait_combination = function(
 }
 
 plot_taxonomy_treemap_number_traits = function(
-  combined_traits_taxonomy, contain_trait_combination, logged = TRUE
+    combined_traits_taxonomy, contain_trait_combination, logged = TRUE
 ) {
 
   if (logged) {
@@ -291,7 +391,7 @@ plot_miss_trait_categories_per_species = function(species_trait_categories) {
 }
 
 plot_miss_trait_categories_per_species_per_growth_form = function(
-  species_trait_categories, combined_growth_form
+    species_trait_categories, combined_growth_form
 ) {
   species_trait_categories %>%
     mutate(across(where(is.numeric), ~ifelse(.x == 0, NA_integer_, 1L))) %>%
@@ -327,7 +427,7 @@ plot_miss_trait_categories_per_species_per_growth_form = function(
 }
 
 plot_miss_trait_categories_per_species_summary = function(
-  species_trait_categories
+    species_trait_categories
 ) {
   species_trait_categories %>%
     mutate(across(where(is.numeric), ~ifelse(.x == 0, NA_real_, .x))) %>%
@@ -381,7 +481,7 @@ plot_number_trait_categories_per_species = function(species_trait_categories) {
 
 
 plot_prop_trait_per_richness = function(
-  regions_trait_prop, unified_glonaf_regions
+    regions_trait_prop, unified_glonaf_regions
 ) {
   regions_trait_prop %>%
     tidyr::pivot_longer(
@@ -458,7 +558,7 @@ plot_map_glonaf_regions = function(unified_glonaf_regions) {
 }
 
 plot_map_proportion_trait_by_region = function(
-  regions_trait_prop, glonaf_small_islands, glonaf_mainland_large_islands
+    regions_trait_prop, glonaf_small_islands, glonaf_mainland_large_islands
 ) {
   # Background map
   world_sf = rnaturalearth::ne_countries(returnclass = "sf") %>%
@@ -521,8 +621,8 @@ plot_map_proportion_trait_by_region = function(
 #'
 #' @noRd
 plot_map_alien_richness_region = function(
-  regions_trait_prop, glonaf_small_islands,
-  glonaf_mainland_large_islands
+    regions_trait_prop, glonaf_small_islands,
+    glonaf_mainland_large_islands
 ) {
   # Background map
   world_sf = rnaturalearth::ne_countries(returnclass = "sf") %>%
