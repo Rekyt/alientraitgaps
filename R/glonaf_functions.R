@@ -371,3 +371,17 @@ get_trait_combinations_and_cat_per_invasion_status = function(
         select(-traits, -in_glonaf),
       by = "species")
 }
+
+count_number_of_regions_and_area = function(
+  glonaf_species_regions, unified_glonaf_regions
+) {
+  glonaf_species_regions %>%
+    inner_join(
+      unified_glonaf_regions %>%
+        as.data.frame() %>%
+        select(OBJIDsic, GeodAREA),
+      by = "OBJIDsic"
+    ) %>%
+    group_by(species) %>%
+    summarise(n_regions = n(), total_area = sum(GeodAREA))
+}

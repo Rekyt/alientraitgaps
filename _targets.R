@@ -415,6 +415,12 @@ list(
       contain_trait_combination
     )
   ),
+  tar_target(
+    glonaf_species_area,
+    count_number_of_regions_and_area(
+      glonaf_species_regions, unified_glonaf_regions
+    )
+  ),
 
 
   # Make figures ---------------------------------------------------------------
