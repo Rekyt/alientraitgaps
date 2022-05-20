@@ -264,6 +264,7 @@ plot_trait_combination_per_range_size = function(
           strip.background = element_blank())
 }
 
+
 # Taxonomic Treemaps -----------------------------------------------------------
 
 plot_taxonomy_treemap_trait_combination = function(
@@ -610,6 +611,58 @@ plot_map_proportion_trait_by_region = function(
     ) +
     scale_color_viridis_c(
       name = "Prop. of aliens species\nwith trait combination",
+      labels = scales::percent_format()
+    ) +
+    ylim(-5747986, NA) +  # Remove whatever is below 60°S
+    theme_void() +
+    theme(legend.position = "top", strip.background = element_blank())
+}
+
+
+plot_map_proportion_trait_by_organ_by_region = function(
+  regions_trait_prop, glonaf_small_islands, glonaf_mainland_large_islands
+) {
+  # Background map
+  world_sf = rnaturalearth::ne_countries(returnclass = "sf") %>%
+    sf::st_transform(crs = "+proj=eqearth")
+
+  # Pivot trait data to be usable across facets
+  pivoted_data = regions_trait_prop %>%
+    select(OBJIDsic, leaf_prop_trait:root_prop_trait) %>%
+    tidyr::pivot_longer(
+      !OBJIDsic, names_to = "prop_name", values_to = "prop_value"
+    ) %>%
+    mutate(
+      prop_name = gsub("_prop_trait", "", prop_name, fixed = TRUE)
+    )
+
+  # Actual plot
+  glonaf_mainland_large_islands %>%
+    inner_join(pivoted_data, by = "OBJIDsic") %>%
+    ggplot(aes(fill = prop_value)) +
+    geom_sf(data = world_sf, fill = "gray85", color = "gray65", size = 1/100) +
+    # Non-small islands and mainlands
+    geom_sf(color = "gray65", size = 1/100) +
+    # Small islands
+    geom_sf(
+      aes(color = prop_value),
+      fill = NA,
+      data = glonaf_small_islands %>%
+        inner_join(pivoted_data, by = "OBJIDsic"),
+      size = 2.5, shape = 21, stroke = 1.5
+    ) +
+    facet_wrap(
+      vars(prop_name),
+      labeller = labeller(
+        prop_name = snakecase::to_title_case
+      )
+    ) +
+    scale_fill_viridis_c(
+      name = "Prop. of aliens species\nwith at least one trait per organ",
+      labels = scales::percent_format()
+    ) +
+    scale_color_viridis_c(
+      name = "Prop. of aliens species\nwith at least one trait per organ",
       labels = scales::percent_format()
     ) +
     ylim(-5747986, NA) +  # Remove whatever is below 60°S
