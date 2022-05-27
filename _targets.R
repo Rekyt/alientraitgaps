@@ -525,6 +525,12 @@ list(
     plot_trait_combination_per_range_size(
       glonaf_most_distributed_species, contain_trait_combination
     )
+  ),
+  tar_target(
+    fig_map_europe_trait_prop,
+    plot_map_europe_proportion_trait(
+      regions_trait_prop, glonaf_small_islands, glonaf_mainland_large_islands
+    )
   )
 ) %>%
   # Post-processing Hooks ------------------------------------------------------

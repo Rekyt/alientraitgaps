@@ -620,7 +620,7 @@ plot_map_proportion_trait_by_region = function(
 
 
 plot_map_proportion_trait_by_organ_by_region = function(
-  regions_trait_prop, glonaf_small_islands, glonaf_mainland_large_islands
+    regions_trait_prop, glonaf_small_islands, glonaf_mainland_large_islands
 ) {
   # Background map
   world_sf = rnaturalearth::ne_countries(returnclass = "sf") %>%
@@ -715,4 +715,87 @@ plot_map_alien_richness_region = function(
     theme_void() +
     theme(legend.position = "top",
           legend.key.width = unit(2, "lines"))
+}
+
+
+plot_map_europe_proportion_trait = function(
+    regions_trait_prop, glonaf_small_islands, glonaf_mainland_large_islands
+) {
+  # Background map
+  europe_sf = rnaturalearth::ne_countries(returnclass = "sf") %>%
+    sf::st_transform(crs = "EPSG:4258") %>%
+    filter(continent == "Europe")
+
+
+  # Pivot trait proportions data
+  pivot_trait = regions_trait_prop %>%
+    select(-n_species) %>%
+    tidyr::pivot_longer(
+      !OBJIDsic, names_to = "prop_name", values_to = "prop_value"
+    ) %>%
+    mutate(
+      prop_name = factor(
+        prop_name,
+        levels = c(
+          "prop_with_any_trait", "has_lhs_prop", "has_diaz_prop",
+          "has_bergmann_prop", "flower_prop_trait", "height_prop_trait",
+          "leaf_prop_trait", "life_history_prop_trait", "root_prop_trait",
+          "seed_prop_trait", "stem_prop_trait")
+        )
+    )
+
+  glonaf_map_mainland = glonaf_mainland_large_islands %>%
+    sf::st_transform(sf::st_crs("EPSG:4258")) %>%
+    inner_join(pivot_trait, by = "OBJIDsic")
+
+  glonaf_map_islands = glonaf_small_islands %>%
+    sf::st_transform(sf::st_crs("EPSG:4258")) %>%
+    inner_join(pivot_trait, by = "OBJIDsic")
+
+  ggplot() +
+    # Background map
+    geom_sf(data = europe_sf, fill = "gray45", alpha = 1/3) +
+    # Mainland
+    geom_sf(data = glonaf_map_mainland, aes(fill = prop_value)) +
+    # Islands
+    geom_sf(data = glonaf_map_islands, fill = NA, size = 2.5, shape = 21,
+            stroke = 1.5, aes(color = prop_value)) +
+    # Rest
+    facet_wrap(
+      vars(prop_name),
+      labeller = labeller(
+        prop_name = c(
+          has_bergmann_prop = "Root Traits\n(4 traits, Bergmann et al. 2020)",
+          has_diaz_prop     = "Aboveground traits\n(6 traits, Díaz et al. 2016)",
+          has_lhs_prop      = "Leaf-Height-Seed mass\n(3 traits, Westoby 2002)",
+          prop_with_any_trait = "Any trait",
+          flower_prop_trait = "Prop. Aliens\nFlower",
+          height_prop_trait = "Prop. Aliens\nHeight",
+          leaf_prop_trait = "Prop. Aliens\nLeaf",
+          life_history_prop_trait = "Prop. Aliens\nLife History",
+          root_prop_trait = "Prop. Aliens\nRoot",
+          seed_prop_trait = "Prop. Aliens\nSeed",
+          stem_prop_trait = "Prop. Aliens\nStem"
+        )
+      )
+    ) +
+    coord_sf(
+      xlim = c(-22, 40),
+      ylim = c(36, 70)
+    ) +
+    scale_fill_viridis_c(
+      "Prop. Alien Species with trait", labels = scales::percent_format(),
+      limits = c(0, 1)
+    ) +
+    scale_color_viridis_c(
+      "Prop. Alien Species with trait", labels = scales::percent_format(),
+      limits = c(0, 1)
+    ) +
+    ggthemes::theme_map() +
+    theme(
+      legend.position = "top",
+      legend.direction = "horizontal",
+      strip.background = element_blank()
+    )
+
 }
