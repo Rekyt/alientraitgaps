@@ -14,18 +14,43 @@ plot_trait_number_try_glonaf_species = function(try_number_trait) {
 }
 
 plot_number_species_per_trait_combined = function(combined_traits) {
-  combined_traits %>%
+
+  max_20_traits = combined_traits %>%
     count(consolidated_name, sort = TRUE, name = "n_species") %>%
-    slice_max(n_species, n = 20) %>%
+    slice_max(n_species, n = 20)
+
+  total_sp = combined_traits %>%
+    pull(species) %>%
+    unique() %>%
+    length()
+
+  max_20_traits %>%
     ggplot(aes(n_species, forcats::fct_reorder(consolidated_name, n_species))) +
     geom_point() +
-    geom_vline(xintercept = 16528, linetype = 2, color = "darkred", size = 1) +
+    geom_text(
+      aes(label = paste0(round((n_species/total_sp) * 100, 0), "%")),
+      hjust = -0.4, size = 2.6, vjust = 0
+    ) +
+    # 50% vertical line
+    geom_text(
+      label = "50%", color = "darkblue", x = total_sp/2, y = 20, hjust = -0.4,
+      vjust = 0.5, size = 2.6
+    ) +
+    geom_vline(
+      xintercept = total_sp/2, linetype = 2, color = "darkblue", size = 1
+    ) +
+    # 100% vertical line
+    geom_vline(
+      xintercept = total_sp, linetype = 2, color = "darkred", size = 1
+    ) +
     scale_x_continuous(
       name = "Number of species with traits",
-      sec.axis = sec_axis(trans = ~.x/16528, labels = scales::percent_format())
+      sec.axis = sec_axis(
+        trans = ~.x/total_sp, labels = scales::percent_format()
+      )
     ) +
     scale_y_discrete(name = "Trait name", labels = label_wrap_gen(30)) +
-    labs(title = "15 most frequently measured trait") +
+    labs(title = "20 most frequently measured traits") +
     theme_bw() +
     theme(aspect.ratio = 1)
 }
