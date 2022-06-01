@@ -7,15 +7,21 @@ tar_load(full_try_df)
 aus_coords = austraits$sites %>%
   filter(grepl("latitude", site_property) | grepl("longitude", site_property))
 aus_traits_with_coords = austraits$traits %>%
-  semi_join(aus_coords, by = c("dataset_id", "site_name"))
+  full_join(
+    aus_coords %>%
+              select(dataset_id, site_name) %>%
+              mutate(has_coords = TRUE),
+    by = c("dataset_id", "site_name")
+  ) %>%
+  mutate(has_coords = ifelse(is.na(has_coords), FALSE, has_coords)) %>%
+  distinct(taxon_name, trait_name, has_coords)
 
 
 # BIEN
 bien_traits_with_coords = glonaf_bien_traits %>%
-  filter(!is.na(latitude), !is.na(longitude))
-
-# GIFT
-# Complicated
+  distinct(scrubbed_species_binomial, trait_name, latitude, longitude) %>%
+  mutate(has_coords = !is.na(latitude) & !is.na(longitude)) %>%
+  select(-latitude, -longitude)
 
 # TRY
 try_coords_data = full_try_df %>%
@@ -34,8 +40,12 @@ try_coords_data = full_try_df %>%
   )
 
 # Consider that trait has coordinates when dataset has at least coordinates
-try_trait_with_coords = full_try_df %>%
-  select(DatasetID, DataID) %>%
+try_trait_with_coords =
+  full_try_df %>%
+  full_join(
+    full_try_df %>%
+  filter(DataID %in% c(59, 60)) %>%  # Latitude and longitude
   collect() %>%
-  distinct() %>%
-  semi_join(try_coords_data, by = c("DataID"))
+  distinct(DatasetID, has_coords = TRUE),
+  by = "DatasetID") %>%
+  mutate(has_coords = ifelse(is.na(has_coords, FALSE, has_coords)))
