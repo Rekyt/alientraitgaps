@@ -40,12 +40,16 @@ try_coords_data = full_try_df %>%
   )
 
 # Consider that trait has coordinates when dataset has at least coordinates
-try_trait_with_coords =
-  full_try_df %>%
+try_trait_with_coords = full_try_df %>%
   full_join(
     full_try_df %>%
-  filter(DataID %in% c(59, 60)) %>%  # Latitude and longitude
+      filter(DataID %in% c(59, 60)) %>%  # Latitude and longitude
+      collect() %>%
+      distinct(DatasetID, has_coords = TRUE),
+    by = "DatasetID") %>%
+  mutate(has_coords = ifelse(is.na(has_coords), FALSE, has_coords)) %>%
+  disk.frame::chunk_distinct(
+    AccSpeciesID, AccSpeciesName, TraitID, TraitName, has_coords
+  ) %>%
   collect() %>%
-  distinct(DatasetID, has_coords = TRUE),
-  by = "DatasetID") %>%
-  mutate(has_coords = ifelse(is.na(has_coords, FALSE, has_coords)))
+  distinct(AccSpeciesID, AccSpeciesName, TraitID, TraitName, has_coords)
