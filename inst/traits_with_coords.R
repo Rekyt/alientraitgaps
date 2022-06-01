@@ -1,55 +1,103 @@
-# Try to identify Georeferenced traits
-tar_load(austraits)
-tar_load(glonaf_bien_traits)
-tar_load(full_try_df)
+tar_load(
+  c("austraits_coords", "try_traits_coords", "bien_traits_coords",
+    "consolidated_trait_names", "match_austraits_tnrs", "match_try_tnrs")
+)
 
-# AusTraits
-aus_coords = austraits$sites %>%
-  filter(grepl("latitude", site_property) | grepl("longitude", site_property))
-aus_traits_with_coords = austraits$traits %>%
-  full_join(
-    aus_coords %>%
-              select(dataset_id, site_name) %>%
-              mutate(has_coords = TRUE),
-    by = c("dataset_id", "site_name")
+
+# Add trait names --------------------------------------------------------------
+
+dim(austraits_coords)
+austraits_coords = austraits_coords %>%
+  # Add consolidated name
+  inner_join(
+    consolidated_trait_names %>%
+      distinct(aus_trait_name, consolidated_name) %>%
+      filter(!is.na(aus_trait_name)),
+    by = c(trait_name = "aus_trait_name")
+  )
+dim(austraits_coords)
+
+
+dim(bien_traits_coords)
+bien_traits_coords = bien_traits_coords %>%
+  # Add consolidated name
+  inner_join(
+    consolidated_trait_names %>%
+      distinct(bien_trait_name, consolidated_name) %>%
+      filter(!is.na(bien_trait_name)),
+    by = c(trait_name = "bien_trait_name")
+  )
+dim(bien_traits_coords)
+
+
+dim(try_traits_coords)
+try_traits_coords = try_traits_coords %>%
+  # Add consolidated name
+  inner_join(
+    consolidated_trait_names %>%
+      distinct(try_trait_id, try_trait_name, consolidated_name) %>%
+      filter(!is.na(try_trait_name)),
+    by = c(TraitID = "try_trait_id", TraitName = "try_trait_name")
+  )
+dim(try_traits_coords)
+
+
+# Add harmonized species names -------------------------------------------------
+
+austraits_coords_species = austraits_coords %>%
+  inner_join(
+    tar_read(harmonized_austraits_glonaf) %>%
+      distinct(name_init_austraits, species_accepted_austraits),
+    by = c(taxon_name = "name_init_austraits")
   ) %>%
-  mutate(has_coords = ifelse(is.na(has_coords), FALSE, has_coords)) %>%
-  distinct(taxon_name, trait_name, has_coords)
-
-
-# BIEN
-bien_traits_with_coords = glonaf_bien_traits %>%
-  distinct(scrubbed_species_binomial, trait_name, latitude, longitude) %>%
-  mutate(has_coords = !is.na(latitude) & !is.na(longitude)) %>%
-  select(-latitude, -longitude)
-
-# TRY
-try_coords_data = full_try_df %>%
-  select(DataID, DataName, OriglName) %>%
-  collect() %>%
-  distinct() %>%
-  filter(
-    grepl(".*longitude.*", DataName, ignore.case = TRUE) |
-      grepl(".*latitude.*", DataName, ignore.case = TRUE)
-  ) %>%
-  distinct(DataID, DataName) %>%
-  # Remove coordinates that for sure
-  filter(
-    !grepl("provenance", DataName, fixed = TRUE) &
-      !grepl("Seed origin", DataName, fixed = TRUE)
+  select(
+    consolidated_name, species_name = species_accepted_austraits, has_coords
   )
 
-# Consider that trait has coordinates when dataset has at least coordinates
-try_trait_with_coords = full_try_df %>%
-  full_join(
-    full_try_df %>%
-      filter(DataID %in% c(59, 60)) %>%  # Latitude and longitude
-      collect() %>%
-      distinct(DatasetID, has_coords = TRUE),
-    by = "DatasetID") %>%
-  mutate(has_coords = ifelse(is.na(has_coords), FALSE, has_coords)) %>%
-  disk.frame::chunk_distinct(
-    AccSpeciesID, AccSpeciesName, TraitID, TraitName, has_coords
+bien_traits_coords_species = bien_traits_coords %>%
+  select(
+    consolidated_name, species_name = scrubbed_species_binomial, has_coords
+  )
+
+try_traits_coords_species = try_traits_coords %>%
+  inner_join(
+    tar_read(harmonized_try_glonaf) %>%
+      distinct(name_init_try, species_accepted_try),
+    by = c(AccSpeciesName = "name_init_try")
   ) %>%
-  collect() %>%
-  distinct(AccSpeciesID, AccSpeciesName, TraitID, TraitName, has_coords)
+  select(consolidated_name, species_name = species_accepted_try, has_coords)
+
+all_coords = list(
+  austraits_coords_species,
+  bien_traits_coords_species,
+  try_traits_coords_species
+) %>%
+  bind_rows()
+
+ko = all_coords %>%
+  semi_join(
+    all_coords %>%
+      count(consolidated_name) %>%
+      slice_max(n, n = 16) %>%
+      distinct(consolidated_name),
+    by = "consolidated_name"
+  )
+
+ko %>%
+  mutate(
+    consolidated_name = consolidated_name %>%
+      factor() %>%
+      forcats::fct_infreq()
+  ) %>%
+  ggplot(aes(x = consolidated_name, fill = has_coords)) +
+  geom_bar() +
+  labs(x = "Trait Name", y = "Number of Species per Trait Obs") +
+  scale_fill_brewer(
+    "Has Coordinates?", labels = c(`FALSE` = "No", `TRUE` = "Yes"),
+    palette = "Set1"
+  ) +
+  theme_bw() +
+  theme(
+    legend.position = "top",
+    axis.text.x = element_text(angle = 45, size = 8, hjust = 1)
+  )
