@@ -562,6 +562,52 @@ plot_prop_trait_per_richness = function(
           legend.position = "top")
 }
 
+plot_proportion_known_combination_per_richness = function(
+  regions_trait_prop, glonaf_species_number
+) {
+  regions_trait_prop %>%
+    full_join(glonaf_species_number, by = "OBJIDsic") %>%
+    select(starts_with("has_") | starts_with("num_")) %>%
+    mutate(
+      num_ratio = (num_invasive_spp + num_naturalized_spp) /
+        (num_invasive_spp + num_naturalized_spp + num_native_spp)
+    ) %>%
+    tidyr::pivot_longer(
+      has_lhs_prop:has_bergmann_prop, names_to = "comb_name",
+      values_to = "comb_value"
+    ) %>%
+    tidyr::pivot_longer(
+      starts_with("num_"), names_to = "rich_name", values_to = "rich_value"
+    ) %>%
+    ggplot(aes(rich_value, comb_value)) +
+    geom_point(shape = ".") +
+    facet_grid(
+      vars(comb_name), vars(rich_name), scales = "free_x",
+      labeller = labeller(
+        comb_name = c(
+          has_bergmann_prop = "Root Traits\n(4 traits, Bergmann et al. 2020)",
+          has_diaz_prop     = "Aboveground traits\n(6 traits, Díaz et al. 2016)",
+          has_lhs_prop      = "Leaf-Height-Seed mass\n(3 traits, Westoby 2002)"
+        ),
+        rich_name = c(
+          num_invasive_spp    = "Number\n of invasive sp.",
+          num_native_spp      = "Number\n of native sp.",
+          num_naturalized_spp = "Number\n of naturalized sp.",
+          num_ratio           = "Aliens/Natives\nrichness ratio"
+        )
+      )
+    ) +
+    ggpmisc::stat_poly_eq(formula = y ~ x, parse = TRUE, label.x = "right") +
+    labs(x = "Richness value",
+         caption = "1 point = 1 GloNAF region") +
+    scale_y_continuous(
+      "Proportion known trait combination", labels = scales::label_percent()
+    ) +
+    theme_bw() +
+    theme(strip.background = element_blank(), aspect.ratio = 1,
+          axis.text.x = element_text(angle = 25, hjust = 1))
+}
+
 
 # Maps -------------------------------------------------------------------------
 
