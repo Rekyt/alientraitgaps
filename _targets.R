@@ -85,6 +85,10 @@ list(
                  "regions_2020-10-28.shp")
     )
   ),
+  tar_target(
+    glonaf_species_number,
+    get_glonaf_species_number(connect_glonaf_db())
+  ),
 
 
   # Load AusTraits data --------------------------------------------------------

@@ -159,6 +159,17 @@ get_glonaf_region_correspondence = function(glonaf_alien_species) {
            author_name, OBJIDsic)
 }
 
+get_glonaf_species_number = function(glonaf_con) {
+  sp = glonaf_con %>%
+    tbl("species_numbers") %>%
+    select(OBJIDsic, starts_with("num_")) %>%
+    collect()
+
+  discon(glonaf_con)
+
+  return(sp)
+}
+
 #' Create a unified regions sf object
 #'
 #' There are no standard ways of creating maps in GloNAF. So we decided it
