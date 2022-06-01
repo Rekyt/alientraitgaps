@@ -10,6 +10,7 @@ source("R/combined_trait_functions.R")
 source("R/figure_functions.R")
 source("R/glonaf_functions.R")
 source("R/gift_functions.R")
+source("R/has_coords_functions.R")
 source("R/harmonize_taxonomy_functions.R")
 source("R/try_functions.R")
 
@@ -381,6 +382,17 @@ list(
     )
   ),
 
+
+  # Traits with Coordinates ----------------------------------------------------
+  tar_target(
+    austraits_coords, get_austraits_traits_with_coords(austraits)
+  ),
+  tar_target(
+    bien_traits_coords, get_bien_traits_with_coords(glonaf_bien_traits)
+  ),
+  tar_target(
+    try_traits_coords, get_try_traits_with_coords(full_try_df)
+  ),
 
   # World Regions --------------------------------------------------------------
   tar_target(
