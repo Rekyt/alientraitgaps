@@ -590,9 +590,9 @@ plot_proportion_known_combination_per_richness = function(
           has_lhs_prop      = "Leaf-Height-Seed mass\n(3 traits, Westoby 2002)"
         ),
         rich_name = c(
-          num_invasive_spp    = "Number\n of invasive sp.",
-          num_native_spp      = "Number\n of native sp.",
-          num_naturalized_spp = "Number\n of naturalized sp.",
+          num_invasive_spp    = "Number\nof invasive sp.",
+          num_native_spp      = "Number\nof native sp.",
+          num_naturalized_spp = "Number\nof naturalized sp.",
           num_ratio           = "Aliens/Natives\nrichness ratio"
         )
       )
