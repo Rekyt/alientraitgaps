@@ -272,7 +272,9 @@ plot_trait_combination_per_range_size = function(
         )
       )
     ) +
-    scale_x_continuous(labels = scales::label_percent()) +
+    scale_x_continuous(
+      "Proportion of Species", labels = scales::label_percent()
+    ) +
     scale_y_discrete(
       NULL,
       labels = c("top.total_area" = "Area (Top)",
