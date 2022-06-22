@@ -399,7 +399,8 @@ plot_combined_traits_heatmap = function(combined_traits) {
       y    = "Species Rank (most to least measured)",
       fill = "Does species has this trait?"
     ) +
-    scale_fill_viridis_d() +
+    scale_fill_viridis_d(labels = c(`TRUE` = "Yes", `FALSE` = "No")) +
+    coord_cartesian(expand = FALSE) +
     theme_bw() +
     theme(aspect.ratio = 1, legend.position = "top")
 }
