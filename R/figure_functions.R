@@ -17,6 +17,7 @@ plot_number_species_per_trait_combined = function(combined_traits) {
 
   max_20_traits = combined_traits %>%
     count(consolidated_name, sort = TRUE, name = "n_species") %>%
+    filter(!grepl("Elevational", consolidated_name, fixed = TRUE)) %>%
     slice_max(n_species, n = 20)
 
   total_sp = combined_traits %>%
@@ -51,8 +52,7 @@ plot_number_species_per_trait_combined = function(combined_traits) {
     ) +
     scale_y_discrete(name = "Trait name", labels = label_wrap_gen(30)) +
     labs(title = "20 most frequently measured traits") +
-    theme_bw() +
-    theme(aspect.ratio = 1)
+    theme_bw()
 }
 
 

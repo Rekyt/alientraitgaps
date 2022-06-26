@@ -7,4 +7,5 @@ inst/exdata/try/17144.txt
 inst/exdata/try/17144.df/
 inst/exdata/gift/
 *.~lock*
+~$*
 Rplots.pdf
