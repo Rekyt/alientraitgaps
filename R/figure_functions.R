@@ -69,25 +69,38 @@ plot_number_specific_trait_combination = function(contain_trait_combination) {
       aes(
         n_species,
         forcats::fct_relevel(comb_name, "has_bergmann", "has_diaz", "has_lhs",
-                             "has_at_least_one_trait", "in_glonaf")
+                             "has_at_least_one_trait")
       )
     ) +
-    geom_vline(xintercept = 16538, linetype = 2, size = 1, color = "darkred") +
+    geom_vline(
+      xintercept = nrow(contain_trait_combination), linetype = 2, size = 1,
+      color = "darkred"
+    ) +
     geom_point(size = 2, color = "darkblue") +
+    geom_text(
+      aes(
+        label = paste0(
+          round(n_species/nrow(contain_trait_combination) * 100, 1), "%"
+          )
+      ), hjust = -0.2, vjust = 0.5
+    ) +
     scale_x_continuous(
-      sec.axis = sec_axis(~./16538, labels = scales::percent_format())
+      sec.axis = sec_axis(
+        ~./nrow(contain_trait_combination), labels = scales::percent_format()
+      )
     ) +
     scale_y_discrete(
-      labels = c(in_glonaf = "In GloNAF",
-                 has_at_least_one_trait = "At least one trait",
-                 has_lhs   = "Leaf-Height-Seed\n(Westoby 1998)",
-                 has_diaz  = "Aboveground traits\n(Díaz et al., 2016)",
-                 has_bergmann = "Root traits\n(Bergmann et al., 2020)")
+      labels = c(
+        in_glonaf = "In GloNAF",
+        has_at_least_one_trait = "At least one trait",
+        has_lhs   = "Leaf-Height-Seed\n(3 traits, Westoby 1998)",
+        has_diaz  = "Aboveground traits\n(6 traits, Díaz et al., 2016)",
+        has_bergmann = "Root traits\n(4 traits, Bergmann et al., 2020)"
+      )
     ) +
     labs(x = "Number of species",
          y = "Trait Combination") +
-    theme_bw() +
-    theme(aspect.ratio = 1)
+    theme_bw()
 }
 
 plot_number_trait_categories_per_invasion_status = function(
@@ -566,7 +579,7 @@ plot_prop_trait_per_richness = function(
 }
 
 plot_proportion_known_combination_per_richness = function(
-  regions_trait_prop, glonaf_species_number
+    regions_trait_prop, glonaf_species_number
 ) {
   regions_trait_prop %>%
     full_join(glonaf_species_number, by = "OBJIDsic") %>%
@@ -815,7 +828,7 @@ plot_map_europe_proportion_trait = function(
           "has_bergmann_prop", "flower_prop_trait", "height_prop_trait",
           "leaf_prop_trait", "life_history_prop_trait", "root_prop_trait",
           "seed_prop_trait", "stem_prop_trait")
-        )
+      )
     )
 
   glonaf_map_mainland = glonaf_mainland_large_islands %>%
