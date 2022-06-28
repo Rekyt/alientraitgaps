@@ -672,7 +672,7 @@ plot_map_proportion_trait_by_region = function(
     ggplot(aes(fill = prop_value)) +
     geom_sf(data = world_sf, fill = "gray85", color = "gray65", size = 1/100) +
     # Non-small islands and mainlands
-    geom_sf(color = "gray65", size = 1/100) +
+    geom_sf(color = NA, size = 1/100) +
     # Small islands
     geom_sf(
       aes(color = prop_value),
