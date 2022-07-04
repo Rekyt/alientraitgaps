@@ -38,20 +38,26 @@ get_glonaf_species_list = function(glonaf_con) {
     inner_join(tbl(glonaf_con, "species"), by = c(species_id = "id")) %>%
     select(-species_id) %>%
     # Add Name status from TPL
-    inner_join(tbl(glonaf_con, "name_status"), by = c(name_status_id = "id")) %>%
+    inner_join(
+      tbl(glonaf_con, "name_status"),
+      by = c(name_status_id = "id")
+    ) %>%
     select(-name_status_id) %>%
     # Get only binomial name
     filter(infra_rank_id == 4) %>%
     # Add full genus name
-    inner_join(glonaf_con %>%
-                 tbl("genus") %>%
-                 select(genus_id = id, genus = name), by = "genus_id") %>%
+    inner_join(
+      tbl(glonaf_con, "genus") %>%
+        select(genus_id = id, genus = name),
+      by = "genus_id"
+    ) %>%
     select(-genus_id) %>%
     # Add author name
-    inner_join(glonaf_con  %>%
-                 tbl("author") %>%
-                 select(author_id = id, author_name = name),
-               by = "author_id") %>%
+    inner_join(
+      tbl(glonaf_con, "author") %>%
+        select(author_id = id, author_name = name),
+      by = "author_id"
+    ) %>%
     select(-author_id) %>%
     collect()
 

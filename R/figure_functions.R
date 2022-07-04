@@ -852,17 +852,20 @@ plot_map_europe_proportion_trait = function(
       vars(prop_name),
       labeller = labeller(
         prop_name = c(
-          has_bergmann_prop = "Root Traits\n(4 traits, Bergmann et al. 2020)",
-          has_diaz_prop     = "Aboveground traits\n(6 traits, Díaz et al. 2016)",
-          has_lhs_prop      = "Leaf-Height-Seed mass\n(3 traits, Westoby 2002)",
-          prop_with_any_trait = "Any trait",
-          flower_prop_trait = "Prop. Aliens\nFlower",
-          height_prop_trait = "Prop. Aliens\nHeight",
-          leaf_prop_trait = "Prop. Aliens\nLeaf",
+          has_bergmann_prop       = paste0("Root Traits\n",
+                                           "(4 traits, Bergmann et al. 2020)"),
+          has_diaz_prop           = paste0("Aboveground traits\n",
+                                           "(6 traits, Díaz et al. 2016)"),
+          has_lhs_prop            = paste0("Leaf-Height-Seed mass\n",
+                                           "(3 traits, Westoby 2002)"),
+          prop_with_any_trait     = "Any trait",
+          flower_prop_trait       = "Prop. Aliens\nFlower",
+          height_prop_trait       = "Prop. Aliens\nHeight",
+          leaf_prop_trait         = "Prop. Aliens\nLeaf",
           life_history_prop_trait = "Prop. Aliens\nLife History",
-          root_prop_trait = "Prop. Aliens\nRoot",
-          seed_prop_trait = "Prop. Aliens\nSeed",
-          stem_prop_trait = "Prop. Aliens\nStem"
+          root_prop_trait         = "Prop. Aliens\nRoot",
+          seed_prop_trait         = "Prop. Aliens\nSeed",
+          stem_prop_trait         = "Prop. Aliens\nStem"
         )
       )
     ) +
