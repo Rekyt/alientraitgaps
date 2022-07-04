@@ -441,6 +441,10 @@ list(
     glonaf_most_distributed_species,
     count_most_distributed_species_and_bootstrap(glonaf_species_area, 100, 100)
   ),
+  tar_target(
+    glonaf_europe,
+    get_european_regions_of_glonaf(glonaf_mainland_large_islands)
+  ),
 
 
   # Make figures ---------------------------------------------------------------

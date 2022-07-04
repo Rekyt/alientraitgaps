@@ -429,3 +429,26 @@ count_most_distributed_species_and_bootstrap = function(
     ) %>%
     select(-area_df, -rest_df)
 }
+
+
+get_european_regions_of_glonaf = function(glonaf_mainland_large_islands) {
+
+  europe_sf = rnaturalearth::ne_countries(returnclass = "sf") %>%
+    sf::st_transform(crs = "EPSG:4258") %>%
+    filter(continent == "Europe")
+
+  europe_sf %>%
+    sf::st_transform(sf::st_crs(glonaf_mainland_large_islands)) %>%
+    sf::st_join(
+      glonaf_mainland_large_islands %>%
+        select(OBJIDsic, IDregion, regionF, name),
+      left = TRUE
+    ) %>%
+    ## Manually filter out some regions
+    # Filter out non-European Russian Regions
+    filter(!grepl("RUS.RFE|RUS.KI|RUS.MAG|RUS.SIB|RUS.KHA", IDregion)) %>%
+    # Filter out Matched South American Regions
+    filter(!grepl("BRA|SUR", IDregion)) %>%
+    # Filter out Matched other Asian regions
+    filter(!grepl("KAZ|CHN|MNG", IDregion))
+}
