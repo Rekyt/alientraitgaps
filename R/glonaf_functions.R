@@ -451,4 +451,30 @@ get_european_regions_of_glonaf = function(glonaf_mainland_large_islands) {
     filter(!grepl("BRA|SUR", IDregion)) %>%
     # Filter out Matched other Asian regions
     filter(!grepl("KAZ|CHN|MNG", IDregion))
+
+}
+
+get_european_glonaf_species = function(
+    glonaf_europe, glonaf_species_regions, contain_trait_combination
+) {
+  glonaf_species_regions %>%
+    semi_join(glonaf_europe, by = "OBJIDsic") %>%
+    distinct(OBJIDsic, species) %>%
+    count(species, name = "n_regions") %>%
+    full_join(
+      contain_trait_combination %>%
+        select(-in_glonaf),
+      by = "species"
+    ) %>%
+    rowwise() %>%
+    mutate(
+      has_seed_mass = "seed mass" %in% traits,
+      has_sla       = "leaf area per leaf dry mass" %in% traits,
+      has_height    = "whole plant height" %in% traits
+    ) %>%
+    ungroup() %>%
+    arrange(desc(n_regions)) %>%
+    mutate(
+      occurrence_rank = row_number()
+    )
 }

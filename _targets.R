@@ -445,6 +445,12 @@ list(
     glonaf_europe,
     get_european_regions_of_glonaf(glonaf_mainland_large_islands)
   ),
+  tar_target(
+    european_species_traits,
+    get_european_glonaf_species(
+      glonaf_europe, glonaf_species_regions, contain_trait_combination
+    )
+  ),
 
 
   # Make figures ---------------------------------------------------------------
