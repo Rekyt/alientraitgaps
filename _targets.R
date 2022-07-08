@@ -12,6 +12,7 @@ source("R/glonaf_functions.R")
 source("R/gift_functions.R")
 source("R/has_coords_functions.R")
 source("R/harmonize_taxonomy_functions.R")
+source("R/paper_figures_functions.R")
 source("R/try_functions.R")
 
 # Initial options --------------------------------------------------------------
@@ -563,6 +564,11 @@ list(
     plot_map_europe_proportion_trait(
       regions_trait_prop, glonaf_small_islands, glonaf_mainland_large_islands
     )
+  ),
+  # Assembling Figures for Paper -----------------------------------------------
+  tar_target(
+    pfig1_trait_heatmap_and_freq,
+    assemble_fig1(fig_combined_trait_heatmap, fig_species_per_trait_combined)
   )
 ) %>%
   # Post-processing Hooks ------------------------------------------------------

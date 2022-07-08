@@ -27,11 +27,6 @@ plot_number_species_per_trait_combined = function(combined_traits) {
 
   max_20_traits %>%
     ggplot(aes(n_species, forcats::fct_reorder(consolidated_name, n_species))) +
-    geom_point() +
-    geom_text(
-      aes(label = paste0(round((n_species/total_sp) * 100, 0), "%")),
-      hjust = -0.4, size = 2.6, vjust = 0
-    ) +
     # 50% vertical line
     geom_text(
       label = "50%", color = "darkblue", x = total_sp/2, y = 20, hjust = -0.4,
@@ -49,6 +44,11 @@ plot_number_species_per_trait_combined = function(combined_traits) {
       sec.axis = sec_axis(
         trans = ~.x/total_sp, labels = scales::percent_format()
       )
+    ) +
+    geom_point() +
+    geom_text(
+      aes(label = paste0(round((n_species/total_sp) * 100, 0), "%")),
+      hjust = -0.1, size = 2.6, vjust = 0
     ) +
     scale_y_discrete(name = "Trait name", labels = label_wrap_gen(30)) +
     labs(title = "20 most frequently measured traits") +
@@ -408,9 +408,9 @@ plot_combined_traits_heatmap = function(combined_traits) {
     ggplot(aes(trait_rank, species_rank, fill = value)) +
     geom_raster() +
     labs(
-      x    = "Trait Rank (most to least measured)",
-      y    = "Species Rank (most to least measured)",
-      fill = "Does species has this trait?"
+      x    = "Trait Rank",
+      y    = "Species Rank",
+      fill = "Was this trait measured for that species?"
     ) +
     scale_fill_viridis_d(labels = c(`TRUE` = "Yes", `FALSE` = "No")) +
     coord_cartesian(expand = FALSE) +
