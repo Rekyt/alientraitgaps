@@ -32,7 +32,9 @@ targets::tar_load(try_traits)
 
 aus_names = names(austraits$definitions$traits$elements)
 
-bien_names = BIEN::BIEN_trait_list()[["trait_name"]]
+bien_names = BIEN::BIEN_trait_list()[["trait_name"]] %>%
+  na.omit() %>%
+  as.character()
 
 gift_names = gift_traits_meta %>%
   distinct(Trait2, Lvl3)
@@ -165,13 +167,83 @@ plot_trait_network = ggraph(trait_network, layout = 'graphopt') +
 
 # Extract connected component --------------------------------------------------
 
+# Extract all connected components seperately
 all_components = trait_network %>%
   to_components()
 
-all_components %>%
+component_size = all_components %>%
   purrr::map_dbl(
     ~.x %>%
-      activate(, nodes) %>%
+      activate(nodes) %>%
       length()
   )
+
+# Look at some of the biggest connected component
+all_components[which(component_size > 10)]
+
+
+db_df = data.frame(
+  database = c("AusTraits", "BIEN", "GIFT", "TRY"),
+  trait_name = c(
+    "austraits_trait_name", "bien_trait_name", "gift_trait_name", "try_trait_id"
+  )
+)
+
+# Get unified trait table
+all_traits = purrr::map_dfr(all_components, function(x) {
+  node_df = x %>%
+    activate(nodes) %>%
+    as.data.frame()
+
+  has_only_try = length(node_df[["database"]]) == 1 &
+    ("TRY" %in% node_df[["database"]])
+
+  node_df = node_df %>%
+    full_join(db_df, by = "database") %>%
+    arrange(trait_name)
+
+  # Add Consolidated Name
+  if (!has_only_try) {
+
+    first_non_na_trait = node_df %>%
+      filter(!is.na(name)) %>%
+      pull(name) %>%
+      .[1]
+
+    node_df = node_df %>%
+      add_row(
+        name = first_non_na_trait,
+        trait_name = "consolidated_name"
+      )
+
+  } else {
+
+
+    first_try_trait = node_df %>%
+      filter(database == "TRY") %>%
+      slice(1)
+
+    try_name = try_traits %>%
+      filter(TraitID == first_try_trait[["name"]]) %>%
+      pull(Trait) %>%
+      .[1]
+
+    node_df = node_df %>%
+      add_row(
+        name = try_name,
+        trait_name = "consolidated_name"
+      )
+  }
+
+  node_df %>%
+    select(-database) %>%
+    tidyr::pivot_wider(
+      names_from = trait_name, values_from = name, values_fn = list
+    )
+}) %>%
+  tidyr::unnest(austraits_trait_name) %>%
+  tidyr::unnest(bien_trait_name) %>%
+  tidyr::unnest(gift_trait_name) %>%
+  tidyr::unnest(try_trait_id) %>%
+  tidyr::unnest(consolidated_name)
 
