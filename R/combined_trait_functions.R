@@ -1,3 +1,268 @@
+read_correspondence_tables = function(raw_correspondence_tables) {
+
+  names(raw_correspondence_tables) = gsub(
+    "_correspondence.ods", "", basename(raw_correspondence_tables), fixed = TRUE
+  )
+
+  lapply(raw_correspondence_tables, function(x) {
+    readODS::read_ods(x) %>%
+      as_tibble()
+  })
+}
+
+check_correspondence_tables = function(
+  correspondence_tables, austraits, gift_traits_meta, try_traits
+) {
+
+  corres_df = correspondence_tables
+
+  # Define Trait Names
+  aus_names = names(austraits$definitions$traits$elements)
+
+  bien_names = BIEN::BIEN_trait_list()[["trait_name"]] %>%
+    na.omit() %>%
+    as.character()
+
+  gift_names = gift_traits_meta %>%
+    distinct(Trait2, Lvl3)
+
+
+  # Check values in columns 'identical' and 'similar'
+  ident_similar = corres_df %>%
+    purrr::imap_dfr(
+      ~.x %>%
+                      distinct(identical, similar) %>%
+                      mutate(table = .y) %>%
+                      select(table, everything()) %>%
+                      arrange(table, identical, similar)
+  ) %>%
+    distinct(identical, similar)
+
+
+  if (ident_similar[["identical"]] != c("no", "yes", NA) |
+      ident_similar[["similar"]] != c("yes", "yes", NA)) {
+    stop("Issue with identical and similar columns")
+  }
+
+
+  # Check that trait names are indeed in database
+  # Check AusTraits names
+  aus_1 = corres_df$austraits_bien %>%
+    filter(!(austraits_trait_name %in% aus_names))
+
+  aus_2 = corres_df$austraits_try %>%
+    filter(!(austraits_trait_name %in% aus_names))
+
+  aus_3 = corres_df$gift_austraits %>%
+    filter(
+      !(austraits_trait_name %in% aus_names) & !is.na(austraits_trait_name)
+  )
+
+  # Check BIEN names
+  bien_1 = corres_df$austraits_bien %>%
+    filter(!(bien_trait_name %in% bien_names) & !is.na(bien_trait_name))
+
+  bien_2 = corres_df$bien_gift %>%
+    filter(!(bien_trait_name %in% bien_names) & !is.na(bien_trait_name))
+
+  bien_3 = corres_df$bien_try %>%
+    filter(!(bien_trait_name) %in% bien_names)
+
+  # Check GIFT names
+  gift_1 = corres_df$bien_gift %>%
+    filter(
+      (!(gift_trait_id %in% gift_names$Lvl3) |
+         !(gift_trait_name %in% gift_names$Trait2)) & (!is.na(gift_trait_id) &
+                                                         !is.na(gift_trait_name))
+    )
+
+  gift_2 = corres_df$gift_austraits %>%
+    filter(!(gift_trait_id %in% gift_names$Lvl3) |
+             !(gift_trait_name %in% gift_names$Trait2))
+
+  gift_3 = corres_df$gift_try %>%
+    filter(!(gift_trait_name %in% gift_names$Trait2))
+
+  # Check TRY names
+  try_1 = corres_df$austraits_try %>%
+    filter(
+      (!(try_trait_id %in% try_traits$TraitID)) &
+        (!is.na(try_trait_id) & !is.na(try_trait_name))
+    )
+
+  try_2 = corres_df$bien_try %>%
+    filter(
+      (!(try_trait_id %in% try_traits$TraitID) |
+         !(try_trait_name %in% try_traits$Trait)) &
+        (!is.na(try_trait_id) & !is.na(try_trait_name))
+    )
+
+  try_3 = corres_df$gift_try %>%
+    filter(
+      (!(try_trait_id %in% try_traits$TraitID) |
+         !(try_trait_name %in% try_traits$Trait)) &
+        (!is.na(try_trait_id) & !is.na(try_trait_name))
+    )
+
+  rows = list(
+    aus_1, aus_2, aus_3, bien_1, bien_2, bien_3, gift_1, gift_2, gift_3, try_1,
+    try_2, try_3
+  ) %>%
+    vapply(nrow, 1L)
+
+  if (any(rows != 0)) {
+    stop("Some rows were not empty")
+  }
+
+  return(corres_df)
+}
+
+
+create_trait_network = function(
+  correspondence_tables_check, austraits, gift_traits_meta, try_traits
+) {
+
+  corres_df = correspondence_tables_check
+
+  # Get back trait names
+  aus_names = names(austraits$definitions$traits$elements)
+
+  bien_names = BIEN::BIEN_trait_list()[["trait_name"]] %>%
+    na.omit() %>%
+    as.character()
+
+  gift_names = gift_traits_meta %>%
+    distinct(Trait2, Lvl3)
+
+
+  # Create nodes data.frame
+  node_df = data.frame(
+    name = c(aus_names, bien_names, gift_names$Trait2, try_traits$TraitID),
+    database = c(
+      rep("AusTraits", length.out = length(aus_names)),
+      rep("BIEN",      length.out = length(bien_names)),
+      rep("GIFT",      length.out = nrow(gift_names)),
+      rep("TRY",       length.out = nrow(try_traits))
+    )
+  )
+
+  # Unified edge data.frame
+  corres_df$gift_austraits = corres_df$gift_austraits %>%
+    select(-gift_trait_id)
+
+  corres_df$bien_gift = corres_df$bien_gift %>%
+    select(-gift_trait_id)
+
+  edge_df = corres_df %>%
+    purrr::map_dfr(
+      function(x) {
+        smaller_df = x %>%
+          select(1:2, identical, similar) %>%
+          mutate(across(.fns = as.character))
+
+        colnames(smaller_df)[1:2] = c("from", "to")
+
+        smaller_df %>%
+          filter(!is.na(to))
+      })
+
+
+  # Create trait network
+  trait_network = tidygraph::tbl_graph(
+    nodes = node_df %>%
+      mutate(name = gsub(" ", "__", name, fixed = TRUE)),
+    edges = edge_df %>%
+      mutate(from = gsub(" ", "__", from, fixed = TRUE),
+             to   = gsub(" ", "__",   to, fixed = TRUE))
+  )
+}
+
+consolidate_trait_names_from_network = function(trait_network, try_traits) {
+
+  # Extract all connected components seperately
+  all_components = trait_network %>%
+    tidygraph::to_components()
+
+  component_size = all_components %>%
+    purrr::map_dbl(
+      ~.x %>%
+        tidygraph::activate(nodes) %>%
+        length()
+    )
+
+  # Look at some of the biggest connected component
+  all_components[which(component_size > 10)]
+
+
+  db_df = data.frame(
+    database = c("AusTraits", "BIEN", "GIFT", "TRY"),
+    trait_name = c(
+      "austraits_trait_name", "bien_trait_name", "gift_trait_name",
+      "try_trait_id"
+    )
+  )
+
+  # Get unified trait table
+  all_traits = purrr::map_dfr(all_components, function(x) {
+    node_df = x %>%
+      tidygraph::activate(nodes) %>%
+      as.data.frame()
+
+    has_only_try = length(node_df[["database"]]) == 1 &
+      ("TRY" %in% node_df[["database"]])
+
+    node_df = node_df %>%
+      full_join(db_df, by = "database") %>%
+      arrange(trait_name)
+
+    # Add Consolidated Name
+    if (!has_only_try) {
+
+      first_non_na_trait = node_df %>%
+        filter(!is.na(name)) %>%
+        pull(name) %>%
+        .[1]
+
+      node_df = node_df %>%
+        add_row(
+          name = first_non_na_trait,
+          trait_name = "consolidated_name"
+        )
+
+    } else {
+
+
+      first_try_trait = node_df %>%
+        filter(database == "TRY") %>%
+        slice(1)
+
+      try_name = try_traits %>%
+        filter(TraitID == first_try_trait[["name"]]) %>%
+        pull(Trait) %>%
+        .[1]
+
+      node_df = node_df %>%
+        add_row(
+          name = try_name,
+          trait_name = "consolidated_name"
+        )
+    }
+
+    node_df %>%
+      select(-database) %>%
+      tidyr::pivot_wider(
+        names_from = trait_name, values_from = name, values_fn = list
+      )
+  }) %>%
+    tidyr::unnest(austraits_trait_name) %>%
+    tidyr::unnest(bien_trait_name) %>%
+    tidyr::unnest(gift_trait_name) %>%
+    tidyr::unnest(try_trait_id) %>%
+    tidyr::unnest(consolidated_name)
+
+}
+
+
 consolidate_trait_names = function(bien_try_convert_df, aus_try_convert_df,
                                    aus_bien_convert_df, gift_try_convert_df,
                                    try_traits) {

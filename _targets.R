@@ -12,7 +12,7 @@ source("R/glonaf_functions.R")
 source("R/gift_functions.R")
 source("R/has_coords_functions.R")
 source("R/harmonize_taxonomy_functions.R")
-source("R/paper_figures_functions.R")
+# source("R/paper_figures_functions.R")
 source("R/try_functions.R")
 
 # Initial options --------------------------------------------------------------
@@ -309,6 +309,35 @@ list(
   ),
 
 
+  # Consolidate Trait Names ----------------------------------------------------
+  tar_target(
+    raw_correspondence_tables,
+    list.files(
+      here::here("inst", "exdata", "correspondence_tables"), full.names = TRUE
+    ),
+    format = "file"
+  ),
+  tar_target(
+    correspondence_tables, read_correspondence_tables(raw_correspondence_tables)
+  ),
+  tar_target(
+    correspondence_tables_check,
+    check_correspondence_tables(
+      correspondence_tables, austraits, gift_traits_meta, try_traits
+    )
+  ),
+  tar_target(
+    trait_network,
+    create_trait_network(
+      correspondence_tables_check, austraits, gift_traits_meta, try_traits
+    )
+  ),
+  tar_target(
+    network_consolidated_trait_names,
+    consolidate_trait_names_from_network(trait_network, try_traits)
+  ),
+
+
   # Combine Trait Data ---------------------------------------------------------
   # Combine trait names from BIEN, AusTraits, and TRY under a common umbrella
   tar_target(
@@ -565,11 +594,18 @@ list(
       regions_trait_prop, glonaf_small_islands, glonaf_mainland_large_islands
     )
   ),
+  tar_target(
+    fig_network_trait_name,
+    plot_network_trait(trait_network)
+  ),
+
+
   # Assembling Figures for Paper -----------------------------------------------
   tar_target(
     pfig1_trait_heatmap_and_freq,
     assemble_fig1(fig_combined_trait_heatmap, fig_species_per_trait_combined)
   )
+
 ) %>%
   # Post-processing Hooks ------------------------------------------------------
   # Convert figures into ggplotGrob() to take less space
