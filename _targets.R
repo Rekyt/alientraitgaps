@@ -360,8 +360,8 @@ list(
   tar_target(
     combined_traits,
     combine_bien_try_aus_gift_traits(
-      consolidated_trait_names, glonaf_bien_traits, glonaf_try_traits_available,
-      aus_traits, gift_glonaf_traits
+      network_consolidated_trait_names, glonaf_bien_traits,
+      glonaf_try_traits_available, aus_traits, gift_glonaf_traits
     )
   ),
   # Add trait categories

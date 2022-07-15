@@ -215,6 +215,8 @@ consolidate_trait_names_from_network = function(trait_network, try_traits) {
       full_join(db_df, by = "database") %>%
       arrange(trait_name)
 
+    node_df$name = gsub("__", " ", node_df$name, fixed = TRUE)
+
     # Add Consolidated Name
     if (!has_only_try) {
 
@@ -258,8 +260,21 @@ consolidate_trait_names_from_network = function(trait_network, try_traits) {
     tidyr::unnest(bien_trait_name) %>%
     tidyr::unnest(gift_trait_name) %>%
     tidyr::unnest(try_trait_id) %>%
-    tidyr::unnest(consolidated_name)
+    tidyr::unnest(consolidated_name) %>%
+    left_join(
+      try_traits %>%
+        distinct(try_trait_id = TraitID, try_trait_name = Trait) %>%
+        mutate(try_trait_id = as.character(try_trait_id)),
+      by = "try_trait_id"
+    )
 
+  # Rename and re-order column as the initial consolidated trait name df
+  all_traits %>%
+    rename(aus_trait_name = austraits_trait_name) %>%
+    select(
+      bien_trait_name, aus_trait_name, try_trait_id, try_trait_name,
+      gift_trait_name, consolidated_name
+    )
 }
 
 
@@ -338,20 +353,20 @@ combine_bien_try_aus_gift_traits = function(
   list(
     # BIEN
     consolidated_trait_names %>%
-      inner_join(bien_distinct_traits,
-                 by = "bien_trait_name"),
+      inner_join(bien_distinct_traits, by = "bien_trait_name"),
     # AusTraits
     consolidated_trait_names %>%
-      inner_join(aus_distinct_traits,
-                 by = "aus_trait_name"),
+      inner_join(aus_distinct_traits, by = "aus_trait_name"),
     # TRY
     consolidated_trait_names %>%
-      inner_join(try_distinct_traits,
-                 by = "try_trait_id"),
+      inner_join(
+        try_distinct_traits %>%
+          mutate(try_trait_id = as.character(try_trait_id)),
+        by = "try_trait_id"
+      ),
     # GIFT
     consolidated_trait_names %>%
-      inner_join(gift_distinct_traits,
-                 by = "gift_trait_name")
+      inner_join(gift_distinct_traits, by = "gift_trait_name")
   ) %>%
     bind_rows() %>%
     distinct(consolidated_name, species)
