@@ -258,8 +258,8 @@ plot_taxonomy_treemap_trait_combination = function(
         "TRUE.TRUE.TRUE.TRUE"    = "Aboveground traits\n(Díaz et al., 2016)"
       ),
       values = c(
-        "TRUE.FALSE.FALSE.FALSE" = "lightgray",
-        "TRUE.TRUE.FALSE.FALSE"  = "#b2df8a",
+        "TRUE.FALSE.FALSE.FALSE" = "white",
+        "TRUE.TRUE.FALSE.FALSE"  = "lightgray",
         "TRUE.TRUE.TRUE.FALSE"   = "#a6cee3",
         "TRUE.TRUE.TRUE.TRUE"    = "#1f78b4"
       )
