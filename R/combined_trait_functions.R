@@ -39,7 +39,7 @@ check_correspondence_tables = function(
     distinct(identical, similar)
 
 
-  if (ident_similar[["identical"]] != c("no", "yes", NA) |
+  if (ident_similar[["identical"]] != c("no", "yes", NA) ||
       ident_similar[["similar"]] != c("yes", "yes", NA)) {
     stop("Issue with identical and similar columns")
   }

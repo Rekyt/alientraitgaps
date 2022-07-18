@@ -12,7 +12,7 @@ source("R/glonaf_functions.R")
 source("R/gift_functions.R")
 source("R/has_coords_functions.R")
 source("R/harmonize_taxonomy_functions.R")
-# source("R/paper_figures_functions.R")
+source("R/paper_figures_functions.R")
 source("R/try_functions.R")
 
 # Initial options --------------------------------------------------------------
