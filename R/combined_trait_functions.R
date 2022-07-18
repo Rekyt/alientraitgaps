@@ -405,15 +405,12 @@ count_specific_trait_combinations = function(combined_traits, match_glonaf_tnrs,
       in_glonaf              = TRUE,
       has_at_least_one_trait = length(traits) > 0,
       has_lhs                = all(
-        c("leaf area per leaf dry mass", "seed mass", "whole plant height") %in%
+        c("specific_leaf_area", "diaspore_mass", "plant_height") %in%
           traits
       ),
       has_diaz               = all(
-        c(
-          "leaf area per leaf dry mass", "seed mass", "whole plant height",
-          "leaf area", "stem wood density",
-          "leaf nitrogen content per leaf dry mass"
-        ) %in% traits
+        c("specific_leaf_area", "diaspore_mass", "plant_height", "leaf_area",
+          "wood_density", "leaf_N_per_dry_mass") %in% traits
       ),
       has_bergmann = bergmann_comb_df %>%
         purrr::map_lgl(~ all(.x %in% traits)) %>%
