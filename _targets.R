@@ -106,15 +106,6 @@ list(
     austraits_list,
     unique(austraits_species[["taxon_name"]])
   ),
-  tar_target(
-    raw_austraits_try_convert_table,
-    here("inst", "exdata", "austraits", "AusTraits-TRY matches.xlsx"),
-    format = "file"
-  ),
-  tar_target(
-    austraits_try_convert,
-    readxl::read_xlsx(raw_austraits_try_convert_table, na = c("", "NA"))
-  ),
 
   # Load GIFT data -------------------------------------------------------------
   tar_target(
@@ -195,26 +186,9 @@ list(
     glonaf_species_per_trait,
     count_species_per_trait(glonaf_try_traits_available)
   ),
-  tar_target(
-    try_trait_categories,
-    make_try_trait_categories(consolidated_trait_names)
-  ),
 
 
   # BIEN traits ----------------------------------------------------------------
-  # List BIEN traits
-  tar_target(
-    bien_trait_list,
-    BIEN::BIEN_trait_list()
-  ),
-  tar_target(
-    bien_try_convert_df,
-    make_bien_try_correspond(bien_trait_list)
-  ),
-  tar_target(
-    bien_trait_categories,
-    make_bien_trait_category(bien_trait_list)
-  ),
 
   # Query BIEN traits for GloNAF species
   tar_target(
@@ -238,25 +212,6 @@ list(
     harmonize_austraits_glonaf(match_austraits_tnrs, match_glonaf_tnrs)
   ),
 
-  # Make correspondance between AusTraits and TRY
-  tar_target(
-    aus_try_convert_df,
-    make_austraits_try_traits_correspond(austraits_try_convert)
-  ),
-
-  # Make correspondance between AusTraits and BIEN (for the one not in TRY)
-  tar_target(
-      aus_bien_convert_df,
-    make_austraits_bien_traits_correspond(
-      aus_try_convert_df, bien_try_convert_df
-    )
-  ),
-  # Non-TRY traits categories
-  tar_target(
-    aus_trait_categories,
-    make_non_try_aus_traits_category(consolidated_trait_names)
-  ),
-
   # Get and count trait data
   tar_target(
     aus_traits,
@@ -275,16 +230,6 @@ list(
 
 
   # GIFT traits ----------------------------------------------------------------
-  # Trait conversion table
-  tar_target(
-    gift_try_convert_df,
-    make_gift_try_traits_correspond(gift_traits_meta)
-  ),
-  tar_target(
-    gift_trait_categories,
-    make_gift_trait_category(gift_traits_meta)
-  ),
-
   # Match species names
   tar_target(
     harmonized_gift_glonaf,
@@ -339,22 +284,7 @@ list(
 
 
   # Combine Trait Data ---------------------------------------------------------
-  # Combine trait names from BIEN, AusTraits, and TRY under a common umbrella
-  tar_target(
-    consolidated_trait_names,
-    consolidate_trait_names(
-      bien_try_convert_df, aus_try_convert_df, aus_bien_convert_df,
-      gift_try_convert_df, try_traits
-    )
-  ),
-  # Add trait categories to traits
-  tar_target(
-    consolidated_trait_categories,
-    combine_trait_categories(
-      consolidated_trait_names, gift_trait_categories, aus_trait_categories,
-      bien_trait_categories, try_trait_categories
-    )
-  ),
+
   ## Actual tables with trait names
   # Actual table with species names and trait names
   tar_target(
@@ -363,12 +293,6 @@ list(
       network_consolidated_trait_names, glonaf_bien_traits,
       glonaf_try_traits_available, aus_traits, gift_glonaf_traits
     )
-  ),
-  # Add trait categories
-  tar_target(
-    combined_trait_categories_species,
-    inner_join(combined_traits, consolidated_trait_categories,
-               by = "consolidated_name")
   ),
   # Growth form table per species
   tar_target(
@@ -393,13 +317,6 @@ list(
     combined_traits_taxonomy,
     get_glonaf_higher_taxonomy_combined_traits(
       combined_traits, match_glonaf_tnrs, glonaf_alien_species
-    )
-  ),
-  # Get for each species the number of traits in each category
-  tar_target(
-    species_trait_categories,
-    count_trait_categories_per_species(
-      combined_trait_categories_species, match_glonaf_tnrs
     )
   ),
 
@@ -450,15 +367,13 @@ list(
   tar_target(
     regions_trait_prop,
     count_species_proportion_trait_by_region(
-      glonaf_species_regions, species_trait_categories,
-      contain_trait_combination
+      glonaf_species_regions, contain_trait_combination
     )
   ),
   tar_target(
     glonaf_status_trait_cat,
     get_trait_combinations_and_cat_per_invasion_status(
-      glonaf_species_regions_status, species_trait_categories,
-      contain_trait_combination
+      glonaf_species_regions_status, contain_trait_combination
     )
   ),
   tar_target(
@@ -519,24 +434,6 @@ list(
     )
   ),
   tar_target(
-    fig_miss_trait_cat_species,
-    plot_miss_trait_categories_per_species(species_trait_categories)
-  ),
-  tar_target(
-    pfig_miss_trait_cat_species_growth_form,
-    plot_miss_trait_categories_per_species_per_growth_form(
-      species_trait_categories, combined_growth_form
-    )
-  ),
-  tar_target(
-    fig_miss_trait_cat_species_summary,
-    plot_miss_trait_categories_per_species_summary(species_trait_categories)
-  ),
-  tar_target(
-    fig_count_trait_cat_species,
-    plot_number_trait_categories_per_species(species_trait_categories)
-  ),
-  tar_target(
     fig_rich_prop_trait,
     plot_prop_trait_per_richness(regions_trait_prop, unified_glonaf_regions)
   ),
@@ -557,30 +454,14 @@ list(
     )
   ),
   tar_target(
-    fig_map_prop_trait_organ_regions,
-    plot_map_proportion_trait_by_organ_by_region(
-      regions_trait_prop, glonaf_small_islands, glonaf_mainland_large_islands
-    )
-  ),
-  tar_target(
     fig_map_alien_richness,
     plot_map_alien_richness_region(
       regions_trait_prop, glonaf_small_islands, glonaf_mainland_large_islands
     )
   ),
   tar_target(
-    fig_status_number_trait_cat,
-    plot_number_trait_categories_per_invasion_status(glonaf_status_trait_cat)
-  ),
-  tar_target(
     fig_status_prop_comb,
     plot_trait_comb_proportion_per_invasion_status(glonaf_status_trait_cat)
-  ),
-  tar_target(
-    fig_widest_range_number_trait_cat,
-    plot_number_trait_categories_per_range_size(
-      glonaf_most_distributed_species, species_trait_categories
-    )
   ),
   tar_target(
     fig_widest_range_trait_comb_prop,

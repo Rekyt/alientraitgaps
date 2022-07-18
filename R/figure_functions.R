@@ -103,47 +103,6 @@ plot_number_specific_trait_combination = function(contain_trait_combination) {
     theme_bw()
 }
 
-plot_number_trait_categories_per_invasion_status = function(
-    glonaf_status_trait_cat
-) {
-
-  status_count = glonaf_status_trait_cat %>%
-    count(status_name) %>%
-    mutate(
-      new_name = ifelse(status_name == "aliens", "unspecified", status_name),
-      label = paste0(tools::toTitleCase(status_name), "\n(n=", n, ")")
-    ) %>%
-    select(status_name, label) %>%
-    tibble::deframe()
-
-  glonaf_status_trait_cat %>%
-    select(-c(has_at_least_one_trait:has_bergmann)) %>%
-    tidyr::pivot_longer(
-      leaf:root, names_to = "cat_name", values_to = "cat_value"
-    ) %>%
-    mutate(
-      status_name = factor(
-        status_name, level = c("alien", "naturalized", "invasive")
-      )
-    ) %>%
-    ggplot(aes(cat_value, status_name)) +
-    ggridges::geom_density_ridges(
-      scale = 0.95, quantile_lines = TRUE, quantiles = 4, calc_ecdf = TRUE
-    ) +
-    facet_wrap(
-      vars(cat_name), scales = "free_x",
-      labeller = labeller(
-        cat_name = function(x) snakecase::to_any_case(x, case = "title")
-      )
-    ) +
-    scale_y_discrete("Invasion Status", labels = status_count) +
-    scale_fill_viridis_d(name = "Quartiles") +
-    theme_bw() +
-    theme(
-      strip.background = element_blank(),
-      axis.text.y = element_text(vjust = 0)
-    )
-}
 
 plot_trait_comb_proportion_per_invasion_status = function(
     glonaf_status_trait_cat
@@ -202,46 +161,6 @@ plot_trait_comb_proportion_per_invasion_status = function(
     )
 }
 
-
-plot_number_trait_categories_per_range_size = function(
-    glonaf_most_distributed_species, species_trait_categories
-) {
-
-  list(
-    top = glonaf_most_distributed_species %>%
-      select(-bootstrap_df) %>%
-      tidyr::unnest(top_species),
-    bootstrap = glonaf_most_distributed_species %>%
-      select(-top_species) %>%
-      tidyr::unnest(bootstrap_df)
-  ) %>%
-    bind_rows(.id = "boot_name") %>%
-    inner_join(
-      species_trait_categories, by = "species"
-    ) %>%
-    tidyr::pivot_longer(
-      leaf:root, names_to = "cat_name", values_to = "cat_value"
-    ) %>%
-    ggplot(aes(cat_value, area_type, fill = boot_name)) +
-    geom_violin(position = position_dodge(width = 0.75)) +
-    facet_wrap(
-      vars(cat_name), scales = "free_x",
-      labeller = labeller(cat_name = snakecase::to_title_case)
-    ) +
-    labs(x = "Number of traits", y = NULL, fill = "Distribution type") +
-    scale_fill_discrete(
-      labels = c(top = "Top Species", bootstrap = "Bootstrap")
-    ) +
-    scale_y_discrete(
-      labels = c(total_area = "Total Area", n_regions = "# Regions")
-    ) +
-    theme_bw() +
-    theme(
-      strip.background = element_blank(),
-      legend.position = "top"
-    )
-
-}
 
 plot_trait_combination_per_range_size = function(
     glonaf_most_distributed_species, contain_trait_combination
@@ -415,110 +334,7 @@ plot_combined_traits_heatmap = function(combined_traits) {
     scale_fill_viridis_d(labels = c(`TRUE` = "Yes", `FALSE` = "No")) +
     coord_cartesian(expand = FALSE) +
     theme_bw() +
-    theme(aspect.ratio = 1, legend.position = "top")
-}
-
-
-plot_miss_trait_categories_per_species = function(species_trait_categories) {
-  species_trait_categories %>%
-    select(-species) %>%
-    mutate(across(where(is.numeric), ~ifelse(.x == 0, NA_integer_, 1L))) %>%
-    janitor::clean_names(case = "title") %>%
-    visdat::vis_miss(cluster = TRUE, sort_miss = TRUE) +
-    scale_fill_viridis_d(
-      direction = -1, name = NULL,
-      labels = c(`TRUE` = "Missing", `FALSE` = "Present")
-    ) +
-    labs(y = "Number of Species")
-}
-
-plot_miss_trait_categories_per_species_per_growth_form = function(
-    species_trait_categories, combined_growth_form
-) {
-  species_trait_categories %>%
-    mutate(across(where(is.numeric), ~ifelse(.x == 0, NA_integer_, 1L))) %>%
-    janitor::clean_names(case = "title") %>%
-    full_join(combined_growth_form, by = c(Species = "species")) %>%
-    select(-Species) %>%
-    mutate(
-      growth_form = growth_form %>%
-        stringr::str_to_title() %>%
-        factor() %>%
-        forcats::fct_infreq()
-    ) %>%
-    tidyr::nest(trait_cat_df = !growth_form) %>%
-    arrange(growth_form) %>%
-    mutate(
-      trait_miss_cat_plot = purrr::map2(
-        growth_form, trait_cat_df,
-        ~.y %>%
-          visdat::vis_miss(cluster = TRUE, sort_miss = TRUE) +
-          labs(
-            title = paste0(.x, "s (n=", nrow(.y), ")"),
-            y = "Number of Species"
-          ) +
-          scale_fill_viridis_d(
-            direction = -1, name = NULL,
-            labels = c(`TRUE` = "Missing", `FALSE` = "Present")
-          )
-      )
-    ) %>%
-    pull(trait_miss_cat_plot) %>%
-    patchwork::wrap_plots(tag_level = "new") +
-    patchwork::plot_annotation(tag_levels = "A")
-}
-
-plot_miss_trait_categories_per_species_summary = function(
-    species_trait_categories
-) {
-  species_trait_categories %>%
-    mutate(across(where(is.numeric), ~ifelse(.x == 0, NA_real_, .x))) %>%
-    select(-species) %>%
-    janitor::clean_names("upper_camel") %>%
-    ggmice::plot_pattern(rotate = TRUE) +
-    theme(text = element_text(size = 10),
-          axis.text.x.top = element_text(angle = 0, hjust = 0.5, vjust = 0.5),
-          axis.text.x.bottom = element_text(angle = 0, hjust = 0.5))
-}
-
-plot_number_trait_categories_per_species = function(species_trait_categories) {
-
-  # Order species by similar trait measurements
-  species_clust = species_trait_categories %>%
-    as.data.frame() %>%
-    tibble::column_to_rownames("species") %>%
-    scale() %>%
-    dist(method = "euclidean") %>%
-    hclust(method = "ward.D")
-
-  # Actual order
-  species_order = species_trait_categories$species[species_clust$order]
-
-  # Actual Figure
-  species_trait_categories %>%
-    tidyr::pivot_longer(
-      flower:root, names_to = "trait_category", values_to = "n_traits"
-    ) %>%
-    mutate(
-      # Order species by cluster order
-      species = factor(species, levels = species_order),
-      # Order trait category by number of measures of the trait
-      trait_category = factor(
-        trait_category,
-        levels = c("life_history", "leaf", "seed", "height", "flower", "root",
-                   "stem")
-      )
-    ) %>%
-    ggplot(aes(trait_category, species, fill = n_traits)) +
-    geom_raster() +
-    scale_x_discrete(
-      name = "Trait Category",
-      labels = function(x) janitor::make_clean_names(x, case = "title")
-    ) +
-    scale_y_discrete(name = "Species", labels = NULL) +
-    scale_fill_viridis_c(name = "Number of Traits Measured", trans = "log10") +
-    theme(axis.ticks.y = element_blank(),
-          legend.position = "top")
+    theme(legend.position = "top")
 }
 
 
@@ -705,57 +521,6 @@ plot_map_proportion_trait_by_region = function(
     theme(legend.position = "top", strip.background = element_blank())
 }
 
-
-plot_map_proportion_trait_by_organ_by_region = function(
-    regions_trait_prop, glonaf_small_islands, glonaf_mainland_large_islands
-) {
-  # Background map
-  world_sf = rnaturalearth::ne_countries(returnclass = "sf") %>%
-    sf::st_transform(crs = "+proj=eqearth")
-
-  # Pivot trait data to be usable across facets
-  pivoted_data = regions_trait_prop %>%
-    select(OBJIDsic, leaf_prop_trait:root_prop_trait) %>%
-    tidyr::pivot_longer(
-      !OBJIDsic, names_to = "prop_name", values_to = "prop_value"
-    ) %>%
-    mutate(
-      prop_name = gsub("_prop_trait", "", prop_name, fixed = TRUE)
-    )
-
-  # Actual plot
-  glonaf_mainland_large_islands %>%
-    inner_join(pivoted_data, by = "OBJIDsic") %>%
-    ggplot(aes(fill = prop_value)) +
-    geom_sf(data = world_sf, fill = "gray85", color = "gray65", size = 1/100) +
-    # Non-small islands and mainlands
-    geom_sf(color = "gray65", size = 1/100) +
-    # Small islands
-    geom_sf(
-      aes(color = prop_value),
-      fill = NA,
-      data = glonaf_small_islands %>%
-        inner_join(pivoted_data, by = "OBJIDsic"),
-      size = 2.5, shape = 21, stroke = 1.5
-    ) +
-    facet_wrap(
-      vars(prop_name),
-      labeller = labeller(
-        prop_name = snakecase::to_title_case
-      )
-    ) +
-    scale_fill_viridis_c(
-      name = "Prop. of aliens species\nwith at least one trait per organ",
-      labels = scales::percent_format()
-    ) +
-    scale_color_viridis_c(
-      name = "Prop. of aliens species\nwith at least one trait per organ",
-      labels = scales::percent_format()
-    ) +
-    ylim(-5747986, NA) +  # Remove whatever is below 60°S
-    theme_void() +
-    theme(legend.position = "top", strip.background = element_blank())
-}
 
 #' Plot a map of alien species richness per region
 #'

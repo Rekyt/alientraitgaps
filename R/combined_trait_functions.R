@@ -278,62 +278,6 @@ consolidate_trait_names_from_network = function(trait_network, try_traits) {
 }
 
 
-consolidate_trait_names = function(bien_try_convert_df, aus_try_convert_df,
-                                   aus_bien_convert_df, gift_try_convert_df,
-                                   try_traits) {
-
-  # Get BIEN <-> TRY traits tabke
-  bien_try_convert_df %>%
-    rename(
-      bien_trait_name = trait_name,
-      try_trait_id    = trait_ids) %>%
-    tidyr::unnest(try_trait_id) %>%
-    # Add all TRY traits (with corresponding full names)
-    full_join(
-      try_traits %>%
-        select(TraitID, try_trait_name = Trait),
-      by = c(try_trait_id = "TraitID")
-    ) %>%
-    # Add AusTrait with correspondence to TRY traits
-    full_join(
-      aus_try_convert_df %>%
-        tidyr::unnest(try_trait_id) %>%
-        filter(!is.na(try_trait_id)),
-      by = c("try_trait_name", "try_trait_id")
-    ) %>%
-    # Add GIFT traits corresponding to TRY
-    full_join(
-      gift_try_convert_df %>%
-        tidyr::unnest(try_trait_id = trait_ids) %>%
-        filter(!is.na(try_trait_id)) %>%
-        rename(gift_trait_name = Trait2),
-      by = "try_trait_id"
-    ) %>%
-    # Add AusTraits with no correspondence in TRY but in BIEN
-    bind_rows(
-      aus_bien_convert_df
-    ) %>%
-    # Add the rest of AusTraits (not in TRY nor in BIEN)
-    bind_rows(
-      aus_try_convert_df %>%
-        tidyr::unnest(try_trait_id) %>%
-        filter(is.na(try_trait_id)) %>%
-        anti_join(aus_bien_convert_df, by = "aus_trait_name")
-    ) %>%
-    # Consolidate all names
-    # Naming is BIEN > AusTraits > GIFT > TRY
-    mutate(consolidated_name = case_when(
-      !is.na(bien_trait_name) ~ bien_trait_name,
-      !is.na(aus_trait_name)  ~ aus_trait_name,
-      !is.na(gift_trait_name) ~ gift_trait_name,
-      TRUE ~ try_trait_name
-    )) %>%
-    select(
-      bien_trait_name, aus_trait_name, try_trait_id, try_trait_name,
-      gift_trait_name, consolidated_name
-    )
-}
-
 combine_bien_try_aus_gift_traits = function(
   consolidated_trait_names, glonaf_bien_traits, glonaf_try_traits_available,
   aus_traits, gift_glonaf_traits
@@ -477,69 +421,6 @@ count_specific_trait_combinations = function(combined_traits, match_glonaf_tnrs,
     )
 }
 
-combine_trait_categories = function(
-  consolidated_trait_names, gift_trait_categories, aus_trait_categories,
-  bien_trait_categories, try_trait_categories
-) {
-  all_trait_categories = consolidated_trait_names %>%
-    full_join(
-      gift_trait_categories %>%
-        rename(gift_trait_name = Trait2, gift_trait_cat = trait_cat),
-      by = "gift_trait_name"
-    ) %>%
-    full_join(
-      aus_trait_categories %>%
-        rename(aus_trait_cat = trait_cat),
-      by = "aus_trait_name"
-    ) %>%
-    full_join(
-      bien_trait_categories %>%
-        rename(bien_trait_name = trait_name, bien_trait_cat = trait_cat),
-      by = "bien_trait_name"
-    ) %>%
-    full_join(
-      try_trait_categories %>%
-        rename(try_trait_cat = trait_cat),
-      by = "consolidated_name"
-    ) %>%
-    filter(!is.na(consolidated_name))
-
-  all_trait_categories %>%
-    select(consolidated_name, ends_with("trait_cat")) %>%
-    tidyr::nest(trait_cat_df = !consolidated_name) %>%
-    mutate(trait_cat_sum = purrr::map(trait_cat_df, distinct),
-           final_trait_cat = purrr::map(
-             trait_cat_sum,
-             ~.x %>%
-               unlist() %>%
-               unique() %>%
-               na.exclude() %>%
-               as.character()
-           ) %>%
-             purrr::modify_if(~ length(.) == 0, ~ NA_character_) %>%
-             as.character()
-    ) %>%
-    select(consolidated_name, trait_category = final_trait_cat)
-}
-
-count_trait_categories_per_species = function(
-  combined_trait_categories_species, match_glonaf_tnrs
-) {
-  combined_trait_categories_species %>%
-    # Count number of traits for each category per sepcies
-    count(species, trait_category) %>%
-    # Remove NA categories
-    filter(!is.na(trait_category)) %>%
-    # Transform into a table where each category is a separate column
-    tidyr::pivot_wider(
-      names_from = trait_category, values_from = n, values_fill = 0
-    ) %>%
-    # Add back species with no trait values
-    full_join(match_glonaf_tnrs %>%
-                distinct(species = Accepted_name),
-              by = "species") %>%
-    mutate(across(where(is.numeric), ~ifelse(is.na(.x), 0, .x)))
-}
 
 # Function to create a unified growth form dataset to use downstream
 extract_growth_form = function(

@@ -325,35 +325,16 @@ extract_species_regions_table = function(glonaf_con, match_glonaf_tnrs) {
 }
 
 count_species_proportion_trait_by_region = function(
-    glonaf_species_regions, species_trait_categories, contain_trait_combination
+    glonaf_species_regions, contain_trait_combination
 ) {
-  trait_prop = glonaf_species_regions %>%
-    full_join(
-      species_trait_categories %>%
-        filter(species != ""),
-      by = "species"
-    ) %>%
-    mutate(
-      across(where(is.numeric), ~ifelse(is.na(.x), 0, .x))
-    ) %>%
-    group_by(OBJIDsic) %>%
-    summarise(
-      # Proportion of each trait category
-      across(where(is.numeric), list(prop_trait = ~sum(.x != 0)/n())),
-      # Total number of species per region
-      n_species     = n(),
-      # Proportion of species with at least one trait
-      prop_with_any_trait = 1 - sum(
-        leaf == 0 & life_history == 0 & flower == 0 & height == 0 & seed == 0 &
-          stem == 0 & root == 0, na.rm = TRUE) / n_species
-    )
 
-  comb_prop = glonaf_species_regions %>%
+  glonaf_species_regions %>%
     full_join(
       contain_trait_combination %>%
         ungroup() %>%
         filter(species != "") %>%
-        select(species, has_lhs:has_bergmann),
+        select(species, has_at_least_one_trait :has_bergmann) %>%
+        mutate(is_present = TRUE),
       by = "species"
     ) %>%
     mutate(
@@ -364,9 +345,12 @@ count_species_proportion_trait_by_region = function(
     summarise(
       # Proportion of species with given combination
       across(where(is.logical), list(prop = ~sum(.x, na.rm = TRUE)/n()))
+    ) %>%
+    rename(
+      n_species = is_present_prop,
+      prop_with_any_trait = has_at_least_one_trait_prop
     )
 
-  full_join(trait_prop, comb_prop, by = "OBJIDsic")
 }
 
 
@@ -374,15 +358,15 @@ count_species_proportion_trait_by_region = function(
 #'
 #' @noRd
 get_trait_combinations_and_cat_per_invasion_status = function(
-    glonaf_species_regions_status, species_trait_categories,
-    contain_trait_combination
+    glonaf_species_regions_status, contain_trait_combination
 ) {
   glonaf_species_regions_status %>%
     distinct(species, status_name) %>%
-    mutate(status_name = ifelse(
-      status_name == "naturalized_archeophyte", "naturalized", status_name)
+    mutate(
+      status_name = ifelse(
+        status_name == "naturalized_archeophyte", "naturalized", status_name
+      )
     ) %>%
-    inner_join(species_trait_categories, by = "species") %>%
     inner_join(
       contain_trait_combination %>%
         select(-traits, -in_glonaf),
