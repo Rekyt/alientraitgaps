@@ -485,6 +485,10 @@ list(
   tar_target(
     pfig1_trait_heatmap_and_freq,
     assemble_fig1(fig_combined_trait_heatmap, fig_species_per_trait_combined)
+  ),
+  tar_target(
+    fig2_treemap_trait_combination,
+    fig_trait_combination_taxonomy
   )
 
 ) %>%

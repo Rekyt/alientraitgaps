@@ -239,10 +239,12 @@ plot_taxonomy_treemap_trait_combination = function(
     filter(!is.na(genus)) %>%
     mutate(across(where(is.character), ~iconv(.x, "latin1", to = "UTF-8"))) %>%
     ggplot(
-      aes(area = 1,
-          fill = interaction(in_glonaf, has_at_least_one_trait, has_lhs,
-                             has_diaz),
-          label = genus, subgroup = family)
+      aes(
+        area = 1,
+        fill = interaction(
+          has_at_least_one_trait, has_lhs, has_diaz, has_bergmann
+        ),
+        label = genus, subgroup = family)
     ) +
     treemapify::geom_treemap(color = NA) +
     treemapify::geom_treemap_subgroup_border(size = 0.7, color = "white") +
@@ -252,19 +254,25 @@ plot_taxonomy_treemap_trait_combination = function(
     scale_fill_manual(
       name = "Trait combination",
       labels = c(
-        "TRUE.FALSE.FALSE.FALSE" = "No trait",
-        "TRUE.TRUE.FALSE.FALSE"  = "At least\none trait",
-        "TRUE.TRUE.TRUE.FALSE"   = "Leaf-Height-Seed\n(Westoby 1998)",
-        "TRUE.TRUE.TRUE.TRUE"    = "Aboveground traits\n(Díaz et al., 2016)"
+        "FALSE.FALSE.FALSE.FALSE" = "No trait",
+        "TRUE.FALSE.FALSE.FALSE"  = "At least\none trait",
+        "TRUE.FALSE.FALSE.TRUE"   = "Root traits\n(Bergmann et al. 2022)",
+        "TRUE.TRUE.FALSE.FALSE"   = "Leaf-Height-Seed\n(Westoby 1998)",
+        "TRUE.TRUE.FALSE.TRUE"    = "LHS and Root traits",
+        "TRUE.TRUE.TRUE.FALSE"    = "Aboveground traits\n(Díaz et al., 2016)",
+        "TRUE.TRUE.TRUE.TRUE"     = "Aboveground and Root traits"
       ),
       values = c(
-        "TRUE.FALSE.FALSE.FALSE" = "white",
-        "TRUE.TRUE.FALSE.FALSE"  = "lightgray",
-        "TRUE.TRUE.TRUE.FALSE"   = "#a6cee3",
-        "TRUE.TRUE.TRUE.TRUE"    = "#1f78b4"
+        "FALSE.FALSE.FALSE.FALSE" = "white",    # No trait
+        "TRUE.FALSE.FALSE.FALSE"  = "#d3d3d3",  # >=1 trait(s)
+        "TRUE.FALSE.FALSE.TRUE"   = "#027a2e",   # Root traits
+        "TRUE.TRUE.FALSE.FALSE"   = "#b19cb9",  # LHS
+        "TRUE.TRUE.FALSE.TRUE"    = "#7a878b",  # LHS + Root
+        "TRUE.TRUE.TRUE.FALSE"    = "#6f2d85",  # Aboveground
+        "TRUE.TRUE.TRUE.TRUE"     = "#011a1d"   # Aboveground + Root
       )
     ) +
-    theme(legend.position = "top")
+    theme(legend.position = "top", aspect.ratio = 1)
 }
 
 plot_taxonomy_treemap_number_traits = function(
