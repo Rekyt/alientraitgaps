@@ -344,10 +344,10 @@ count_species_proportion_trait_by_region = function(
     group_by(OBJIDsic) %>%
     summarise(
       # Proportion of species with given combination
-      across(where(is.logical), list(prop = ~sum(.x, na.rm = TRUE)/n()))
+      across(where(is.logical), list(prop = ~sum(.x, na.rm = TRUE)/n())),
+      n_species = n()
     ) %>%
     rename(
-      n_species = is_present_prop,
       prop_with_any_trait = has_at_least_one_trait_prop
     )
 

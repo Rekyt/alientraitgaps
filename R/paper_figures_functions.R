@@ -7,3 +7,11 @@ assemble_fig1 = function(
   ) +
     patchwork::plot_annotation(tag_levels = "A")
 }
+
+assemble_fig3 = function(fig_map_alien_richness, fig_map_prop_trait_regions) {
+  patchwork::wrap_plots(
+    fig_map_alien_richness, fig_map_prop_trait_regions,
+    tag_level = "new", ncol = 1
+  ) +
+    patchwork::plot_annotation(tag_levels = "A")
+}

@@ -489,6 +489,10 @@ list(
   tar_target(
     fig2_treemap_trait_combination,
     fig_trait_combination_taxonomy
+  ),
+  tar_target(
+    pfig3_maps_trait_prop_and_richness,
+    assemble_fig3(fig_map_alien_richness, fig_map_prop_trait_regions)
   )
 
 ) %>%
