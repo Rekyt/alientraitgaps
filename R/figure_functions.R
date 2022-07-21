@@ -244,13 +244,23 @@ plot_taxonomy_treemap_trait_combination = function(
         fill = interaction(
           has_at_least_one_trait, has_lhs, has_diaz, has_bergmann
         ),
-        label = genus, subgroup = family)
+        label = genus, subgroup = family,
+        subgroup2 =  interaction(
+          has_at_least_one_trait, has_lhs, has_diaz, has_bergmann
+        )
+      )
     ) +
-    treemapify::geom_treemap(color = NA) +
-    treemapify::geom_treemap_subgroup_border(size = 0.7, color = "white") +
+    treemapify::geom_treemap(color = NA, layout = "scol") +
+    treemapify::geom_treemap_subgroup_border(
+      size = 2, color = "white", layout = "scol"
+    ) +
+    treemapify::geom_treemap_subgroup2_border(
+      size = 1/3, color = "white", layout = "scol"
+    ) +
     treemapify::geom_treemap_subgroup_text(
-      place = "centre", grow = TRUE, alpha = 0.7, colour = "black",
-      fontface = "italic", min.size = 0) +
+      place = "centre", grow = TRUE, alpha = 2/3, colour = "black",
+      fontface = "italic", min.size = 7, layout = "scol"
+    ) +
     scale_fill_manual(
       name = "Trait combination",
       labels = c(
@@ -265,11 +275,11 @@ plot_taxonomy_treemap_trait_combination = function(
       values = c(
         "FALSE.FALSE.FALSE.FALSE" = "white",    # No trait
         "TRUE.FALSE.FALSE.FALSE"  = "#d3d3d3",  # >=1 trait(s)
-        "TRUE.FALSE.FALSE.TRUE"   = "#027a2e",   # Root traits
-        "TRUE.TRUE.FALSE.FALSE"   = "#b19cb9",  # LHS
-        "TRUE.TRUE.FALSE.TRUE"    = "#7a878b",  # LHS + Root
-        "TRUE.TRUE.TRUE.FALSE"    = "#6f2d85",  # Aboveground
-        "TRUE.TRUE.TRUE.TRUE"     = "#011a1d"   # Aboveground + Root
+        "TRUE.FALSE.FALSE.TRUE"   = "#d25601",  # Root traits
+        "TRUE.TRUE.FALSE.FALSE"   = "#9283ac",  # LHS
+        "TRUE.TRUE.FALSE.TRUE"    = "#923601",  # LHS + Root
+        "TRUE.TRUE.TRUE.FALSE"    = "#563787",  # Aboveground
+        "TRUE.TRUE.TRUE.TRUE"     = "#551601"   # Aboveground + Root
       )
     ) +
     theme(legend.position = "top", aspect.ratio = 1)
