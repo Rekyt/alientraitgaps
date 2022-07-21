@@ -39,18 +39,42 @@ plot_number_species_per_trait_combined = function(combined_traits) {
     geom_vline(
       xintercept = total_sp, linetype = 2, color = "darkred", size = 1
     ) +
+    geom_point() +
+    geom_text(
+      aes(label = paste0(round((n_species/total_sp) * 100, 0), "%")),
+      hjust = -0.1, size = 2.6, vjust = 0
+    ) +
     scale_x_continuous(
       name = "Number of species with traits",
       sec.axis = sec_axis(
         trans = ~.x/total_sp, labels = scales::percent_format()
       )
     ) +
-    geom_point() +
-    geom_text(
-      aes(label = paste0(round((n_species/total_sp) * 100, 0), "%")),
-      hjust = -0.1, size = 2.6, vjust = 0
+    scale_y_discrete(
+      name = "Trait name",
+      labels = c(
+        life_form                    = "Growth Form (cat.)",
+        woodiness                    = "Woodiness (cat.)",
+        life_history                 = "Life History (cat.)",
+        leaf_type                    = "Leaf Type (cat.)",
+        plant_height                 = "Plant Height (cont.)",
+        leaf_compoundness            = "Leaf Compoundness (cat.)",
+        photosynthetic_pathway       = "Photosynthetic Pathway (cat.)",
+        diaspore_mass                = "Seed Mass (cont.)",
+        `Leaflet number per leaf`    = "Leaflet number per leaf (cont.)",
+        dispersal_appendage          = "Fruit Type (cat.)",
+        leaf_phenology               = "Leaf Phenology (cat.)",
+        `Species tolerance to frost` = "Species tolerane to frost (cont.)",
+        flowering_time               = "Flowering Phenology (cat.)",
+        dispersal_syndrome           = "Fruit Dispersal Syndrome (cat.)",
+        nitrogen_fixing              = "Nitrogen Fixer (bin.)",
+        leaf_length                  = "Leaf Length (cont.)",
+        leaf_width                   = "Leaf Width (cont.)",
+        pollination_syndrome         = "Pollination Syndrome (cat.)",
+        leaf_arrangement             = "Leaf Arrangement (cat.)",
+        sex_type                     = "Flower Sex Syndrome (cat.)"
+      )
     ) +
-    scale_y_discrete(name = "Trait name", labels = label_wrap_gen(30)) +
     labs(title = "20 most frequently measured traits") +
     theme_bw()
 }
@@ -81,7 +105,7 @@ plot_number_specific_trait_combination = function(contain_trait_combination) {
       aes(
         label = paste0(
           round(n_species/nrow(contain_trait_combination) * 100, 1), "%"
-          )
+        )
       ), hjust = -0.2, vjust = 0.5
     ) +
     scale_x_continuous(
@@ -347,7 +371,7 @@ plot_combined_traits_heatmap = function(combined_traits) {
     labs(
       x    = "Trait Rank",
       y    = "Species Rank",
-      fill = "Was this trait measured for that species?"
+      fill = "Was trait measured?"
     ) +
     scale_fill_viridis_d(labels = c(`TRUE` = "Yes", `FALSE` = "No")) +
     coord_cartesian(expand = FALSE) +
