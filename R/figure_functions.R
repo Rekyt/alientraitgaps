@@ -131,58 +131,72 @@ plot_number_specific_trait_combination = function(contain_trait_combination) {
 plot_trait_comb_proportion_per_invasion_status = function(
     glonaf_status_trait_cat
 ) {
-  # Axis label with number of species per invasion status
-  status_count = glonaf_status_trait_cat %>%
-    count(status_name) %>%
+  trait_comb_prop_status = glonaf_status_trait_cat %>%
+    group_by(status_name) %>%
+    summarise(
+      across(
+        has_at_least_one_trait:has_bergmann,
+        .fns = list(
+          prop   = ~sum(.x, na.rm = TRUE)/n(),
+          n_true = ~sum(.x, na.rm = TRUE)
+        )
+      ),
+      n = n(),
+    )
+
+  status_labels = trait_comb_prop_status %>%
+    select(status_name, n) %>%
     mutate(
-      new_name = ifelse(status_name == "aliens", "unspecified", status_name),
-      label = paste0(tools::toTitleCase(status_name), "\n(n=", n, ")")
+      labels = paste0(status_name, "\n(n = ", format(n, big.mark = ","), ")")
     ) %>%
-    select(status_name, label) %>%
+    select(-n) %>%
     tibble::deframe()
 
-  glonaf_status_trait_cat %>%
-    select(status_name, species, has_at_least_one_trait:has_bergmann) %>%
+  trait_comb_prop_status %>%
+    select(status_name, ends_with("prop")) %>%
     tidyr::pivot_longer(
-      has_at_least_one_trait:has_bergmann, names_to = "comb_name",
-      values_to = "comb_value"
+      ends_with("prop"), names_to = "comb_name", values_to = "comb_value"
     ) %>%
     mutate(
       status_name = factor(
-        status_name, level = c("alien", "naturalized", "invasive")
+        status_name, levels = c("alien", "naturalized", "invasive")
       ),
       comb_name = factor(
         comb_name,
-        levels = c("has_at_least_one_trait", "has_lhs", "has_diaz",
-                   "has_bergmann")
+        levels = c("has_bergmann_prop", "has_diaz_prop", "has_lhs_prop",
+                   "has_at_least_one_trait_prop")
       )
     ) %>%
-    ggplot(aes(y = status_name, fill = comb_value)) +
-    geom_bar(position = "fill", width = 2/3) +
-    facet_wrap(
-      vars(comb_name), scales = "free_x",
-      labeller = labeller(
-        comb_name = c(
-          has_bergmann     = "Root Traits\n(4 traits, Bergmann et al. 2020)",
-          has_diaz         = "Aboveground traits\n(6 traits, Díaz et al. 2016)",
-          has_lhs          = "Leaf-Height-Seed mass\n(3 traits, Westoby 2002)",
-          has_at_least_one_trait = "At least one trait"
-        )
+    ggplot(aes(comb_name, comb_value, shape = status_name, color = status_name)) +
+    geom_point(position = position_dodge(width = 0.5), size = 2) +
+    geom_linerange(
+      aes(x = comb_name, ymin = 0, ymax = comb_value,
+          group = interaction(status_name, comb_name)),
+      position = position_dodge(width = 0.5)
+    ) +
+    scale_x_discrete(
+      labels = c(
+        has_bergmann_prop           = "Root traits",
+        has_diaz_prop               = "Aboveground traits",
+        has_lhs_prop                = "LHS traits",
+        has_at_least_one_trait_prop = "At least one trait"
       )
     ) +
-    scale_x_continuous(
-      "Proportion of species", labels = scales::label_percent()
+    scale_y_continuous(
+      "Proportion of Species", labels = scales::label_percent(), limits = c(0, 1)
     ) +
-    scale_y_discrete("Invasion Status", labels = status_count) +
-    scale_fill_brewer(
-      "Known Trait Combination?", palette = "Set1",
-      labels = c(`FALSE` = "No", `TRUE` = "Yes")
+    scale_shape_discrete(
+      "Species Status", guide = guide_legend(reverse = TRUE),
+      labels = status_labels
     ) +
+    scale_color_manual("Species Status", values = c(
+      invasive = "#E69F00", naturalized = "#56B4E9", alien = "#009E73"
+    ), guide = guide_legend(reverse = TRUE), labels = status_labels
+    ) +
+    coord_flip() +
     theme_bw() +
-    theme(
-      strip.background = element_blank(),
-      legend.position = "top"
-    )
+    theme(legend.position = "top", panel.grid.minor = element_blank(),
+          panel.grid.major.y = element_blank())
 }
 
 
