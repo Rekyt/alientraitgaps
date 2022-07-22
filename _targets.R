@@ -499,6 +499,10 @@ list(
   tar_target(
     pfig3_maps_trait_prop_and_richness,
     assemble_fig3(fig_map_alien_richness, fig_map_prop_trait_regions)
+  ),
+  tar_target(
+    pfig4_trait_comb_prop_status_regions,
+    assemble_fig4(fig_status_prop_comb, fig_widest_range_trait_comb_prop)
   )
 
 ) %>%

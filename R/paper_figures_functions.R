@@ -15,3 +15,13 @@ assemble_fig3 = function(fig_map_alien_richness, fig_map_prop_trait_regions) {
   ) +
     patchwork::plot_annotation(tag_levels = "A")
 }
+
+assemble_fig4 = function(
+  fig_status_prop_comb, fig_widest_range_trait_comb_prop
+) {
+  patchwork::wrap_plots(
+    fig_status_prop_comb, fig_widest_range_trait_comb_prop,
+    tag_level = "new", nrow = 1
+  ) +
+    patchwork::plot_annotation(tag_levels = "A")
+}
