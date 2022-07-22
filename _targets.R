@@ -357,6 +357,10 @@ list(
     )
   ),
   tar_target(
+    glonaf_mainland_large_islands_simplified,
+    sf::st_simplify(glonaf_mainland_large_islands, dTolerance = 30000)
+  ),
+  tar_target(
     glonaf_species_regions_status,
     extract_species_regions_table(connect_glonaf_db(), match_glonaf_tnrs)
   ),
@@ -450,13 +454,15 @@ list(
   tar_target(
     fig_map_prop_trait_regions,
     plot_map_proportion_trait_by_region(
-      regions_trait_prop, glonaf_small_islands, glonaf_mainland_large_islands
+      regions_trait_prop, glonaf_small_islands,
+      glonaf_mainland_large_islands_simplified
     )
   ),
   tar_target(
     fig_map_alien_richness,
     plot_map_alien_richness_region(
-      regions_trait_prop, glonaf_small_islands, glonaf_mainland_large_islands
+      regions_trait_prop, glonaf_small_islands,
+      glonaf_mainland_large_islands_simplified
     )
   ),
   tar_target(

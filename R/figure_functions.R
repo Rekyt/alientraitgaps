@@ -537,7 +537,7 @@ plot_map_proportion_trait_by_region = function(
       fill = NA,
       data = glonaf_small_islands %>%
         inner_join(pivoted_data, by = "OBJIDsic"),
-      size = 2.5, shape = 21, stroke = 1.5
+      size = 1.2, shape = 21, stroke = 0.4
     ) +
     facet_wrap(
       vars(prop_name),
@@ -550,17 +550,22 @@ plot_map_proportion_trait_by_region = function(
         )
       )
     ) +
-    scale_fill_viridis_c(
+    scale_fill_viridis_b(
       name = "Prop. of aliens species\nwith trait combination",
-      labels = scales::percent_format()
+      labels = scales::percent_format(), n.breaks = 6, show.limits = TRUE
     ) +
-    scale_color_viridis_c(
+    scale_color_viridis_b(
       name = "Prop. of aliens species\nwith trait combination",
-      labels = scales::percent_format()
+      labels = scales::percent_format(), n.breaks = 6, show.limits = TRUE
     ) +
     ylim(-5747986, NA) +  # Remove whatever is below 60°S
     theme_void() +
-    theme(legend.position = "top", strip.background = element_blank())
+    theme(
+      legend.position = "top",
+      legend.key.width = unit(2, "lines"),
+      strip.background = element_blank(),
+      plot.margin      = margin(b = 3/11)
+    )
 }
 
 
@@ -607,8 +612,11 @@ plot_map_alien_richness_region = function(
     ) +
     ylim(-5747986, NA) +  # Remove whatever is below 60°S
     theme_void() +
-    theme(legend.position = "top",
-          legend.key.width = unit(2, "lines"))
+    theme(
+      legend.position  = "top",
+      legend.key.width = unit(2, "lines"),
+      plot.margin      = margin(b = 3, unit = "pt")
+    )
 }
 
 
