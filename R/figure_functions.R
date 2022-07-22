@@ -175,6 +175,7 @@ plot_trait_comb_proportion_per_invasion_status = function(
       position = position_dodge(width = 0.5)
     ) +
     scale_x_discrete(
+      "Trait Combination",
       labels = c(
         has_bergmann_prop           = "Root traits",
         has_diaz_prop               = "Aboveground traits",
@@ -201,64 +202,77 @@ plot_trait_comb_proportion_per_invasion_status = function(
 
 
 plot_trait_combination_per_range_size = function(
-    glonaf_most_distributed_species, contain_trait_combination
+    glonaf_species_area, contain_trait_combination
 ) {
-  list(
-    top = glonaf_most_distributed_species %>%
-      select(-bootstrap_df) %>%
-      tidyr::unnest(top_species),
-    bootstrap = glonaf_most_distributed_species %>%
-      select(-top_species) %>%
-      tidyr::unnest(bootstrap_df)
-  ) %>%
-    bind_rows(.id = "boot_name") %>%
-    select(-area_value) %>%
-    inner_join(
-      contain_trait_combination %>%
-        select(-traits, -in_glonaf),
-      by = "species"
+  trait_comb_prop_widespread = glonaf_species_area %>%
+    select(-total_area) %>%
+    arrange(desc(n_regions)) %>%
+    mutate(
+      n_regions_rank = row_number(),
+      n_regions_top  = n_regions_rank <= 100
     ) %>%
+    left_join(
+      contain_trait_combination %>%
+        select(-traits, -in_glonaf)
+    ) %>%
+    group_by(n_regions_top) %>%
+    summarise(
+      across(
+        has_at_least_one_trait:has_bergmann,
+        .fns = list(
+          prop   = ~sum(.x, na.rm = TRUE)/n(),
+          n_true = ~sum(.x, na.rm = TRUE)
+        )
+      ),
+      n = n(),
+    )
+
+  trait_comb_prop_widespread %>%
+    select(n_regions_top, ends_with("prop")) %>%
     tidyr::pivot_longer(
-      has_at_least_one_trait:has_bergmann, names_to = "comb_name",
-      values_to = "comb_value"
+      ends_with("prop"), names_to = "comb_name", values_to = "comb_value"
     ) %>%
     mutate(
       comb_name = factor(
         comb_name,
-        levels = c("has_at_least_one_trait", "has_lhs", "has_diaz",
-                   "has_bergmann")
+        levels = c("has_bergmann_prop", "has_diaz_prop", "has_lhs_prop",
+                   "has_at_least_one_trait_prop")
       )
     ) %>%
-    ggplot(aes(y = interaction(boot_name, area_type), fill = comb_value)) +
-    geom_bar(position = "fill", width = 2/3) +
-    facet_wrap(
-      vars(comb_name),
-      labeller = labeller(
-        comb_name = c(
-          has_bergmann     = "Root Traits\n(4 traits, Bergmann et al. 2020)",
-          has_diaz         = "Aboveground traits\n(6 traits, Díaz et al. 2016)",
-          has_lhs          = "Leaf-Height-Seed mass\n(3 traits, Westoby 2002)",
-          has_at_least_one_trait = "At least one trait"
-        )
+    ggplot(
+      aes(comb_name, comb_value, shape = n_regions_top, color = n_regions_top)
+    ) +
+    geom_point(position = position_dodge(width = 0.5), size = 2) +
+    geom_linerange(
+      aes(x = comb_name, ymin = 0, ymax = comb_value,
+          group = interaction(n_regions_top, comb_name)),
+      position = position_dodge(width = 0.5)
+    ) +
+    scale_x_discrete(
+      "Trait Combination",
+      labels = c(
+        has_bergmann_prop           = "Root traits",
+        has_diaz_prop               = "Aboveground traits",
+        has_lhs_prop                = "LHS traits",
+        has_at_least_one_trait_prop = "At least one trait"
       )
     ) +
-    scale_x_continuous(
-      "Proportion of Species", labels = scales::label_percent()
+    scale_y_continuous(
+      "Proportion of Species", labels = scales::label_percent(), limits = c(0, 1)
     ) +
-    scale_y_discrete(
-      NULL,
-      labels = c("top.total_area" = "Area (Top)",
-                 "bootstrap.total_area" = "Area (Bootstrap)",
-                 "top.n_regions"  = "# Regions (Top)",
-                 "bootstrap.n_regions" = "# Regions (Bootstrap)")
+    scale_shape_discrete(
+      "Top 100 Widespread? (# of regions)", guide = guide_legend(reverse = TRUE),
+      labels = c(`TRUE` = "Yes", `FALSE` = "No")
     ) +
-    scale_fill_brewer(
-      "Known Trait Combination?", palette = "Set1",
-      labels = c(`FALSE` = "No", `TRUE` = "Yes")
+    scale_color_manual(
+      "Top 100 Widespread? (# of regions)", guide = guide_legend(reverse = TRUE),
+      labels = c(`TRUE` = "Yes", `FALSE` = "No"),
+      values = c(`TRUE` = "#018571", `FALSE` = "#a6611a")
     ) +
+    coord_flip() +
     theme_bw() +
-    theme(legend.position = "top",
-          strip.background = element_blank())
+    theme(legend.position = "top", panel.grid.minor = element_blank(),
+          panel.grid.major.y = element_blank())
 }
 
 

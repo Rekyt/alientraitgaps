@@ -472,7 +472,7 @@ list(
   tar_target(
     fig_widest_range_trait_comb_prop,
     plot_trait_combination_per_range_size(
-      glonaf_most_distributed_species, contain_trait_combination
+      glonaf_species_area, contain_trait_combination
     )
   ),
   tar_target(
