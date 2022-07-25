@@ -147,9 +147,14 @@ plot_trait_comb_proportion_per_invasion_status = function(
   status_labels = trait_comb_prop_status %>%
     select(status_name, n) %>%
     mutate(
-      labels = paste0(status_name, "\n(n = ", format(n, big.mark = ","), ")")
+      better_status = case_when(
+        status_name == "invasive"    ~ "invasive",
+        status_name == "naturalized" ~ "non-invasive",
+        status_name == "alien"       ~ "undetermined"
+      ),
+      labels = paste0(better_status, "\n(n = ", format(n, big.mark = ","), ")")
     ) %>%
-    select(-n) %>%
+    select(-n, -better_status) %>%
     tibble::deframe()
 
   trait_comb_prop_status %>%
