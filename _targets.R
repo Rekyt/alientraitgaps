@@ -320,6 +320,15 @@ list(
     )
   ),
 
+  # Count number of traits per database
+  tar_target(
+    combined_traits_origin,
+    count_traits_per_database(
+      network_consolidated_trait_names, glonaf_bien_traits,
+      glonaf_try_traits_available, aus_traits, gift_glonaf_traits
+    )
+  ),
+
   # Trait Combinations ---------------------------------------------------------
   tar_target(bergmann_comb_df, get_bergmann_combs()),
   tar_target(

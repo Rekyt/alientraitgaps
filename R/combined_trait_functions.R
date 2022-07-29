@@ -316,6 +316,60 @@ combine_bien_try_aus_gift_traits = function(
     distinct(consolidated_name, species)
 }
 
+count_traits_per_database = function(
+  network_consolidated_trait_names, glonaf_bien_traits,
+  glonaf_try_traits_available, aus_traits, gift_glonaf_traits
+) {
+
+  bien_traits = glonaf_bien_traits %>%
+    select(
+      species = scrubbed_species_binomial, bien_trait_name = trait_name,
+    ) %>%
+    mutate(origin = "BIEN")
+
+  aus_traits = aus_traits %>%
+    select(
+      species = species_accepted_austraits, aus_trait_name = trait_name,
+    ) %>%
+    mutate(origin = "AusTraits")
+
+  try_traits = glonaf_try_traits_available %>%
+    select(
+      species = species_accepted_try, try_trait_id = TraitID
+    ) %>%
+    mutate(origin = "TRY")
+
+  gift_traits = gift_glonaf_traits %>%
+    select(
+      species = species_accepted_gift, gift_trait_name = Trait2
+    ) %>%
+    mutate(origin = "GIFT")
+
+  list(
+    # BIEN
+    network_consolidated_trait_names %>%
+      inner_join(bien_traits, by = "bien_trait_name"),
+    # AusTraits
+    network_consolidated_trait_names %>%
+      inner_join(aus_traits, by = "aus_trait_name"),
+    # TRY
+    network_consolidated_trait_names %>%
+      inner_join(
+        try_traits %>%
+          mutate(try_trait_id = as.character(try_trait_id)),
+        by = "try_trait_id"
+      ),
+    # GIFT
+    network_consolidated_trait_names %>%
+      inner_join(gift_traits, by = "gift_trait_name")
+  ) %>%
+    bind_rows() %>%
+    select(consolidated_name, species, origin) %>%
+    group_by(consolidated_name, origin, species) %>%
+    summarise(n_measurements = n()) %>%
+    summarise(n_sp = n(), n_total_measurements = sum(n_measurements))
+}
+
 rank_species_trait_number = function(
   glonaf_bien_traits_count, try_total_number_trait,
   glonaf_try_traits_available, harmonized_try_glonaf) {
