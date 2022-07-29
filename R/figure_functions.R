@@ -29,15 +29,15 @@ plot_number_species_per_trait_combined = function(combined_traits) {
     ggplot(aes(n_species, forcats::fct_reorder(consolidated_name, n_species))) +
     # 50% vertical line
     geom_text(
-      label = "50%", color = "darkblue", x = total_sp/2, y = 20, hjust = -0.4,
-      vjust = 0.5, size = 2.6
+      label = "50%", color = "darkblue", x = total_sp/2, y = 20, hjust = -0.5,
+      vjust = 0.6, size = 2.6
     ) +
     geom_vline(
-      xintercept = total_sp/2, linetype = 2, color = "darkblue", size = 1
+      xintercept = total_sp/2, linetype = 2, color = "darkblue", linewidth = 1
     ) +
     # 100% vertical line
     geom_vline(
-      xintercept = total_sp, linetype = 2, color = "darkred", size = 1
+      xintercept = total_sp, linetype = 2, color = "darkred", linewidth = 1
     ) +
     geom_point() +
     geom_text(
@@ -64,7 +64,7 @@ plot_number_species_per_trait_combined = function(combined_traits) {
         `Leaflet number per leaf`    = "Leaflet number per leaf (cont.)",
         dispersal_appendage          = "Fruit Type (cat.)",
         leaf_phenology               = "Leaf Phenology (cat.)",
-        `Species tolerance to frost` = "Species tolerane to frost (cont.)",
+        `Species tolerance to frost` = "Species tolerance to frost (cont.)",
         flowering_time               = "Flowering Phenology (cat.)",
         dispersal_syndrome           = "Fruit Dispersal Syndrome (cat.)",
         nitrogen_fixing              = "Nitrogen Fixer (bin.)",
