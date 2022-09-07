@@ -493,6 +493,13 @@ list(
     fig_trait_histogram_regions,
     plot_histogram_number_trait_regions(trait_n_regions)
   ),
+  tar_target(
+    fig_map_median_n_traits_region,
+    plot_map_median_n_traits_region(
+      trait_n_regions, glonaf_small_islands,
+      glonaf_mainland_large_islands_simplified
+    )
+  ),
 
 
   # Assembling Figures for Paper -----------------------------------------------

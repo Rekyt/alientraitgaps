@@ -738,6 +738,50 @@ plot_map_europe_proportion_trait = function(
 
 }
 
+plot_map_median_n_traits_region = function(
+  trait_n_regions, glonaf_small_islands,
+  glonaf_mainland_large_islands_simplified
+) {
+
+  # Background Map
+  world_sf = rnaturalearth::ne_countries(returnclass = "sf") %>%
+    sf::st_transform(crs = "+proj=eqearth")
+
+  # Actual Plot
+  glonaf_mainland_large_islands_simplified %>%
+    inner_join(trait_n_regions, by = "OBJIDsic") %>%
+    ggplot(aes(fill = n_traits_median)) +
+    geom_sf(data = world_sf, fill = "gray85", color = "gray65", size = 1/100) +
+    # Non-small islands and mainlands
+    geom_sf(color = NA, size = 1/100) +
+    # Small islands
+    geom_sf(
+      aes(color = n_traits_median),
+      fill = NA,
+      data = glonaf_small_islands %>%
+        inner_join(trait_n_regions, by = "OBJIDsic"),
+      size = 1.2, shape = 21, stroke = 0.4
+    ) +
+    # Fixed manual breaks to sync color & fill scales
+    scale_fill_viridis_b(
+      name = "Median # Traits",
+      breaks = c(10, 30, 50, 100, 300),
+      limits = c(10, 300), show.limits = TRUE
+    ) +
+    scale_color_viridis_b(
+      name = "Median # Traits",
+      breaks = c(10, 30, 50, 100, 300),
+      limits = c(10, 300), show.limits = TRUE
+    ) +
+    ylim(-5747986, NA) +  # Remove whatever is below 60°S
+    theme_void() +
+    theme(
+      legend.position = "top",
+      legend.key.width = unit(2, "lines"),
+      plot.margin      = margin(b = 3/11)
+    )
+}
+
 
 # Trait Network ----------------------------------------------------------------
 plot_network_trait = function(trait_name_network) {
