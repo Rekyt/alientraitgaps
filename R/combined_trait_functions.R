@@ -523,3 +523,20 @@ extract_growth_form = function(
     # Any species without growth form should be labelled "unknown"
     mutate(growth_form = ifelse(is.na(growth_form), "unknown", growth_form))
 }
+
+# Count Summary of Number of Traits per species per Region
+count_number_of_traits_per_region = function(
+  glonaf_species_regions, combined_traits
+) {
+  glonaf_species_regions %>%
+    full_join(
+      combined_traits %>%
+        count(species, name = "n_traits"),
+      by = "species"
+    ) %>%
+    mutate(n_traits = ifelse(is.na(n_traits), 0, n_traits)) %>%
+    group_by(OBJIDsic) %>%
+    summarise(
+      across(n_traits, .fns = list(median = median, mean = mean, sd = sd))
+    )
+}

@@ -400,6 +400,10 @@ list(
       glonaf_europe, glonaf_species_regions, contain_trait_combination
     )
   ),
+  tar_target(
+    trait_n_regions,
+    count_number_of_traits_per_region(glonaf_species_regions, combined_traits)
+  ),
 
 
   # Make figures ---------------------------------------------------------------
@@ -484,6 +488,10 @@ list(
   tar_target(
     fig_network_trait_name,
     plot_network_trait(trait_network)
+  ),
+  tar_target(
+    fig_trait_histogram_regions,
+    plot_histogram_number_trait_regions(trait_n_regions)
   ),
 
 

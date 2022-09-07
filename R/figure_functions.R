@@ -755,3 +755,25 @@ plot_network_trait = function(trait_name_network) {
     theme(legend.position = "top")
 
 }
+
+
+# Other Figures ----------------------------------------------------------------
+plot_histogram_number_trait_regions = function(trait_n_regions) {
+  trait_n_regions %>%
+    tidyr::pivot_longer(-OBJIDsic) %>%
+    ggplot(aes(value)) +
+    geom_histogram(color = "white") +
+    facet_wrap(
+      vars(name), scales = "free_x",
+      labeller = c(
+        n_traits_mean   = "Mean # Traits per region",
+        n_traits_median = "Median # Traits per region",
+        n_traits_sd     = "SD # Traits per region"
+      ) %>%
+        as_labeller()
+    ) +
+    scale_x_log10("Number of Traits per Regions") +
+    labs(y = "Number of Species") +
+    theme_bw() +
+    theme(aspect.ratio = 1)
+}
