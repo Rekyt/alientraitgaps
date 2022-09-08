@@ -760,23 +760,28 @@ plot_map_median_n_traits_region = function(
       fill = NA,
       data = glonaf_small_islands %>%
         inner_join(trait_n_regions, by = "OBJIDsic"),
-      size = 1.2, shape = 21, stroke = 0.4
+      size = 3, shape = 21, stroke = 2
     ) +
     # Fixed manual breaks to sync color & fill scales
     scale_fill_viridis_b(
-      name = "Median # Traits",
+      name = "Median Number of Traits",
       breaks = c(10, 30, 50, 100, 300),
       limits = c(10, 300), show.limits = TRUE
     ) +
     scale_color_viridis_b(
-      name = "Median # Traits",
+      name = "Median Number of Traits",
       breaks = c(10, 30, 50, 100, 300),
       limits = c(10, 300), show.limits = TRUE
+    ) +
+    guides(
+      fill  = guide_bins(title.vjust = 0.8, axis = FALSE, axis.linewidth = 0),
+      color = guide_bins(title.vjust = 0.8, axis = FALSE, axis.linewidth = 0)
     ) +
     ylim(-5747986, NA) +  # Remove whatever is below 60°S
     theme_void() +
     theme(
-      legend.position = "top",
+      legend.position  = "top",
+      legend.key       = element_rect(colour = NA),
       legend.key.width = unit(2, "lines"),
       plot.margin      = margin(b = 3/11)
     )
