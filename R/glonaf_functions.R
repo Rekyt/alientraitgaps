@@ -369,6 +369,7 @@ get_trait_combinations_and_cat_per_invasion_status = function(
     ) %>%
     inner_join(
       contain_trait_combination %>%
+        mutate(n_traits = length(traits)) %>%
         select(-traits, -in_glonaf),
       by = "species")
 }
