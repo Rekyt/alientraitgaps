@@ -320,6 +320,13 @@ list(
       glonaf_try_traits_available, aus_traits, gift_glonaf_traits
     )
   ),
+  tar_target(
+    combined_traits_origin_species,
+    summarise(
+      combined_traits_origin, n_sp = n(),
+      n_total_measurements = sum(n_measurements)
+    )
+  ),
 
   # Trait Combinations ---------------------------------------------------------
   tar_target(bergmann_comb_df, get_bergmann_combs()),

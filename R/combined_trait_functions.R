@@ -366,8 +366,7 @@ count_traits_per_database = function(
     bind_rows() %>%
     select(consolidated_name, species, origin) %>%
     group_by(consolidated_name, origin, species) %>%
-    summarise(n_measurements = n()) %>%
-    summarise(n_sp = n(), n_total_measurements = sum(n_measurements))
+    summarise(n_measurements = n())
 }
 
 get_bergmann_combs = function() {
