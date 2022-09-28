@@ -38,8 +38,8 @@ assemble_trait_knowledge_df = function(
     group_by(species) %>%
     summarise(n_traits = n()) %>%
     full_join(combined_growth_form, by = "species") %>%
-    full_join(alien_range, by = "species") %>%
-    full_join(invasive_range, by = "species") %>%
+    full_join(alien_range_size, by = "species") %>%
+    full_join(invasive_range_size, by = "species") %>%
     # Replace all NAs by 0s
     mutate(
       across(where(is.numeric), .fns = ~tidyr::replace_na(.x, 0))
