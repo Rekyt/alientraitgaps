@@ -13,6 +13,7 @@ source("R/gift_functions.R")
 source("R/has_coords_functions.R")
 source("R/harmonize_taxonomy_functions.R")
 source("R/paper_figures_functions.R")
+source("R/trait_knowledge.R")
 source("R/try_functions.R")
 
 # Initial options --------------------------------------------------------------
@@ -339,6 +340,32 @@ list(
   ),
   tar_target(
     try_traits_coords, get_try_traits_with_coords(full_try_df)
+  ),
+
+
+  # Trait Knowledge Model ------------------------------------------------------
+  tar_target(
+    alien_range_size,
+    get_alien_range_size(glonaf_species_regions_status)
+  ),
+  tar_target(
+    invasive_range_size,
+    get_invasive_range_size(glonaf_species_regions_status)
+  ),
+  tar_target(
+    continent_origin,
+    get_continental_origin()
+  ),
+  tar_target(
+    trait_knowledge_df,
+    assemble_trait_knowledge_df(
+      combined_traits, alien_range_size, invasive_range_size, continent_origin,
+      combined_growth_form
+    )
+  ),
+  tar_target(
+    trait_knowledge_model,
+    model_alien_trait_knowledge(trait_knowledge_df)
   ),
 
   # World Regions --------------------------------------------------------------
