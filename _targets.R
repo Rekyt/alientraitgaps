@@ -327,6 +327,10 @@ list(
       n_total_measurements = sum(n_measurements)
     )
   ),
+  tar_target(
+    traits_per_database,
+    count_traits_and_species_per_database(combined_traits_origin)
+  ),
 
   # Trait Combinations ---------------------------------------------------------
   tar_target(bergmann_comb_df, get_bergmann_combs()),

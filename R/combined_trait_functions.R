@@ -539,3 +539,37 @@ count_number_of_traits_per_region = function(
       across(n_traits, .fns = list(median = median, mean = mean, sd = sd))
     )
 }
+
+count_traits_and_species_per_database = function(combined_traits_origin) {
+
+  combined_traits_origin %>%
+    ungroup() %>%
+    group_by(consolidated_name, species) %>%
+    # Count Total Number of Measures of a trait per species across databases
+    mutate(total_measurements = sum(n_measurements)) %>%
+    ungroup() %>%
+    # Re-arrange table so that total and all database are on separate columns
+    tidyr::pivot_wider(names_from = origin, values_from = n_measurements) %>%
+    tidyr::pivot_longer(
+      cols = total_measurements:GIFT, names_to = "origin",
+      values_to = "n_measurements"
+    ) %>%
+    tidyr::pivot_wider(names_from = origin, values_from = n_measurements) %>%
+    # Replace all NAs with 0s
+    mutate(
+      across(where(is.numeric), .fns = ~tidyr::replace_na(.x, 0))
+    ) %>%
+    group_by(consolidated_name) %>%
+    summarise(
+      # Count number of species in total and from each database
+      n_species = n(),
+      across(BIEN:GIFT, .fns = list(n_sp = ~sum(.x != 0))),
+      # Count total number of measurements
+      across(total_measurements:GIFT, .fns = ~sum(.x, na.rm = TRUE))
+    ) %>%
+    # Counting proportion of traits given by each database compared to total
+    mutate(
+      across(BIEN:GIFT, .fns = list(prop = ~ .x/total_measurements)),
+      across(BIEN_n_sp:GIFT_n_sp, .fns = list(prop = ~ .x/n_species))
+    )
+}
