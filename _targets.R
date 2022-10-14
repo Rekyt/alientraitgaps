@@ -458,6 +458,18 @@ list(
     here::here("inst", "exdata", "grip", "grip4_total_dens_m_km2.asc"),
     format = "file"
   ),
+  tar_target(
+    population_count_file,
+    here::here(
+      "inst", "exdata", "gpw", "gpw_v4_population_count_rev11_1_deg.nc"
+    )
+  ),
+  tar_target(
+    population_density_file,
+    here::here(
+      "inst", "exdata", "gpw", "gpw_v4_population_density_rev11_1_deg.nc"
+    )
+  ),
 
   # Make figures ---------------------------------------------------------------
   tar_target(
