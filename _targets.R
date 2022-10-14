@@ -462,6 +462,12 @@ list(
     plot_number_specific_trait_combination(contain_trait_combination)
   ),
   tar_target(
+    fig_treemap_general,
+    plot_general_treemap_trait_combination(
+      combined_traits_taxonomy, contain_trait_combination
+    )
+  ),
+  tar_target(
     fig_trait_combination_taxonomy,
     plot_taxonomy_treemap_trait_combination(
       combined_traits_taxonomy, contain_trait_combination
@@ -546,8 +552,8 @@ list(
     assemble_fig1(fig_combined_trait_heatmap, fig_species_per_trait_combined)
   ),
   tar_target(
-    fig2_treemap_trait_combination,
-    fig_trait_combination_taxonomy
+    pfig2_treemap_trait_combination,
+    assemble_fig2(fig_treemap_general, fig_trait_combination_taxonomy)
   ),
   tar_target(
     pfig3_maps_trait_prop_and_richness,
@@ -557,16 +563,4 @@ list(
     pfig4_trait_comb_prop_status_regions,
     assemble_fig4(fig_status_prop_comb, fig_widest_range_trait_comb_prop)
   )
-
-) %>%
-  # Post-processing Hooks ------------------------------------------------------
-  # Convert figures into ggplotGrob() to take less space
-  tarchetypes::tar_hook_outer(
-    ggplot2::ggplotGrob(.x),
-    dplyr::starts_with("fig_")
-  ) %>%
-  # Convert patchwork figures into patchworkGrob()
-  tarchetypes::tar_hook_outer(
-    patchwork::patchworkGrob(.x),
-    dplyr::starts_with("pfig_")
-  )
+)
