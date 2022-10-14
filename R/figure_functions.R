@@ -379,6 +379,54 @@ plot_taxonomy_treemap_number_traits = function(
     theme(legend.position = "top")
 }
 
+plot_general_treemap_trait_combination = function(
+    combined_traits_taxonomy, contain_trait_combination
+) {
+
+  combined_traits_taxonomy %>%
+    mutate(species = ifelse(is.na(species), paste(genus, epithet), species)) %>%
+    distinct(species, genus, family) %>%
+    right_join(
+      contain_trait_combination %>%
+        select(-traits),
+      by = "species") %>%
+    filter(!is.na(genus)) %>%
+    mutate(across(where(is.character), ~iconv(.x, "latin1", to = "UTF-8"))) %>%
+    ggplot(
+      aes(
+        area = 1,
+        fill = interaction(
+          has_at_least_one_trait, has_lhs, has_diaz, has_bergmann
+        ),
+        label = genus, subgroup = interaction(
+          has_at_least_one_trait, has_lhs, has_diaz, has_bergmann
+        )
+      )
+    ) +
+    treemapify::geom_treemap(color = NA, layout = "scol") +
+    scale_fill_manual(
+      name = "Trait combination",
+      labels = c(
+        "FALSE.FALSE.FALSE.FALSE" = "No trait",
+        "TRUE.FALSE.FALSE.FALSE"  = "At least\none trait",
+        "TRUE.FALSE.FALSE.TRUE"   = "Root traits\n(Bergmann et al. 2022)",
+        "TRUE.TRUE.FALSE.FALSE"   = "Leaf-Height-Seed\n(Westoby 1998)",
+        "TRUE.TRUE.FALSE.TRUE"    = "LHS and Root traits",
+        "TRUE.TRUE.TRUE.FALSE"    = "Aboveground traits\n(Díaz et al., 2016)",
+        "TRUE.TRUE.TRUE.TRUE"     = "Aboveground and Root traits"
+      ),
+      values = c(
+        "FALSE.FALSE.FALSE.FALSE" = "white",    # No trait
+        "TRUE.FALSE.FALSE.FALSE"  = "#d3d3d3",  # >=1 trait(s)
+        "TRUE.FALSE.FALSE.TRUE"   = "#d25601",  # Root traits
+        "TRUE.TRUE.FALSE.FALSE"   = "#9283ac",  # LHS
+        "TRUE.TRUE.FALSE.TRUE"    = "#923601",  # LHS + Root
+        "TRUE.TRUE.TRUE.FALSE"    = "#563787",  # Aboveground
+        "TRUE.TRUE.TRUE.TRUE"     = "#551601"   # Aboveground + Root
+      )
+    ) +
+    theme(legend.position = "top", aspect.ratio = 1)
+}
 
 # Missing Traits ---------------------------------------------------------------
 

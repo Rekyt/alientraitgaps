@@ -3,9 +3,18 @@ assemble_fig1 = function(
 ) {
   patchwork::wrap_plots(
     fig_combined_trait_heatmap, fig_species_per_trait_combined,
-    tag_level = "new", nrow = 1, widths = c(1/3, 2/3)
+    tag_level = "new", nrow = 1, widths = c(2/5, 3/5)
   ) +
     patchwork::plot_annotation(tag_levels = "A")
+}
+
+assemble_fig2 = function(fig_treemap_general, fig_trait_combination_taxonomy) {
+  patchwork::wrap_plots(
+    fig_treemap_general, fig_trait_combination_taxonomy,
+    tag_level = "new", nrow = 1
+  ) +
+    patchwork::plot_annotation(tag_levels = "A") +
+    patchwork::plot_layout(guides = 'collect')
 }
 
 assemble_fig3 = function(fig_map_alien_richness, fig_map_prop_trait_regions) {
