@@ -677,7 +677,7 @@ plot_map_alien_richness_region = function(
       fill = NA,
       data = glonaf_small_islands %>%
         inner_join(region_richness, by = "OBJIDsic"),
-      size = 2.5, shape = 21, stroke = 1.5
+      size = 2.5, shape = 21, stroke = 0.75
     ) +
     scale_fill_viridis_b(
       name = "Alien Species Richness", trans = "log10", n.breaks = 5,
