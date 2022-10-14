@@ -7,6 +7,7 @@ library("magrittr")
 source("R/austraits_functions.R")
 source("R/bien_functions.R")
 source("R/combined_trait_functions.R")
+source("R/env_socioeco_vars.R")
 source("R/figure_functions.R")
 source("R/glonaf_functions.R")
 source("R/gift_functions.R")
@@ -443,6 +444,20 @@ list(
     count_number_of_traits_per_region(glonaf_species_regions, combined_traits)
   ),
 
+  # Get environmental & socioeconomic variables --------------------------------
+  tar_target(
+    world_socioeco,
+    get_socioeco_variables()
+  ),
+  tar_target(
+    avg_socioeco,
+    average_country_socioeco_vars(world_socioeco)
+  ),
+  tar_target(
+    road_density_file,
+    here::here("inst", "exdata", "grip", "grip4_total_dens_m_km2.asc"),
+    format = "file"
+  ),
 
   # Make figures ---------------------------------------------------------------
   tar_target(
