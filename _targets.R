@@ -476,6 +476,12 @@ list(
       unified_glonaf_regions, road_density_file
     )
   ),
+  tar_target(
+    glonaf_gdp_research,
+    get_world_bank_indicators_on_glonaf(
+      avg_socioeco, unified_glonaf_regions
+    )
+  ),
 
   # Make figures ---------------------------------------------------------------
   tar_target(

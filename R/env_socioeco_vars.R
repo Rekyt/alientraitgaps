@@ -43,4 +43,35 @@ extract_road_density_glonaf_regions = function(
   road_density_avg %>%
     as.data.frame() %>%
     select(OBJIDsic, IDregion, road_density = grip4_total_dens_m_km2)
+
+}
+
+get_world_bank_indicators_on_glonaf = function(
+    avg_socioeco, unified_glonaf_regions
+) {
+
+  # Get a map of the world
+  world_sf = rnaturalearth::ne_countries(returnclass = "sf")
+
+  # Add World Bank Indicators
+  world_sf = world_sf %>%
+    inner_join(
+      avg_socioeco %>%
+        select(iso3c:gdp_per_capita),
+      by = c(iso_a3 = "iso3c")
+    )
+
+  # Combine WDI with Unified
+  unified_glonaf_regions %>%
+    sf::st_join(world_sf %>%
+                  sf::st_transform(sf::st_crs(unified_glonaf_regions))) %>%
+    as.data.frame() %>%
+    select(OBJIDsic, IDregion, research_expenditure_perc_gdp:gdp_per_capita) %>%
+    group_by(OBJIDsic, IDregion) %>%
+    summarise(
+      across(
+        research_expenditure_perc_gdp:gdp_per_capita, ~mean(.x, na.rm = TRUE)
+      )
+    ) %>%
+    ungroup()
 }
