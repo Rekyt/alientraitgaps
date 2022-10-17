@@ -25,6 +25,10 @@ plot_number_species_per_trait_combined = function(combined_traits) {
     unique() %>%
     length()
 
+  # Clean environment
+  rm(combined_traits)
+
+  # Actual plot
   max_20_traits %>%
     ggplot(aes(n_species, forcats::fct_reorder(consolidated_name, n_species))) +
     # 50% vertical line
@@ -82,13 +86,23 @@ plot_number_species_per_trait_combined = function(combined_traits) {
 
 
 plot_number_specific_trait_combination = function(contain_trait_combination) {
-  contain_trait_combination %>%
+
+  # Pre-process dataset
+  prop_comb_sp = contain_trait_combination %>%
     select(-traits) %>%
     tidyr::pivot_longer(!species, names_to = "comb_name",
                         values_to = "comb_value") %>%
     filter(comb_value) %>%
     count(comb_name, sort = TRUE, name = "n_species") %>%
-    filter(comb_name != "in_glonaf") %>%
+    filter(comb_name != "in_glonaf")
+
+  n_sp = nrow(contain_trait_combination)
+
+  # Clean environment
+  rm(contain_trait_combination)
+
+  # Actual Plot
+  prop_comb_sp %>%
     ggplot(
       aes(
         n_species,
@@ -97,20 +111,20 @@ plot_number_specific_trait_combination = function(contain_trait_combination) {
       )
     ) +
     geom_vline(
-      xintercept = nrow(contain_trait_combination), linetype = 2, size = 1,
+      xintercept = n_sp, linetype = 2, size = 1,
       color = "darkred"
     ) +
     geom_point(size = 2, color = "darkblue") +
     geom_text(
       aes(
         label = paste0(
-          round(n_species/nrow(contain_trait_combination) * 100, 1), "%"
+          round(n_species/n_sp * 100, 1), "%"
         )
       ), hjust = -0.2, vjust = 0.5
     ) +
     scale_x_continuous(
       sec.axis = sec_axis(
-        ~./nrow(contain_trait_combination), labels = scales::percent_format()
+        ~./n_sp, labels = scales::percent_format()
       )
     ) +
     scale_y_discrete(
@@ -131,6 +145,8 @@ plot_number_specific_trait_combination = function(contain_trait_combination) {
 plot_trait_comb_proportion_per_invasion_status = function(
     glonaf_status_trait_cat
 ) {
+
+  # Pre-process data
   trait_comb_prop_status = glonaf_status_trait_cat %>%
     group_by(status_name) %>%
     summarise(
@@ -157,7 +173,7 @@ plot_trait_comb_proportion_per_invasion_status = function(
     select(-n, -better_status) %>%
     tibble::deframe()
 
-  trait_comb_prop_status %>%
+  trait_comb_prop_status = trait_comb_prop_status %>%
     select(status_name, ends_with("prop")) %>%
     tidyr::pivot_longer(
       ends_with("prop"), names_to = "comb_name", values_to = "comb_value"
@@ -171,8 +187,17 @@ plot_trait_comb_proportion_per_invasion_status = function(
         levels = c("has_bergmann_prop", "has_diaz_prop", "has_lhs_prop",
                    "has_at_least_one_trait_prop")
       )
-    ) %>%
-    ggplot(aes(comb_name, comb_value, shape = status_name, color = status_name)) +
+    )
+
+  # Clean environment
+  rm(glonaf_status_trait_cat)
+
+
+  # Actual Plot
+  trait_comb_prop_status %>%
+    ggplot(
+      aes(comb_name, comb_value, shape = status_name, color = status_name)
+    ) +
     geom_point(position = position_dodge(width = 0.5), size = 2) +
     geom_linerange(
       aes(x = comb_name, ymin = 0, ymax = comb_value,
@@ -189,7 +214,8 @@ plot_trait_comb_proportion_per_invasion_status = function(
       )
     ) +
     scale_y_continuous(
-      "Proportion of Species", labels = scales::label_percent(), limits = c(0, 1)
+      "Proportion of Species", labels = scales::label_percent(),
+      limits = c(0, 1)
     ) +
     scale_shape_discrete(
       "Species Status", guide = guide_legend(reverse = TRUE),
@@ -201,14 +227,18 @@ plot_trait_comb_proportion_per_invasion_status = function(
     ) +
     coord_flip() +
     theme_bw() +
-    theme(legend.position = "top", panel.grid.minor = element_blank(),
-          panel.grid.major.y = element_blank())
+    theme(
+      legend.position = "top", panel.grid.minor = element_blank(),
+      panel.grid.major.y = element_blank()
+    )
 }
 
 
 plot_trait_combination_per_range_size = function(
     glonaf_species_area, contain_trait_combination
 ) {
+
+  # Pre-process data
   trait_comb_prop_widespread = glonaf_species_area %>%
     select(-total_area) %>%
     arrange(desc(n_regions)) %>%
@@ -230,9 +260,8 @@ plot_trait_combination_per_range_size = function(
         )
       ),
       n = n(),
-    )
-
-  trait_comb_prop_widespread %>%
+    ) %>%
+    # Reformat proportion in a tidy format
     select(n_regions_top, ends_with("prop")) %>%
     tidyr::pivot_longer(
       ends_with("prop"), names_to = "comb_name", values_to = "comb_value"
@@ -243,7 +272,13 @@ plot_trait_combination_per_range_size = function(
         levels = c("has_bergmann_prop", "has_diaz_prop", "has_lhs_prop",
                    "has_at_least_one_trait_prop")
       )
-    ) %>%
+    )
+
+  # Clean environment
+  rm(glonaf_species_area, contain_trait_combination)
+
+  # Actual Plot
+  trait_comb_prop_widespread %>%
     ggplot(
       aes(comb_name, comb_value, shape = n_regions_top, color = n_regions_top)
     ) +
@@ -263,21 +298,26 @@ plot_trait_combination_per_range_size = function(
       )
     ) +
     scale_y_continuous(
-      "Proportion of Species", labels = scales::label_percent(), limits = c(0, 1)
+      "Proportion of Species", labels = scales::label_percent(),
+      limits = c(0, 1)
     ) +
     scale_shape_discrete(
-      "Top 100 Widespread? (# of regions)", guide = guide_legend(reverse = TRUE),
+      "Top 100 Widespread? (# of regions)",
+      guide = guide_legend(reverse = TRUE),
       labels = c(`TRUE` = "Yes", `FALSE` = "No")
     ) +
     scale_color_manual(
-      "Top 100 Widespread? (# of regions)", guide = guide_legend(reverse = TRUE),
+      "Top 100 Widespread? (# of regions)",
+      guide = guide_legend(reverse = TRUE),
       labels = c(`TRUE` = "Yes", `FALSE` = "No"),
       values = c(`TRUE` = "#018571", `FALSE` = "#a6611a")
     ) +
     coord_flip() +
     theme_bw() +
-    theme(legend.position = "top", panel.grid.minor = element_blank(),
-          panel.grid.major.y = element_blank())
+    theme(
+      legend.position = "top", panel.grid.minor = element_blank(),
+      panel.grid.major.y = element_blank()
+    )
 }
 
 
@@ -286,7 +326,9 @@ plot_trait_combination_per_range_size = function(
 plot_taxonomy_treemap_trait_combination = function(
     combined_traits_taxonomy, contain_trait_combination
 ) {
-  combined_traits_taxonomy %>%
+
+  # Pre-process data
+  tax_comb = combined_traits_taxonomy %>%
     mutate(species = ifelse(is.na(species), paste(genus, epithet), species)) %>%
     distinct(species, genus, family) %>%
     right_join(
@@ -294,7 +336,13 @@ plot_taxonomy_treemap_trait_combination = function(
         select(-traits),
       by = "species") %>%
     filter(!is.na(genus)) %>%
-    mutate(across(where(is.character), ~iconv(.x, "latin1", to = "UTF-8"))) %>%
+    mutate(across(where(is.character), ~iconv(.x, "latin1", to = "UTF-8")))
+
+  # Clean environment
+  rm(combined_traits_taxonomy, contain_trait_combination)
+
+  # Actual Plot
+  tax_comb %>%
     ggplot(
       aes(
         area = 1,
@@ -358,13 +406,21 @@ plot_taxonomy_treemap_number_traits = function(
     )
   }
 
-  combined_traits_taxonomy %>%
+  # Pre-process data
+  tax_comb = combined_traits_taxonomy %>%
     mutate(species = ifelse(is.na(species), paste(genus, epithet), species)) %>%
     distinct(species, genus, family) %>%
     right_join(contain_trait_combination, by = "species") %>%
     mutate(number_of_traits = purrr::map_int(traits, length)) %>%
     filter(!is.na(genus)) %>%
-    mutate(across(where(is.character), ~iconv(.x, "latin1", to = "UTF-8"))) %>%
+    mutate(across(where(is.character), ~iconv(.x, "latin1", to = "UTF-8")))
+
+
+  # Clean environment
+  rm(combined_traits_taxonomy, contain_trait_combination)
+
+  # Actual plot
+  tax_comb %>%
     ggplot(
       aes(area = 1, fill = number_of_traits + 1, label = genus,
           subgroup = family)
@@ -383,7 +439,8 @@ plot_general_treemap_trait_combination = function(
     combined_traits_taxonomy, contain_trait_combination
 ) {
 
-  combined_traits_taxonomy %>%
+  # Preprocess data
+  tax_comb = combined_traits_taxonomy %>%
     mutate(species = ifelse(is.na(species), paste(genus, epithet), species)) %>%
     distinct(species, genus, family) %>%
     right_join(
@@ -391,7 +448,13 @@ plot_general_treemap_trait_combination = function(
         select(-traits),
       by = "species") %>%
     filter(!is.na(genus)) %>%
-    mutate(across(where(is.character), ~iconv(.x, "latin1", to = "UTF-8"))) %>%
+    mutate(across(where(is.character), ~iconv(.x, "latin1", to = "UTF-8")))
+
+  # Clean environment
+  rm(combined_traits_taxonomy, contain_trait_combination)
+
+  # Actual plot
+  tax_comb %>%
     ggplot(
       aes(
         area = 1,
@@ -433,7 +496,7 @@ plot_general_treemap_trait_combination = function(
 plot_combined_traits_heatmap = function(combined_traits) {
 
   # Get combinations of trait measured by species ordered by frequency
-  combined_traits %>%
+  comb_sp_freq = combined_traits %>%
     mutate(
       species_fact = factor(species) %>%
         forcats::fct_infreq(),
@@ -445,8 +508,13 @@ plot_combined_traits_heatmap = function(combined_traits) {
     ) %>%
     select(species_rank, trait_rank, value) %>%
     tidyr::complete(species_rank, trait_rank,
-                    fill = list(value = FALSE)) %>%
-    # Plot as a heatmap
+                    fill = list(value = FALSE))
+
+  # Clean environment
+  rm(combined_traits)
+
+  # Plot as a heatmap
+  comb_sp_freq %>%
     ggplot(aes(trait_rank, species_rank, fill = value)) +
     geom_raster() +
     labs(
@@ -464,7 +532,9 @@ plot_combined_traits_heatmap = function(combined_traits) {
 plot_prop_trait_per_richness = function(
     regions_trait_prop, unified_glonaf_regions
 ) {
-  regions_trait_prop %>%
+
+  # Preprocess data
+  prop_trait_per_richness = regions_trait_prop %>%
     tidyr::pivot_longer(
       !c(n_species, OBJIDsic), names_to = "prop_name", values_to = "prop_value"
     ) %>%
@@ -482,7 +552,13 @@ plot_prop_trait_per_richness = function(
                      "stem", "prop_with_any_trait", "has_lhs", "has_diaz",
                      "has_bergmann")
         )
-    ) %>%
+    )
+
+  # Clean environment
+  rm(regions_trait_prop, unified_glonaf_regions)
+
+  # Actual plot
+  prop_trait_per_richness %>%
     ggplot(aes(n_species, prop_value, color = island == 1)) +
     geom_point(size = 1/2, alpha = 1/3) +
     facet_wrap(
@@ -520,7 +596,9 @@ plot_prop_trait_per_richness = function(
 plot_proportion_known_combination_per_richness = function(
     regions_trait_prop, glonaf_species_number
 ) {
-  regions_trait_prop %>%
+
+  # Preprocess data
+  prop_known = regions_trait_prop %>%
     full_join(glonaf_species_number, by = "OBJIDsic") %>%
     select(starts_with("has_") | starts_with("num_")) %>%
     mutate(
@@ -533,7 +611,13 @@ plot_proportion_known_combination_per_richness = function(
     ) %>%
     tidyr::pivot_longer(
       starts_with("num_"), names_to = "rich_name", values_to = "rich_value"
-    ) %>%
+    )
+
+  # Clean environment
+  rm(regions_trait_prop, glonaf_species_number)
+
+  # Actual plot
+  prop_known %>%
     ggplot(aes(rich_value, comb_value)) +
     geom_point(shape = ".") +
     facet_grid(
@@ -605,9 +689,20 @@ plot_map_proportion_trait_by_region = function(
       )
     )
 
+  # Mainland regions
+  mainland_pivot = glonaf_mainland_large_islands %>%
+    inner_join(pivoted_data, by = "OBJIDsic")
+
+  # Island regions
+  island_pivot = glonaf_small_islands %>%
+    inner_join(pivoted_data, by = "OBJIDsic")
+
+  # Clean environment
+  rm(pivoted_data, glonaf_mainland_large_islands, glonaf_small_islands,
+     regions_trait_prop)
+
   # Actual plot
-  glonaf_mainland_large_islands %>%
-    inner_join(pivoted_data, by = "OBJIDsic") %>%
+  mainland_pivot %>%
     ggplot(aes(fill = prop_value)) +
     geom_sf(data = world_sf, fill = "gray85", color = "gray65", size = 1/100) +
     # Non-small islands and mainlands
@@ -616,8 +711,7 @@ plot_map_proportion_trait_by_region = function(
     geom_sf(
       aes(color = prop_value),
       fill = NA,
-      data = glonaf_small_islands %>%
-        inner_join(pivoted_data, by = "OBJIDsic"),
+      data = island_pivot,
       size = 1.2, shape = 21, stroke = 0.4
     ) +
     facet_wrap(
@@ -657,16 +751,31 @@ plot_map_alien_richness_region = function(
     regions_trait_prop, glonaf_small_islands,
     glonaf_mainland_large_islands
 ) {
+
   # Background map
   world_sf = rnaturalearth::ne_countries(returnclass = "sf") %>%
     sf::st_transform(crs = "+proj=eqearth")
 
+  # Alien Species richness per GloNAF region
   region_richness = regions_trait_prop %>%
     select(OBJIDsic, n_species)
 
+  richness_range = range(region_richness[["n_species"]])
+
+  # Mainland richness
+  mainland_richness = glonaf_mainland_large_islands %>%
+    inner_join(region_richness, by = "OBJIDsic")
+
+  # Island richness
+  island_richness = glonaf_small_islands %>%
+    inner_join(region_richness, by = "OBJIDsic")
+
+  # Clean environment
+  rm(regions_trait_prop, glonaf_small_islands, glonaf_mainland_large_islands,
+     region_richness)
+
   # Actual plot
-  glonaf_mainland_large_islands %>%
-    inner_join(region_richness, by = "OBJIDsic") %>%
+  mainland_richness %>%
     ggplot(aes(fill = n_species)) +
     geom_sf(data = world_sf, fill = "gray85", size = 1/100) +
     # Non-small islands and mainlands
@@ -675,21 +784,20 @@ plot_map_alien_richness_region = function(
     geom_sf(
       aes(color = n_species),
       fill = NA,
-      data = glonaf_small_islands %>%
-        inner_join(region_richness, by = "OBJIDsic"),
+      data = island_richness,
       size = 2.5, shape = 21, stroke = 0.75
     ) +
     scale_fill_viridis_b(
       name = "Alien Species Richness", trans = "log10", n.breaks = 5,
       show.limits = TRUE,
       # Force limit to merge axes
-      limits = range(region_richness[["n_species"]])
+      limits = richness_range
     ) +
     scale_color_viridis_b(
       name = "Alien Species Richness", trans = "log10", n.breaks = 5,
       show.limits = TRUE,
       # Force limit to merge axes
-      limits = range(region_richness[["n_species"]])
+      limits = richness_range
     ) +
     ylim(-5747986, NA) +  # Remove whatever is below 60°S
     theme_void() +
@@ -704,11 +812,11 @@ plot_map_alien_richness_region = function(
 plot_map_europe_proportion_trait = function(
     regions_trait_prop, glonaf_small_islands, glonaf_mainland_large_islands
 ) {
+
   # Background map
   europe_sf = rnaturalearth::ne_countries(returnclass = "sf") %>%
     sf::st_transform(crs = "EPSG:4258") %>%
     filter(continent == "Europe")
-
 
   # Pivot trait proportions data
   pivot_trait = regions_trait_prop %>%
@@ -735,6 +843,12 @@ plot_map_europe_proportion_trait = function(
     sf::st_transform(sf::st_crs("EPSG:4258")) %>%
     inner_join(pivot_trait, by = "OBJIDsic")
 
+
+  # Clean environment
+  rm(regions_trait_prop, glonaf_small_islands, glonaf_mainland_large_islands,
+     pivot_trait)
+
+  # Actual Plot
   ggplot() +
     # Background map
     geom_sf(data = europe_sf, fill = "gray45", alpha = 1/3) +
@@ -795,9 +909,20 @@ plot_map_median_n_traits_region = function(
   world_sf = rnaturalearth::ne_countries(returnclass = "sf") %>%
     sf::st_transform(crs = "+proj=eqearth")
 
+  # Mainland median traits
+  mainland_n_traits = glonaf_mainland_large_islands_simplified %>%
+    inner_join(trait_n_regions, by = "OBJIDsic")
+
+  # Island median traits
+  island_n_traits = glonaf_small_islands %>%
+    inner_join(trait_n_regions, by = "OBJIDsic")
+
+  # Clean environment
+  rm(trait_n_regions, glonaf_small_islands,
+     glonaf_mainland_large_islands_simplified)
+
   # Actual Plot
-  glonaf_mainland_large_islands_simplified %>%
-    inner_join(trait_n_regions, by = "OBJIDsic") %>%
+  mainland_n_traits %>%
     ggplot(aes(fill = n_traits_median)) +
     geom_sf(data = world_sf, fill = "gray85", color = "gray65", size = 1/100) +
     # Non-small islands and mainlands
@@ -806,8 +931,7 @@ plot_map_median_n_traits_region = function(
     geom_sf(
       aes(color = n_traits_median),
       fill = NA,
-      data = glonaf_small_islands %>%
-        inner_join(trait_n_regions, by = "OBJIDsic"),
+      data = island_n_traits,
       size = 3, shape = 21, stroke = 2
     ) +
     # Fixed manual breaks to sync color & fill scales
