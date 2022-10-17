@@ -2,8 +2,8 @@ get_socioeco_variables = function() {
   WDI::WDI(
     indicator = c(
       research_expenditure_perc_gdp = "GB.XPD.RSDV.GD.ZS",
-      gdp_total                     = "6.0.GDP_current",
-      gdp_per_capita                = "6.0.GDPpc_constant"
+      gdp_total                     = "NY.GDP.MKTP.KD",
+      gdp_per_capita                = "NY.GDP.PCAP.KD"
     )
   )
 }
