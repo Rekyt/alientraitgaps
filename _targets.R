@@ -470,6 +470,12 @@ list(
       "inst", "exdata", "gpw", "gpw_v4_population_density_rev11_1_deg.nc"
     )
   ),
+  tar_target(
+    glonaf_road_density,
+    extract_road_density_glonaf_regions(
+      unified_glonaf_regions, road_density_file
+    )
+  ),
 
   # Make figures ---------------------------------------------------------------
   tar_target(
