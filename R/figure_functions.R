@@ -320,6 +320,29 @@ plot_trait_combination_per_range_size = function(
     )
 }
 
+plot_number_of_traits_per_number_of_regions = function(
+  contain_trait_combination, glonaf_species_area
+) {
+  # Preprocess data
+  n_traits_n_regions = contain_trait_combination %>%
+    mutate(n_traits = length(traits)) %>%
+    select(species, n_traits) %>%
+    ungroup() %>%
+    inner_join(glonaf_species_area, by = "species")
+
+  # Clean plotting environment
+  rm(contain_trait_combination, glonaf_species_area)
+
+  # Actual plot
+  n_traits_n_regions %>%
+    ggplot(aes(n_regions, n_traits)) +
+    geom_point(shape = ".") +
+    stat_smooth(method = "lm", se = FALSE) +
+    scale_x_log10("# of Occupied Regions") +
+    scale_y_log10("# of Traits") +
+    ggpmisc::stat_poly_eq(formula = y ~ x, label.x = 0.9) +
+    theme_bw()
+}
 
 # Taxonomic Treemaps -----------------------------------------------------------
 

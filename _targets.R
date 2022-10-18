@@ -603,6 +603,12 @@ list(
       glonaf_mainland_large_islands_simplified
     )
   ),
+  tar_target(
+    fig_n_traits_n_regions,
+    plot_number_of_traits_per_number_of_regions(
+      contain_trait_combination, glonaf_species_area
+    )
+  ),
 
 
   # Assembling Figures for Paper -----------------------------------------------

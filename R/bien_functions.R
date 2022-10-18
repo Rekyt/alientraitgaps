@@ -9,7 +9,8 @@ get_bien_traits = function(harmonized_try_glonaf) {
   harmonized_try_glonaf %>%
     pull(species_accepted_try) %>%
     unique() %>%
-    BIEN::BIEN_trait_species()
+    BIEN::BIEN_trait_species() %>%
+    filter(!is.na(trait_name))
 }
 
 count_bien_species_per_trait = function(glonaf_bien_traits_count) {
