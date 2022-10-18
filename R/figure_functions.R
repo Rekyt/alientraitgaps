@@ -959,6 +959,56 @@ plot_map_median_n_traits_region = function(
     )
 }
 
+plot_map_sd_n_traits_region = function(
+    trait_n_regions, glonaf_small_islands,
+    glonaf_mainland_large_islands_simplified
+) {
+
+  # Background Map
+  world_sf = rnaturalearth::ne_countries(returnclass = "sf") %>%
+    sf::st_transform(crs = "+proj=eqearth")
+
+  # Mainland median traits
+  mainland_n_traits = glonaf_mainland_large_islands_simplified %>%
+    inner_join(trait_n_regions, by = "OBJIDsic")
+
+  # Island median traits
+  island_n_traits = glonaf_small_islands %>%
+    inner_join(trait_n_regions, by = "OBJIDsic")
+
+  # Clean environment
+  rm(trait_n_regions, glonaf_small_islands,
+     glonaf_mainland_large_islands_simplified)
+
+  # Actual Plot
+  mainland_n_traits %>%
+    ggplot(aes(fill = n_traits_sd)) +
+    geom_sf(data = world_sf, fill = "gray85", color = "gray65", size = 1/100) +
+    # Non-small islands and mainlands
+    geom_sf(color = NA, size = 1/100) +
+    # Small islands
+    geom_sf(
+      aes(color = n_traits_sd),
+      fill = NA,
+      data = island_n_traits,
+      size = 2.5, shape = 21, stroke = 1.5
+    ) +
+    scale_fill_viridis_b("# Traits SD", trans = "log10") +
+    scale_color_viridis_b("# Traits SD", trans = "log10") +
+    guides(
+      fill  = guide_bins(title.vjust = 0.8, axis = FALSE, axis.linewidth = 0),
+      color = guide_bins(title.vjust = 0.8, axis = FALSE, axis.linewidth = 0)
+    ) +
+    ylim(-5747986, NA) +  # Remove whatever is below 60°S
+    theme_void() +
+    theme(
+      legend.position  = "top",
+      legend.key       = element_rect(colour = NA),
+      legend.key.width = unit(2, "lines"),
+      plot.margin      = margin(b = 3/11)
+    )
+}
+
 
 # Trait Network ----------------------------------------------------------------
 plot_network_trait = function(trait_name_network) {
