@@ -75,3 +75,46 @@ get_world_bank_indicators_on_glonaf = function(
     ) %>%
     ungroup()
 }
+
+extract_pop_count_glonaf_regions = function(
+  unified_glonaf_regions, population_count_file
+) {
+
+  pop_count = terra::rast(population_count_file)
+
+  glonaf_pop_count = terra::extract(
+    pop_count[[1:5]],
+    unified_glonaf_regions %>%
+      sf::st_transform(sf::st_crs(pop_count)),
+    fun = mean, na.rm = TRUE
+  )
+
+  colnames(glonaf_pop_count)[2:6] = paste0("pop_count", seq(2000, 2020, by = 5))
+
+  unified_glonaf_regions %>%
+    as.data.frame() %>%
+    select(OBJIDsic, IDregion) %>%
+    cbind(glonaf_pop_count[, 2:6])
+}
+
+extract_pop_density_glonaf_regions = function(
+  unified_glonaf_regions, population_density_file
+) {
+
+  pop_density = terra::rast(population_density_file)
+
+  glonaf_pop_density = terra::extract(
+    pop_density[[1:5]],
+    unified_glonaf_regions %>%
+      sf::st_transform(sf::st_crs(pop_density)),
+    fun = mean, na.rm = TRUE
+  )
+
+  colnames(glonaf_pop_density)[2:6] =
+    paste0("pop_density", seq(2000, 2020, by = 5))
+
+  unified_glonaf_regions %>%
+    as.data.frame() %>%
+    select(OBJIDsic, IDregion) %>%
+    cbind(glonaf_pop_density[, 2:6])
+}

@@ -483,6 +483,18 @@ list(
       avg_socioeco, unified_glonaf_regions
     )
   ),
+  tar_target(
+    glonaf_pop_count,
+    extract_pop_count_glonaf_regions(
+      unified_glonaf_regions, population_count_file
+    )
+  ),
+  tar_target(
+    glonaf_pop_density,
+    extract_pop_density_glonaf_regions(
+      unified_glonaf_regions, population_density_file
+    )
+  ),
 
   # Make figures ---------------------------------------------------------------
   tar_target(
