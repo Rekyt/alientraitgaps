@@ -461,13 +461,14 @@ list(
   tar_target(
     population_count_file,
     here::here(
-      "inst", "exdata", "gpw", "gpw_v4_population_count_rev11_1_deg.nc"
+      "inst", "exdata", "gpw", "gpw_v4_population_count_adjusted_rev11_1_deg.nc"
     )
   ),
   tar_target(
     population_density_file,
     here::here(
-      "inst", "exdata", "gpw", "gpw_v4_population_density_rev11_1_deg.nc"
+      "inst", "exdata", "gpw",
+      "gpw_v4_population_density_adjusted_rev11_1_deg.nc"
     )
   ),
   tar_target(
