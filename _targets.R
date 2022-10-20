@@ -329,8 +329,12 @@ list(
     )
   ),
   tar_target(
-    traits_per_database,
-    count_traits_and_species_per_database(combined_traits_origin)
+    trait_database_sp_list,
+    list_species_by_trait_per_database(combined_traits_origin)
+  ),
+  tar_target(
+    trait_database_euler_diagrams,
+    intersect_species_list_by_trait_across_database(trait_database_sp_list)
   ),
 
   # Trait Combinations ---------------------------------------------------------
@@ -608,6 +612,10 @@ list(
     plot_number_of_traits_per_number_of_regions(
       contain_trait_combination, glonaf_species_area
     )
+  ),
+  tar_target(
+    fig_euler_diagrams_top_20_traits_database,
+    plot_data_origin_intersect_top_20_traits(trait_database_euler_diagrams),
   ),
 
 

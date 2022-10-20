@@ -1071,3 +1071,50 @@ plot_histogram_number_trait_regions = function(trait_n_regions) {
     theme_bw() +
     theme(aspect.ratio = 1)
 }
+
+plot_data_origin_intersect_top_20_traits = function(
+    trait_database_euler_diagrams
+) {
+
+  # Needed data
+  n_traits = seq(1, 20, by = 1)
+
+  # Fill scale (corresponds to Set1)
+  db_fills = c(
+    "#e41a1c",  # (AusTraits) Red
+    "#377eb8",  # (BIEN)      Blue
+    "#4daf4a",  # (GIFT)      Green
+    "#984ea3"   # (TRY)       Purple
+  )
+
+  # Plots
+  eulerr::eulerr_options(padding = grid::unit(1, "lines"))
+
+  euler_plots = lapply(
+    n_traits,
+    function(x) {
+      plot(
+        trait_database_euler_diagrams[["euler"]][[x]],
+        # Style the title
+        main = list(
+          label = ggplot2::label_wrap_gen()(
+            trait_database_euler_diagrams[["consolidated_name"]][[x]]
+          ),
+          fontsize = 10, cex = 1, lineheight = 0.9, check.overlap = TRUE
+        ),
+        # Style other elements
+        quantities = list(type = "counts", fontsize = 8),
+        labels = list(fontsize = 8),
+        fills = list(fill = db_fills),
+        adjust_labels = TRUE
+      )
+    }
+  )
+
+  # Tidy environment
+  rm(trait_database_euler_diagrams)
+
+  # Actual final plot
+  patchwork::wrap_plots(list = euler_plots) +
+    theme(plot.margin = margin(5.5, 5.5, 5.5, 35))
+}

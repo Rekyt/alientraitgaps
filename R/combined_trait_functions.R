@@ -540,36 +540,55 @@ count_number_of_traits_per_region = function(
     )
 }
 
-count_traits_and_species_per_database = function(combined_traits_origin) {
+list_species_by_trait_per_database = function(combined_traits_origin) {
 
   combined_traits_origin %>%
     ungroup() %>%
-    group_by(consolidated_name, species) %>%
-    # Count Total Number of Measures of a trait per species across databases
-    mutate(total_measurements = sum(n_measurements)) %>%
-    ungroup() %>%
-    # Re-arrange table so that total and all database are on separate columns
-    tidyr::pivot_wider(names_from = origin, values_from = n_measurements) %>%
-    tidyr::pivot_longer(
-      cols = total_measurements:GIFT, names_to = "origin",
-      values_to = "n_measurements"
-    ) %>%
-    tidyr::pivot_wider(names_from = origin, values_from = n_measurements) %>%
-    # Replace all NAs with 0s
+    group_by(consolidated_name, origin) %>%
+    # List species per trait per database
+    summarise(sp_list = list(species)) %>%
+    # Get list of species common across database (with data)
+    # and list of all species available
+    mutate(common_sp = list(Reduce(intersect, sp_list)),
+           all_sp    = list(Reduce(union, sp_list))) %>%
+    # Count number of species across category
+    rowwise() %>%
     mutate(
-      across(where(is.numeric), .fns = ~tidyr::replace_na(.x, 0))
+      n_species = length(sp_list),    # Number of species per database
+      n_common  = length(common_sp),  # Number of species in common
+      n_all     = length(all_sp)      # Total number of species
     ) %>%
+    ungroup()
+
+}
+
+intersect_species_list_by_trait_across_database = function(
+    trait_database_sp_list
+) {
+
+  trait_database_sp_list %>%
+    # Sub-select only needed information
+    select(consolidated_name, origin, sp_list, n_all) %>%
+    # Get all combinations of trait name and database
+    tidyr::complete(
+      consolidated_name, origin, fill = list(sp_list = list(""))
+    ) %>%
+    # Fill NAs 'n_all' columns by non empty values
     group_by(consolidated_name) %>%
+    arrange(desc(n_all), consolidated_name, origin) %>%
+    mutate(n_all = zoo::na.locf(n_all)) %>%
+    ungroup() %>%
+    # Organize diagrams per number of species/trait name/database name
+    arrange(desc(n_all), consolidated_name, origin) %>%
+    group_by(consolidated_name) %>%
+    # Create actual Euler diagrams
     summarise(
-      # Count number of species in total and from each database
-      n_species = n(),
-      across(BIEN:GIFT, .fns = list(n_sp = ~sum(.x != 0))),
-      # Count total number of measurements
-      across(total_measurements:GIFT, .fns = ~sum(.x, na.rm = TRUE))
+      euler = sp_list %>%
+        setNames(origin) %>%
+        eulerr::euler() %>%
+        lst(),
+      n_all = unique(n_all)
     ) %>%
-    # Counting proportion of traits given by each database compared to total
-    mutate(
-      across(BIEN:GIFT, .fns = list(prop = ~ .x/total_measurements)),
-      across(BIEN_n_sp:GIFT_n_sp, .fns = list(prop = ~ .x/n_species))
-    )
+    arrange(desc(n_all))
+
 }
