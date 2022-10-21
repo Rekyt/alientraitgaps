@@ -376,7 +376,7 @@ list(
     trait_knowledge_df,
     assemble_trait_knowledge_df(
       combined_traits, alien_range_size, invasive_range_size, continent_origin,
-      combined_growth_form
+      combined_growth_form, species_socioecovars, match_glonaf_tnrs
     )
   ),
   tar_target(
@@ -497,6 +497,13 @@ list(
     glonaf_pop_density,
     extract_pop_density_glonaf_regions(
       unified_glonaf_regions, population_density_file
+    )
+  ),
+  tar_target(
+    species_socioecovars,
+    combine_species_socioecovars (
+      glonaf_species_regions, glonaf_road_density, glonaf_pop_density,
+      glonaf_pop_count, glonaf_gdp_research
     )
   ),
 

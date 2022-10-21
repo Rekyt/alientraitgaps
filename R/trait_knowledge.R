@@ -31,18 +31,25 @@ get_continental_origin = function() {
 
 assemble_trait_knowledge_df = function(
     combined_traits, alien_range_size, invasive_range_size, continent_origin,
-    combined_growth_form
+    combined_growth_form, species_socioecovars, match_glonaf_tnrs
 ) {
 
-  combined_traits %>%
+  all_unified_species = match_glonaf_tnrs %>%
+    distinct(species = Accepted_name)
+
+  number_measured_traits = combined_traits %>%
     group_by(species) %>%
-    summarise(n_traits = n()) %>%
-    full_join(combined_growth_form, by = "species") %>%
-    full_join(alien_range_size, by = "species") %>%
-    full_join(invasive_range_size, by = "species") %>%
-    # Replace all NAs by 0s
+    summarise(n_traits = n())
+
+  Reduce(
+    function(x, y) full_join(x, y, by = "species"),
+    list(number_measured_traits, combined_growth_form, alien_range_size,
+         invasive_range_size, species_socioecovars, all_unified_species)
+  ) %>%
+    select(species, growth_form, everything()) %>%
+    # Replace problematic NAs by 0s
     mutate(
-      across(where(is.numeric), .fns = ~tidyr::replace_na(.x, 0))
+      across(n_traits:n_invasive_regions, .fns = ~tidyr::replace_na(.x, 0))
     )
 
 }

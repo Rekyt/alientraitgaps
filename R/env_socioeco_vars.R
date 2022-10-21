@@ -118,3 +118,35 @@ extract_pop_density_glonaf_regions = function(
     select(OBJIDsic, IDregion) %>%
     cbind(glonaf_pop_density[, 2:6])
 }
+
+combine_species_socioecovars = function(
+    glonaf_species_regions, glonaf_road_density, glonaf_pop_density,
+    glonaf_pop_count, glonaf_gdp_research
+) {
+
+  list(
+    glonaf_species_regions, glonaf_road_density, glonaf_pop_density,
+    glonaf_pop_count, glonaf_gdp_research
+  ) %>%
+    # Repeatedly join datasets
+    Reduce(
+      function(x, y) full_join(x, select(y, -IDregion), by = "OBJIDsic"), .
+    ) %>%
+    filter(!is.na(species)) %>%  # Remove regions with no referenced species
+    select(-OBJIDsic) %>%
+    group_by(species) %>%
+    # Compute average Socioecovars across full range of species
+    summarise(across(where(is.numeric), ~mean(.x, na.rm = TRUE))) %>%
+    # Compute a single pop. density and pop. count across range of species
+    rowwise() %>%
+    mutate(
+      pop_density = mean(
+        c_across(pop_density2000:pop_density2020), na.rm = TRUE
+      ),
+      pop_count   = mean(c_across(pop_count2000:pop_count2020), na.rm = TRUE)
+    ) %>%
+    ungroup() %>%
+    # Remove individual pop. count & pop. density columns
+    select(-matches("[0-9]+"))
+
+}
