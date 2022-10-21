@@ -322,13 +322,6 @@ list(
     )
   ),
   tar_target(
-    combined_traits_origin_species,
-    summarise(
-      combined_traits_origin, n_sp = n(),
-      n_total_measurements = sum(n_measurements)
-    )
-  ),
-  tar_target(
     trait_database_sp_list,
     list_species_by_trait_per_database(combined_traits_origin)
   ),
