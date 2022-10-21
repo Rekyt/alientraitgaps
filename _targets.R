@@ -304,6 +304,10 @@ list(
       harmonized_gift_glonaf, match_glonaf_tnrs
     )
   ),
+  tar_target(
+    simplified_growth_form,
+    simplify_growth_form(combined_growth_form)
+  ),
 
   # Get higher taxonomy for combined traits
   tar_target(
@@ -362,14 +366,10 @@ list(
     get_invasive_range_size(glonaf_species_regions_status)
   ),
   tar_target(
-    continent_origin,
-    get_continental_origin()
-  ),
-  tar_target(
     trait_knowledge_df,
     assemble_trait_knowledge_df(
-      combined_traits, alien_range_size, invasive_range_size, continent_origin,
-      combined_growth_form, species_socioecovars, match_glonaf_tnrs
+      combined_traits, alien_range_size, invasive_range_size,
+      simplified_growth_form, species_socioecovars, match_glonaf_tnrs
     )
   ),
   tar_target(

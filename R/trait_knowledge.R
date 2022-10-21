@@ -30,8 +30,8 @@ get_continental_origin = function() {
 }
 
 assemble_trait_knowledge_df = function(
-    combined_traits, alien_range_size, invasive_range_size, continent_origin,
-    combined_growth_form, species_socioecovars, match_glonaf_tnrs
+    combined_traits, alien_range_size, invasive_range_size,
+    simplified_growth_form, species_socioecovars, match_glonaf_tnrs
 ) {
 
   all_unified_species = match_glonaf_tnrs %>%
@@ -43,10 +43,10 @@ assemble_trait_knowledge_df = function(
 
   Reduce(
     function(x, y) full_join(x, y, by = "species"),
-    list(number_measured_traits, combined_growth_form, alien_range_size,
+    list(number_measured_traits, simplified_growth_form, alien_range_size,
          invasive_range_size, species_socioecovars, all_unified_species)
   ) %>%
-    select(species, growth_form, everything()) %>%
+    select(species, simp_form, everything()) %>%
     # Replace problematic NAs by 0s
     mutate(
       across(n_traits:n_invasive_regions, .fns = ~tidyr::replace_na(.x, 0))
@@ -57,7 +57,7 @@ assemble_trait_knowledge_df = function(
 model_alien_trait_knowledge = function(trait_knowledge_df) {
 
   glm(
-    n_traits ~ growth_form + n_alien_regions + n_invasive_regions,
+    n_traits ~ simp_form + n_alien_regions + n_invasive_regions,
     data = trait_knowledge_df, family = poisson
   )
 

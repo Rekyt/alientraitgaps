@@ -523,6 +523,29 @@ extract_growth_form = function(
     mutate(growth_form = ifelse(is.na(growth_form), "unknown", growth_form))
 }
 
+
+simplify_growth_form = function(combined_growth_form) {
+
+  combined_growth_form %>%
+    # List all growth forms by species
+    group_by(species) %>%
+    summarise(all_forms = list(growth_form)) %>%
+    # Simplify growth forms by using tree > shrub > herb > other > unknown
+    rowwise() %>%
+    mutate(
+      simp_form = case_when(
+        length(all_forms) == 1 ~ all_forms[[1]],
+        "tree"  %in% all_forms ~ "tree",
+        "shrub" %in% all_forms ~ "shrub",
+        "herb"  %in% all_forms ~ "herb",
+        "other" %in% all_forms ~ "other"
+      )
+    ) %>%
+    ungroup() %>%
+    select(-all_forms)
+
+}
+
 # Count Summary of Number of Traits per species per Region
 count_number_of_traits_per_region = function(
   glonaf_species_regions, combined_traits
