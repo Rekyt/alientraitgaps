@@ -1088,7 +1088,7 @@ plot_data_origin_intersect_top_20_traits = function(
   )
 
   # Plots
-  eulerr::eulerr_options(padding = grid::unit(1, "lines"))
+  eulerr::eulerr_options(padding = grid::unit(2/3, "lines"))
 
   euler_plots = lapply(
     n_traits,
@@ -1098,13 +1098,17 @@ plot_data_origin_intersect_top_20_traits = function(
         # Style the title
         main = list(
           label = ggplot2::label_wrap_gen()(
-            trait_database_euler_diagrams[["consolidated_name"]][[x]]
+            trait_database_euler_diagrams[["consolidated_name"]][[x]] %>%
+              gsub("_", " ", .) %>%
+              tools::toTitleCase()
           ),
-          fontsize = 10, cex = 1, lineheight = 0.9, check.overlap = TRUE
+          fontsize = 10, cex = 1, lineheight = 0.9, check.overlap = TRUE,
+          vjust = 1
         ),
         # Style other elements
-        quantities = list(type = "counts", fontsize = 8),
-        labels = list(fontsize = 8),
+        quantities = list(type = "counts", fontsize = 7),
+        edges = list(lwd = 0.1, lex = 1),
+        labels = list(fontsize = 7),
         fills = list(fill = db_fills),
         adjust_labels = TRUE
       )
