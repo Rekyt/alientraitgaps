@@ -1,3 +1,6 @@
+library("ggplot2")
+library("patchwork")
+
 pfig1_trait_heatmap_and_freq = patchwork::wrap_plots(
   fig_combined_trait_heatmap, fig_species_per_trait_combined,
   tag_level = "new", nrow = 1, widths = c(1, 1.618)
@@ -24,3 +27,23 @@ ggsave(
   height = 618, width = 1000, units = "mm", scale = 1/4, dpi = 500
 )
 
+
+# Figure 2/3 proportion of combination versus status and widenspreadness
+
+pfig3_trait_comb_prop_status_regions = patchwork::wrap_plots(
+  targets::tar_read(fig_status_prop_comb),
+  targets::tar_read(fig_widest_range_trait_comb_prop),
+  tag_level = "new", ncol = 1
+) &
+  theme_bw(base_size = 25) &
+  theme(
+    legend.position = "top",
+    panel.grid.minor = element_blank(),
+    panel.grid.major.y = element_blank()
+  )
+
+ggsave(
+  "../poster_alientraitgaps_sfe_metz_2022/fig_status_widespread_trait_prop.svg",
+  pfig3_trait_comb_prop_status_regions,
+  width = 315, height = 260, units = "mm"
+)
