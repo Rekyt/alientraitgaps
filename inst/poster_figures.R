@@ -73,7 +73,8 @@ actual_map = mainland_pivot %>%
         has_lhs_prop      = "LHS Traits",
         prop_with_any_trait = "Any trait"
       )
-    )
+    ),
+    nrow = 1
   ) +
   scale_fill_viridis_b(
     name = "Proportion of alien species\nwith trait combination",
@@ -100,8 +101,8 @@ ggsave(
 
 ggsave(
   "../poster_alientraitgaps_sfe_metz_2022/fig_map_prop_trait_regions.png",
-  tar_read(fig_map_prop_trait_regions),
-  height = 618, width = 1000, units = "mm", scale = 1/4, dpi = 500
+  actual_map,
+  height = 128, width = 741, units = "mm", scale = 3/4, dpi = 500
 )
 
 
