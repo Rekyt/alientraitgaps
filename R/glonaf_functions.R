@@ -312,7 +312,7 @@ extract_species_regions_table = function(glonaf_con, match_glonaf_tnrs) {
     distinct(OBJIDsic, status_name, genus, epithet, author_name) %>%
     mutate(
       full_name = paste(genus, epithet, author_name) %>%
-        iconv("utf-8", "latin1")
+        stringi::stri_trans_general("Latin-ASCII")
     ) %>%
     inner_join(
       match_glonaf_tnrs %>%
