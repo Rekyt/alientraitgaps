@@ -316,6 +316,10 @@ extract_species_regions_table = function(glonaf_con, match_glonaf_tnrs) {
     ) %>%
     inner_join(
       match_glonaf_tnrs %>%
+        mutate(
+          Name_submitted = Name_submitted %>%
+            {gsub("  ", ", ", ., fixed = TRUE)}
+        ) %>%
         distinct(Name_submitted, species = Accepted_name),
       by = c(full_name = "Name_submitted")
     ) %>%
