@@ -301,7 +301,7 @@ list(
     combined_growth_form,
     extract_growth_form(
       combined_traits, glonaf_bien_traits, gift_traits_final, gift_names_traits,
-      harmonized_gift_glonaf, match_glonaf_tnrs
+      harmonized_gift_glonaf, match_glonaf_tnrs, glonaf_list
     )
   ),
   tar_target(
@@ -313,7 +313,7 @@ list(
   tar_target(
     combined_traits_taxonomy,
     get_glonaf_higher_taxonomy_combined_traits(
-      combined_traits, match_glonaf_tnrs, glonaf_alien_species
+      combined_traits, match_glonaf_tnrs, glonaf_alien_species, glonaf_list
     )
   ),
 

@@ -23,13 +23,20 @@ extract_gift_names_with_traits = function(gift_traits_final, gift_names) {
 
 harmonize_gift_glonaf = function(match_gift_tnrs, match_glonaf_tnrs) {
   match_gift_tnrs %>%
-    distinct(name_init_gift        = Name_submitted,
-             species_accepted_gift = Accepted_species) %>%
+    distinct(
+      gift_id = id,
+      name_init_gift        = Name_submitted,
+      species_accepted_gift = Accepted_species
+    ) %>%
     inner_join(
       match_glonaf_tnrs %>%
-        distinct(name_init_glonaf        = Name_submitted,
-                 species_accepted_glonaf = Accepted_species),
-      by = c(species_accepted_gift = "species_accepted_glonaf")) %>%
+        distinct(
+          glonaf_id = id,
+          name_init_glonaf        = Name_submitted,
+          species_accepted_glonaf = Accepted_species
+        ),
+      by = c(species_accepted_gift = "species_accepted_glonaf")
+    ) %>%
     filter(species_accepted_gift != "")
 }
 

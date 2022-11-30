@@ -76,8 +76,14 @@ extract_glonaf_list = function(glonaf_alien_species) {
 }
 
 get_glonaf_higher_taxonomy_combined_traits = function(
-    combined_traits, match_glonaf_tnrs, glonaf_alien_species
+    combined_traits, match_glonaf_tnrs, glonaf_alien_species, glonaf_list
 ) {
+
+  # Reconstruct GloNAF df
+  glonaf_names_df = data.frame(
+    id           = paste0("glonaf-", seq_along(glonaf_list)),
+    species_name = glonaf_list
+  )
 
   glonaf_con = connect_glonaf_db()
 
@@ -85,9 +91,9 @@ get_glonaf_higher_taxonomy_combined_traits = function(
     distinct(species) %>%
     full_join(
       match_glonaf_tnrs %>%
-        select(Name_submitted, Name_matched) %>%
-        mutate(Name_matched = iconv(Name_matched, "utf-8", "latin1")),
-      by = c(species = "Name_matched")
+        inner_join(glonaf_names_df, by = c(ID = "id")) %>%
+        select(Name_submitted = species_name, species = Accepted_species),
+      by = "species"
     ) %>%
     full_join(
       glonaf_alien_species %>%

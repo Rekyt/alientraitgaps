@@ -10,6 +10,7 @@ harmonize_try_glonaf_species = function(match_try_tnrs, match_glonaf_tnrs) {
   # Subset most important columns
   sub_try = match_try_tnrs %>%
     distinct(
+      try_id               = id,
       name_init_try        = Name_submitted,
       status_try           = Taxonomic_status,
       name_accepted_try    = Accepted_name,
@@ -19,6 +20,7 @@ harmonize_try_glonaf_species = function(match_try_tnrs, match_glonaf_tnrs) {
 
   sub_glonaf = match_glonaf_tnrs %>%
     distinct(
+      glonaf_id               = id,
       name_init_glonaf        = Name_submitted,
       status_glonaf           = Taxonomic_status,
       name_accepted_glonaf    = Accepted_name,

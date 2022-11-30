@@ -415,9 +415,11 @@ count_specific_trait_combinations = function(combined_traits, match_glonaf_tnrs,
   combined_traits %>%
     group_by(species) %>%
     summarise(traits = list(consolidated_name)) %>%
-    right_join(match_glonaf_tnrs %>%
-                 select(Name_matched),
-               by = c(species = "Name_matched")) %>%
+    right_join(
+      match_glonaf_tnrs %>%
+        select(species = Accepted_species),
+      by = "species"
+    ) %>%
     rowwise() %>%
     mutate(
       in_glonaf              = TRUE,
@@ -440,8 +442,14 @@ count_specific_trait_combinations = function(combined_traits, match_glonaf_tnrs,
 # Function to create a unified growth form dataset to use downstream
 extract_growth_form = function(
   combined_traits, glonaf_bien_traits, gift_traits_final, gift_names_traits,
-  harmonized_gift_glonaf, match_glonaf_tnrs
+  harmonized_gift_glonaf, match_glonaf_tnrs, glonaf_list
 ) {
+  # Reconstruct GloNAF df
+  glonaf_names_df = data.frame(
+    id           = paste0("glonaf-", seq_along(glonaf_list)),
+    species_name = glonaf_list
+  )
+
   # Extract growth form data from BIEN
   bien_growth_form = glonaf_bien_traits %>%
     filter(grepl("whole plant growth form",trait_name)) %>%
@@ -506,6 +514,7 @@ extract_growth_form = function(
     # Add GloNAF species that show NO trait data
     full_join(
       match_glonaf_tnrs %>%
+        inner_join(glonaf_names_df, by = "id") %>%
         distinct(species = Accepted_species),
       by = "species"
     ) %>%
