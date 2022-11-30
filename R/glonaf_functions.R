@@ -318,9 +318,10 @@ extract_species_regions_table = function(glonaf_con, match_glonaf_tnrs) {
       match_glonaf_tnrs %>%
         mutate(
           Name_submitted = Name_submitted %>%
-            {gsub("  ", ", ", ., fixed = TRUE)}
+            {gsub("  ", ", ", ., fixed = TRUE)} %>%
+            stringi::stri_trans_general("Latin-ASCII")
         ) %>%
-        distinct(Name_submitted, species = Accepted_name),
+        distinct(Name_submitted, species = Accepted_species),
       by = c(full_name = "Name_submitted")
     ) %>%
     distinct(species, status_name, OBJIDsic) %>%

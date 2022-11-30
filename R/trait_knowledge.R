@@ -35,7 +35,7 @@ assemble_trait_knowledge_df = function(
 ) {
 
   all_unified_species = match_glonaf_tnrs %>%
-    distinct(species = Accepted_name)
+    distinct(species = Accepted_species)
 
   number_measured_traits = combined_traits %>%
     group_by(species) %>%
@@ -50,7 +50,8 @@ assemble_trait_knowledge_df = function(
     # Replace problematic NAs by 0s
     mutate(
       across(n_traits:n_invasive_regions, .fns = ~tidyr::replace_na(.x, 0))
-    )
+    ) %>%
+    filter(species != "")
 
 }
 

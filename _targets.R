@@ -494,7 +494,7 @@ list(
   ),
   tar_target(
     species_socioecovars,
-    combine_species_socioecovars (
+    combine_species_socioecovars(
       glonaf_species_regions, glonaf_road_density, glonaf_pop_density,
       glonaf_pop_count, glonaf_gdp_research
     )

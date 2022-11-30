@@ -506,7 +506,7 @@ extract_growth_form = function(
     # Add GloNAF species that show NO trait data
     full_join(
       match_glonaf_tnrs %>%
-        distinct(species = Accepted_name),
+        distinct(species = Accepted_species),
       by = "species"
     ) %>%
     # Add growth trait datasets
