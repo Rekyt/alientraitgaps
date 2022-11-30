@@ -1,3 +1,11 @@
+get_tnrs_values = function(species_list, prefix = "a") {
+  data.frame(
+    id             = paste0(prefix, "-", seq_along(species_list)),
+    species_name = species_list
+  ) %>%
+    TNRS::TNRS()
+}
+
 harmonize_try_glonaf_species = function(match_try_tnrs, match_glonaf_tnrs) {
   # Subset most important columns
   sub_try = match_try_tnrs %>%

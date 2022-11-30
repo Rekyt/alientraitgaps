@@ -68,7 +68,6 @@ get_glonaf_species_list = function(glonaf_con) {
 
 extract_glonaf_list = function(glonaf_alien_species) {
   glonaf_alien_species %>%
-    filter(name == "accepted") %>%
     distinct(genus, epithet, author_name) %>%
     mutate(full_name = paste(genus, epithet, author_name)) %>%
     pull(full_name) %>%
@@ -248,7 +247,17 @@ select_glonaf_mainland_large_islands = function(
     )
 }
 
-extract_species_regions_table = function(glonaf_con, match_glonaf_tnrs) {
+extract_species_regions_table = function(
+    glonaf_con, match_glonaf_tnrs, glonaf_list
+) {
+
+  # Reconstruct GloNAF df
+  glonaf_names_df = data.frame(
+    id           = paste0("glonaf-", seq_along(glonaf_list)),
+    species_name = glonaf_list
+  )
+
+  # Extract all regions for all species referenced in GloNAF
   species_regions = tbl(glonaf_con, "flora_orig") %>%
     # Get taxa that are referenced as naturalized, alien, or invasive
     filter(status_id %in% c(2, 4, 5, 7)) %>%
@@ -307,22 +316,20 @@ extract_species_regions_table = function(glonaf_con, match_glonaf_tnrs) {
     collect()
 
   discon(glonaf_con)
-
+  # Merge this information based on
   species_regions %>%
     distinct(OBJIDsic, status_name, genus, epithet, author_name) %>%
     mutate(
-      full_name = paste(genus, epithet, author_name) %>%
-        stringi::stri_trans_general("Latin-ASCII")
+      full_name = paste(genus, epithet, author_name)
     ) %>%
     inner_join(
       match_glonaf_tnrs %>%
-        mutate(
-          Name_submitted = Name_submitted %>%
-            {gsub("  ", ", ", ., fixed = TRUE)} %>%
-            stringi::stri_trans_general("Latin-ASCII")
+        inner_join(
+          glonaf_names_df,
+          by = c(ID = "id")
         ) %>%
-        distinct(Name_submitted, species = Accepted_species),
-      by = c(full_name = "Name_submitted")
+        distinct(species_name, species = Accepted_species),
+      by = c(full_name = "species_name")
     ) %>%
     distinct(species, status_name, OBJIDsic) %>%
     select(OBJIDsic, status_name, species) %>%

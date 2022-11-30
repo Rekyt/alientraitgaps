@@ -153,16 +153,16 @@ list(
 
   # TNRS Matching: Harmonize Taxonomies against TNRS ---------------------------
   tar_target(
-    match_try_tnrs, TNRS::TNRS(try_list)
+    match_try_tnrs, get_tnrs_values(try_list, "try")
   ),
   tar_target(
-    match_glonaf_tnrs, TNRS::TNRS(glonaf_list)
+    match_glonaf_tnrs, get_tnrs_values(glonaf_list, "glonaf")
   ),
   tar_target(
-    match_austraits_tnrs, TNRS::TNRS(austraits_list),
+    match_austraits_tnrs, get_tnrs_values(austraits_list, "austraits"),
   ),
   tar_target(
-    match_gift_tnrs, TNRS::TNRS(gift_sublist)
+    match_gift_tnrs, get_tnrs_values(gift_sublist, "gift")
   ),
 
   # TRY traits -----------------------------------------------------------------
@@ -398,7 +398,9 @@ list(
   ),
   tar_target(
     glonaf_species_regions_status,
-    extract_species_regions_table(connect_glonaf_db(), match_glonaf_tnrs)
+    extract_species_regions_table(
+      connect_glonaf_db(), match_glonaf_tnrs, glonaf_list
+    )
   ),
   tar_target(
     glonaf_species_regions,
