@@ -1,14 +1,14 @@
 harmonize_austraits_glonaf = function(match_austraits_tnrs, match_glonaf_tnrs) {
   match_austraits_tnrs %>%
     distinct(
-      austraits_id               = id,
+      austraits_id               = ID,
       name_init_austraits        = Name_submitted,
       species_accepted_austraits = Accepted_species
     ) %>%
     inner_join(
       match_glonaf_tnrs %>%
         distinct(
-          glonaf_id = id,
+          glonaf_id = ID,
           name_init_glonaf        = Name_submitted,
           species_accepted_glonaf = Accepted_species
         ),
