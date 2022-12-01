@@ -71,8 +71,7 @@ extract_glonaf_list = function(glonaf_alien_species) {
     distinct(genus, epithet, author_name) %>%
     mutate(full_name = paste(genus, epithet, author_name)) %>%
     pull(full_name) %>%
-    unique() %>%
-    iconv("utf-8", "latin1")
+    unique()
 }
 
 get_glonaf_higher_taxonomy_combined_traits = function(
