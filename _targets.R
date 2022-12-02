@@ -473,25 +473,25 @@ list(
   tar_target(
     glonaf_road_density,
     extract_road_density_glonaf_regions(
-      unified_glonaf_regions, road_density_file
+      glonaf_regions, road_density_file
     )
   ),
   tar_target(
     glonaf_gdp_research,
     get_world_bank_indicators_on_glonaf(
-      avg_socioeco, unified_glonaf_regions
+      avg_socioeco, glonaf_regions
     )
   ),
   tar_target(
     glonaf_pop_count,
     extract_pop_count_glonaf_regions(
-      unified_glonaf_regions, population_count_file
+      glonaf_regions, population_count_file
     )
   ),
   tar_target(
     glonaf_pop_density,
     extract_pop_density_glonaf_regions(
-      unified_glonaf_regions, population_density_file
+      glonaf_regions, population_density_file
     )
   ),
   tar_target(

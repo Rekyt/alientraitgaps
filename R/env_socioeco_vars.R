@@ -61,10 +61,17 @@ get_world_bank_indicators_on_glonaf = function(
       by = c(iso_a3 = "iso3c")
     )
 
+  unified_glonaf_regions = unified_glonaf_regions %>%
+    sf::st_transform(
+      sf::st_crs("+proj=eqearth")
+    )
+
   # Combine WDI with Unified
   unified_glonaf_regions %>%
-    sf::st_join(world_sf %>%
-                  sf::st_transform(sf::st_crs(unified_glonaf_regions))) %>%
+    sf::st_join(
+      world_sf %>%
+        sf::st_transform(sf::st_crs(unified_glonaf_regions))
+    ) %>%
     as.data.frame() %>%
     select(OBJIDsic, IDregion, research_expenditure_perc_gdp:gdp_per_capita) %>%
     group_by(OBJIDsic, IDregion) %>%
