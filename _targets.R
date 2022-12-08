@@ -254,6 +254,34 @@ list(
     gift_trait_per_species,
     count_gift_trait_per_species(gift_glonaf_traits)
   ),
+  # Getting GIFT up-to-date
+  tar_target(
+    gift_version,
+    "2.2"
+  ),
+  tar_target(
+    gift_api,
+    Sys.getenv("GIFT_RESTRICTED_API")
+  ),
+  tar_target(
+    gift_all_species,
+    GIFT::GIFT_species(gift_api, GIFT_version = gift_version)
+  ),
+  tar_target(
+    gift_current_trait_meta,
+    GIFT::GIFT_traits_meta(gift_api, gift_version)
+  ),
+  tar_target(
+    gift_shape,
+    GIFT::GIFT_shape(api = gift_api, GIFT_version = gift_version)
+  ),
+  tar_target(
+    gift_all_raw_traits,
+    GIFT::GIFT_traits_raw(
+      gift_current_trait_meta[["Lvl3"]], api = gift_api,
+      GIFT_version = gift_version
+    )
+  ),
 
 
   # Consolidate Trait Names ----------------------------------------------------
