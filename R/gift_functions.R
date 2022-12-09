@@ -1,5 +1,11 @@
 # Functions to wrangle GIFT trait data specifically
 
+extract_raw_gift_species = function(gift_all_raw_traits) {
+  gift_all_raw_traits %>%
+    distinct(orig_ID, genus, species_epithet, author, subtaxon) %>%
+    mutate(full_name = paste(genus, species_epithet, subtaxon, author))
+}
+
 extract_gift_species_names = function(gift_names) {
   gift_names %>%
     select(genus, species_epithet, subtaxon, author) %>%

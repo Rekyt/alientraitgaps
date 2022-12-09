@@ -164,6 +164,9 @@ list(
   tar_target(
     match_gift_tnrs, get_tnrs_values(gift_sublist, "gift")
   ),
+  tar_target(
+    match_raw_gift_tnrs, get_tnrs_values(gift_raw_list, "gift-raw")
+  ),
 
   # TRY traits -----------------------------------------------------------------
   # Harmonize TRY and GloNAF
@@ -281,6 +284,14 @@ list(
       gift_current_trait_meta[["Lvl3"]], api = gift_api,
       GIFT_version = gift_version
     )
+  ),
+  tar_target(
+    gift_raw_species,
+    extract_raw_gift_species(gift_all_raw_traits)
+  ),
+  tar_target(
+    gift_raw_list,
+    gift_raw_species[["full_name"]]
   ),
 
 
