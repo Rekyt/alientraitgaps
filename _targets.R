@@ -297,6 +297,12 @@ list(
     gift_checklists,
     retrieve_all_gift_checklists(gift_api, gift_version)
   ),
+  tar_target(
+    gift_matched_taxonomy,
+    match_taxonomy_checklists_raw(
+      gift_all_raw_traits, gift_raw_species, gift_raw_list, match_raw_gift_tnrs
+    )
+  ),
 
 
   # Consolidate Trait Names ----------------------------------------------------
