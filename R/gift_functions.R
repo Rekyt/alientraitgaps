@@ -3,7 +3,13 @@
 extract_raw_gift_species = function(gift_all_raw_traits) {
   gift_all_raw_traits %>%
     distinct(orig_ID, genus, species_epithet, author, subtaxon) %>%
-    mutate(full_name = paste(genus, species_epithet, subtaxon, author))
+    mutate(
+      full_name = paste(
+      genus, species_epithet,
+      ifelse(!is.na(author), author, ""),
+      ifelse(!is.na(subtaxon), subtaxon, "")
+    )
+  )
 }
 
 extract_gift_species_names = function(gift_names) {
@@ -25,6 +31,19 @@ extract_gift_names_with_traits = function(gift_traits_final, gift_names) {
         distinct(work_ID),
       by = "work_ID"
     )
+}
+
+retrieve_all_gift_checklists = function(gift_api, gift_version) {
+  GIFT::GIFT_checklist(
+    taxon_name = "Tracheophyta",
+    complete_taxon = FALSE,
+    floristic_group = "all",
+    complete_floristic = FALSE,
+    geo_type = "All",
+    suit_geo = FALSE,
+    api = gift_api,
+    GIFT_version = gift_version
+  )
 }
 
 harmonize_gift_glonaf = function(match_gift_tnrs, match_glonaf_tnrs) {
