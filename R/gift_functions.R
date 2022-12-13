@@ -73,6 +73,19 @@ match_taxonomy_checklists_raw = function(
     full_join(original_names, by = "orig_ID")
 }
 
+match_checklist = function(gift_matched_taxonomy, gift_checklists) {
+  gift_checklists[[2]] %>%
+    full_join(
+      gift_matched_taxonomy %>%
+        distinct(work_ID, genus_ID, work_species, Accepted_species),
+      by = c("work_ID", "genus_ID", "work_species")
+    ) %>%
+    distinct(
+      ref_ID, list_ID, entity_ID, Accepted_species, native, naturalized,
+      endemic_list
+    )
+}
+
 
 harmonize_gift_glonaf = function(match_gift_tnrs, match_glonaf_tnrs) {
   match_gift_tnrs %>%

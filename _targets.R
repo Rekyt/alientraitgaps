@@ -303,7 +303,10 @@ list(
       gift_all_raw_traits, gift_raw_species, gift_raw_list, match_raw_gift_tnrs
     )
   ),
-
+  tar_target(
+    gift_matched_checklists,
+    match_checklist(gift_matched_taxonomy, gift_checklists)
+  ),
 
   # Consolidate Trait Names ----------------------------------------------------
   tar_target(
