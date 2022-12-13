@@ -55,19 +55,19 @@ match_taxonomy_checklists_raw = function(
     distinct(orig_ID, name_ID, work_ID, genus_ID, work_species)
 
   # Correspondence between original names and used string to match them
-  subitted_names = gift_raw_species %>%
+  submitted_names = gift_raw_species %>%
     distinct(orig_ID, full_name) %>%
     inner_join(
       gift_raw_list %>%
-        tibble::enframe("full_name", "other_id") %>%
-        mutate(ID = paste0("gift-raw", row_number())) %>%
-        select(ID, orig_ID, full_name),
+        tibble::enframe("other_id", "full_name") %>%
+        mutate(ID = paste0("gift-raw-", row_number())) %>%
+        select(ID, full_name),
       by = "full_name"
     )
 
   # Make full correspondence between original names and rematched ones
   match_raw_gift_tnrs %>%
-    full_join(subitted_names, by = "ID") %>%
+    full_join(submitted_names, by = "ID") %>%
     select(orig_ID, Accepted_species) %>%
     # Add 'work_ID' for prematched names to retrieve in checklists
     full_join(original_names, by = "orig_ID")
