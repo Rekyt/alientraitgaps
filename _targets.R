@@ -307,6 +307,10 @@ list(
     gift_matched_checklists,
     match_checklist(gift_matched_taxonomy, gift_checklists)
   ),
+  tar_target(
+    gift_unified_distribution,
+    simplify_gift_distribution(gift_matched_checklists)
+  ),
 
   # Consolidate Trait Names ----------------------------------------------------
   tar_target(

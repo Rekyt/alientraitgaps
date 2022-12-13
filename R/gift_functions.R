@@ -86,6 +86,38 @@ match_checklist = function(gift_matched_taxonomy, gift_checklists) {
     )
 }
 
+simplify_gift_distribution = function(gift_matched_checklists) {
+
+  # Simplify species status per polygon
+  # The code smells but comes from GIFT::GIFT_species_distribution()
+  # Couldn't simplify it with case_when() or order functions
+  gift_matched_checklists %>%
+    filter(Accepted_species != "") %>%
+    group_by(entity_ID, Accepted_species) %>%
+    dplyr::mutate(
+      conflict_native       = ifelse(length(unique(native)) > 1, 1, 0),
+      conflict_naturalized  = ifelse(length(unique(naturalized)) > 1, 1, 0),
+      conflict_endemic_list = ifelse(length(unique(endemic_list)) > 1, 1, 0),
+      native = ifelse(
+        1 %in% native, 1,
+        ifelse(0 %in% native, 0, NA)
+      ),
+      naturalized = ifelse(
+        0 %in% naturalized, 0,
+        ifelse(1 %in% naturalized, 1, NA)
+      ),
+      endemic_list = ifelse(
+        0 %in% endemic_list, 0,
+        ifelse(1 %in% endemic_list, 1, NA)
+      )
+    ) %>%
+    distinct(native, naturalized, endemic_list, .keep_all = TRUE) %>%
+    ungroup() %>%
+    select(-ref_ID, -list_ID) %>%
+    distinct() %>%
+    select(entity_ID, Accepted_species, everything())
+
+}
 
 harmonize_gift_glonaf = function(match_gift_tnrs, match_glonaf_tnrs) {
   match_gift_tnrs %>%
