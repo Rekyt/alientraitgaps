@@ -173,16 +173,21 @@ get_gift_socioecovars = function(gift_api, gift_version) {
 compute_gift_species_socioecovars = function(
     gift_socioecovars, gift_unified_distribution
 ) {
+
   gift_unified_distribution %>%
-    inner_join(gift_socioecovars, by = "entity_ID") %>%
     select(entity_ID, Accepted_species, status) %>%
+    inner_join(gift_socioecovars, by = "entity_ID") %>%
     group_by(Accepted_species) %>%
     summarise(
       across(
         mean_hf_v2geo:mean_access_cities_2015, .fns = ~ mean(.x, na.rm = TRUE)
       ),
-      area = sum(area),
+      area = sum(as.numeric(area)),
+      n_total  = n(),
       n_native = sum(status == "native"),
-      n_naturalized = sum(status == "naturalized")
+      n_naturalized = sum(status == "naturalized"),
+      n_non_native  = sum(status == "non-native"),
+      n_unknown = sum(status == "unknown")
     )
+
 }

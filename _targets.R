@@ -563,7 +563,9 @@ list(
   ),
   tar_target(
     species_gift_socioecovars,
-    compute_gift_species_socioecovars(gift_socioecovars, gift_unified_distribution)
+    compute_gift_species_socioecovars(
+      gift_socioecovars, gift_unified_distribution
+    )
   ),
 
   # Make figures ---------------------------------------------------------------
