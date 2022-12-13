@@ -157,3 +157,32 @@ combine_species_socioecovars = function(
     select(-matches("[0-9]+"))
 
 }
+
+get_gift_socioecovars = function(gift_api, gift_version) {
+
+  GIFT::GIFT_env(
+    miscellaneous = c("area", "biome"),
+    rasterlayer = c("hf_v2geo", "hii_v2geo", "GDP_PPP_2015",
+                    "access_cities_2015"),
+    GIFT_version = gift_version,
+    api = gift_api
+  )
+
+}
+
+compute_gift_species_socioecovars = function(
+    gift_socioecovars, gift_unified_distribution
+) {
+  gift_unified_distribution %>%
+    inner_join(gift_socioecovars, by = "entity_ID") %>%
+    select(entity_ID, Accepted_species, status) %>%
+    group_by(Accepted_species) %>%
+    summarise(
+      across(
+        mean_hf_v2geo:mean_access_cities_2015, .fns = ~ mean(.x, na.rm = TRUE)
+      ),
+      area = sum(area),
+      n_native = sum(status == "native"),
+      n_naturalized = sum(status == "naturalized")
+    )
+}

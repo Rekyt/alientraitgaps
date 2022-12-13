@@ -115,7 +115,16 @@ simplify_gift_distribution = function(gift_matched_checklists) {
     ungroup() %>%
     select(-ref_ID, -list_ID) %>%
     distinct() %>%
-    select(entity_ID, Accepted_species, everything())
+    select(entity_ID, Accepted_species, everything()) %>%
+    mutate(status = case_when(
+      native == 1 & naturalized == 0     ~ "native",
+      native == 1 & is.na(naturalized)   ~ "native",
+      native == 0 & is.na(naturalized)   ~ "non-native",
+      native == 0 & naturalized == 1     ~ "naturalized",
+      native == 0 & naturalized == 0     ~ "non-native",
+      is.na(native) & is.na(naturalized) ~ "unknown",
+      TRUE                               ~ "unknown"
+    ))
 
 }
 

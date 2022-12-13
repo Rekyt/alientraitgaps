@@ -557,6 +557,14 @@ list(
       glonaf_pop_count, glonaf_gdp_research
     )
   ),
+  tar_target(
+    gift_socioecovars,
+    get_gift_socioecovars(gift_api, gift_version)
+  ),
+  tar_target(
+    species_gift_socioecovars,
+    compute_gift_species_socioecovars(gift_socioecovars, gift_unified_distribution)
+  ),
 
   # Make figures ---------------------------------------------------------------
   tar_target(
