@@ -3,7 +3,7 @@ get_tnrs_values = function(species_list, prefix = "a") {
     id             = paste0(prefix, "-", seq_along(species_list)),
     species_name = species_list
   ) %>%
-    TNRS::TNRS()
+    TNRS::TNRS(sources = c("wcvp", "wfo"))
 }
 
 harmonize_try_glonaf_species = function(match_try_tnrs, match_glonaf_tnrs) {
