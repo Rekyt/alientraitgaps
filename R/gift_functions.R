@@ -41,6 +41,7 @@ retrieve_all_gift_checklists = function(gift_api, gift_version) {
     complete_floristic = FALSE,
     geo_type = "All",
     suit_geo = FALSE,
+    namesmatched = TRUE,
     api = gift_api,
     GIFT_version = gift_version
   )
