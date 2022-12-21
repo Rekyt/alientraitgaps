@@ -286,16 +286,16 @@ list(
     )
   ),
   tar_target(
+    gift_checklists,
+    retrieve_all_gift_checklists(gift_api, gift_version)
+  ),
+  tar_target(
     gift_raw_species,
-    extract_raw_gift_species(gift_all_raw_traits)
+    extract_raw_gift_species(gift_all_raw_traits, gift_checklists)
   ),
   tar_target(
     gift_raw_list,
     gift_raw_species[["full_name"]]
-  ),
-  tar_target(
-    gift_checklists,
-    retrieve_all_gift_checklists(gift_api, gift_version)
   ),
   tar_target(
     gift_matched_taxonomy,

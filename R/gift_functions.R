@@ -1,7 +1,8 @@
 # Functions to wrangle GIFT trait data specifically
 
-extract_raw_gift_species = function(gift_all_raw_traits) {
-  gift_all_raw_traits %>%
+extract_raw_gift_species = function(gift_all_raw_traits, gift_checklists) {
+
+  traits_raw_species = gift_all_raw_traits %>%
     distinct(orig_ID, genus, species_epithet, author, subtaxon) %>%
     mutate(
       full_name = paste(
@@ -10,6 +11,24 @@ extract_raw_gift_species = function(gift_all_raw_traits) {
       ifelse(!is.na(subtaxon), subtaxon, "")
     )
   )
+
+  checklists_raw_species = gift_checklists[[2]] %>%
+    distinct(orig_ID, genus, species_epithet, author, subtaxon) %>%
+    mutate(
+      full_name = paste(
+        genus, species_epithet,
+        ifelse(!is.na(author), author, ""),
+        ifelse(!is.na(subtaxon), subtaxon, "")
+      ) %>%
+        trimws(which = "both")
+    )
+
+  traits_raw_species %>%
+    bind_rows(
+      checklists_raw_species
+    ) %>%
+    distinct(orig_ID, genus, species_epithet, author, subtaxon, full_name)
+
 }
 
 extract_gift_species_names = function(gift_names) {
