@@ -176,7 +176,7 @@ compute_gift_species_socioecovars = function(
 
   gift_unified_distribution %>%
     select(entity_ID, Accepted_species, status) %>%
-    inner_join(gift_socioecovars, by = "entity_ID") %>%
+    full_join(gift_socioecovars, by = "entity_ID") %>%
     group_by(Accepted_species) %>%
     summarise(
       across(
