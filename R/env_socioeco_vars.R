@@ -191,3 +191,16 @@ compute_gift_species_socioecovars = function(
     )
 
 }
+
+combine_socioecovars = function(
+  species_socioecovars, species_gift_socioecovars
+) {
+
+  species_socioecovars %>%
+    distinct(species) %>%
+    left_join(
+      species_gift_socioecovars,
+      by = c(species = "Accepted_species")
+    )
+
+}

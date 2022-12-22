@@ -424,8 +424,8 @@ list(
   tar_target(
     trait_knowledge_df,
     assemble_trait_knowledge_df(
-      combined_traits, alien_range_size, invasive_range_size,
-      simplified_growth_form, species_socioecovars, match_glonaf_tnrs
+      combined_traits, simplified_growth_form, species_final_socioecovars,
+      match_glonaf_tnrs
     )
   ),
   tar_target(
@@ -565,6 +565,12 @@ list(
     species_gift_socioecovars,
     compute_gift_species_socioecovars(
       gift_socioecovars, gift_unified_distribution
+    )
+  ),
+  tar_target(
+    species_final_socioecovars,
+    combine_socioecovars(
+      species_socioecovars, species_gift_socioecovars
     )
   ),
 
