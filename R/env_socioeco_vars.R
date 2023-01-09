@@ -237,12 +237,18 @@ compute_gift_species_socioecovars = function(
 }
 
 combine_and_filter_socioecovars = function(
-    species_gift_count_socioecovars, species_gift_socioecovars
+    species_socioecovars, species_gift_count_socioecovars,
+    species_gift_socioecovars
 ) {
 
-  species_gift_count_socioecovars %>%
-    filter(prop_n_described >= 0.8) %>%
-    distinct(species = Accepted_species) %>%
+  species_socioecovars %>%
+    distinct(species) %>%
+    inner_join(
+      species_gift_count_socioecovars %>%
+        filter(prop_n_described >= 0.8) %>%
+        distinct(species = Accepted_species),
+    by = "species"
+    ) %>%
     left_join(
       species_gift_socioecovars,
       by = c(species = "Accepted_species")

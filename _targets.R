@@ -574,7 +574,8 @@ list(
   tar_target(
     species_final_socioecovars,
     combine_and_filter_socioecovars(
-      species_gift_count_socioecovars, species_gift_socioecovars
+      species_socioecovars, species_gift_count_socioecovars,
+      species_gift_socioecovars
     )
   ),
 

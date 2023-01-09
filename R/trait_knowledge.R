@@ -42,7 +42,7 @@ assemble_trait_knowledge_df = function(
     summarise(n_traits = n())
 
   Reduce(
-    function(x, y) full_join(x, y, by = "species"),
+    function(x, y) inner_join(x, y, by = "species"),
     list(number_measured_traits, simplified_growth_form, species_socioecovars,
          all_unified_species)
   ) %>%
@@ -73,10 +73,12 @@ model_alien_trait_knowledge = function(trait_knowledge_df) {
       across(n_total:mean_access_cities_2015, ~ as.numeric(scale(.x)))
     ) %>%
     {
-      glm(
+      glmmTMB::glmmTMB(
         n_traits ~ simp_form + n_total + n_total_non_native + mean_hii_v2geo +
           mean_GDP_PPP_2015 + mean_access_cities_2015,
-        data = ., family = poisson
+        family    = glmmTMB::nbinom2,
+        ziformula = ~ 0,
+        data      = .
       )
     }
 
