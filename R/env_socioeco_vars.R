@@ -170,6 +170,50 @@ get_gift_socioecovars = function(gift_api, gift_version) {
 
 }
 
+
+count_socioecovars_cover = function(
+    gift_socioecovars, gift_unified_distribution
+) {
+
+  # Transform socioecovars appropriately
+  gift_trans = gift_socioecovars %>%
+    select(-biome) %>%
+    mutate(
+      across(mean_hf_v2geo:mean_access_cities_2015, ~!is.na(.x)),
+      area = as.numeric(area)
+    )
+
+  # Count proportion of range covered
+  gift_unified_distribution %>%
+    select(entity_ID, Accepted_species, status) %>%
+    left_join(gift_trans, by = "entity_ID") %>%
+    group_by(Accepted_species) %>%
+    summarise(
+      # Count number of regions/area of total range
+      n_total = n(),
+      area_total = sum(area, na.rm = TRUE),
+      # Number of regions/area of range with given described variables
+      across(
+        mean_hf_v2geo:mean_access_cities_2015,
+        .fns = list(
+          n_described = ~sum(.x, na.rm = TRUE),
+          area_described = ~sum(area[isTRUE(.x)], na.rm = TRUE)
+        )
+      ),
+      # Minimum range described across all variables
+      min_n_described = min(
+        c_across(ends_with("n_described")), na.rm = TRUE
+      ),
+      min_area_described = min(
+        c_across(ends_with("area_described")), na.rm = TRUE
+      ),
+      # Proportion of range described
+      prop_n_described = min_n_described/n_total,
+      prop_area_described = min_area_described/area_total
+    )
+
+}
+
 compute_gift_species_socioecovars = function(
     gift_socioecovars, gift_unified_distribution
 ) {
@@ -182,12 +226,12 @@ compute_gift_species_socioecovars = function(
       across(
         mean_hf_v2geo:mean_access_cities_2015, .fns = ~ mean(.x, na.rm = TRUE)
       ),
-      area = sum(as.numeric(area)),
-      n_total  = n(),
-      n_native = sum(status == "native"),
+      area          = sum(as.numeric(area)),
+      n_total       = n(),
+      n_native      = sum(status == "native"),
       n_naturalized = sum(status == "naturalized"),
       n_non_native  = sum(status == "non-native"),
-      n_unknown = sum(status == "unknown")
+      n_unknown     = sum(status == "unknown")
     )
 
 }

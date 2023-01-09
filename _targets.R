@@ -562,6 +562,10 @@ list(
     get_gift_socioecovars(gift_api, gift_version)
   ),
   tar_target(
+    species_gift_count_socioecovars,
+    count_socioecovars_cover(gift_socioecovars, gift_unified_distribution)
+  ),
+  tar_target(
     species_gift_socioecovars,
     compute_gift_species_socioecovars(
       gift_socioecovars, gift_unified_distribution
