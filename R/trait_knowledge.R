@@ -62,20 +62,22 @@ model_alien_trait_knowledge = function(trait_knowledge_df) {
 
   trait_knowledge_df %>%
     filter(
-      !is.na(mean_hii_v2geo), !is.na(mean_GDP_PPP_2015),
-      !is.na(mean_access_cities_2015)
+      !is.na(mean_hii_v2geo_mean), !is.na(gdp_mean_native),
+      !is.na(gdp_mean_non_native), !is.na(mean_access_cities_2015_mean)
     ) %>%
     select(
-      species, n_traits, simp_form, n_total, n_total_non_native, mean_hii_v2geo,
-      mean_GDP_PPP_2015, mean_access_cities_2015
+      species, n_traits, simp_form, n_total, n_total_non_native, n_biomes,
+      mean_hii_v2geo_mean, mean_hii_v2geo_sd, gdp_mean_native,
+      gdp_mean_non_native, mean_access_cities_2015_mean
     ) %>%
     mutate(
-      across(n_total:mean_access_cities_2015, ~ as.numeric(scale(.x)))
+      across(n_total:mean_access_cities_2015_mean, ~ as.numeric(scale(.x)))
     ) %>%
     {
       glmmTMB::glmmTMB(
-        n_traits ~ simp_form + n_total + n_total_non_native + mean_hii_v2geo +
-          mean_GDP_PPP_2015 + mean_access_cities_2015,
+        n_traits ~ simp_form + n_total + n_total_non_native + n_biomes +
+          mean_hii_v2geo_mean + mean_hii_v2geo_sd + gdp_mean_native +
+          gdp_mean_non_native + mean_access_cities_2015_mean,
         family    = glmmTMB::nbinom2,
         ziformula = ~ 0,
         data      = .

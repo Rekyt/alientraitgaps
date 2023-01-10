@@ -220,18 +220,29 @@ compute_gift_species_socioecovars = function(
 
   gift_unified_distribution %>%
     select(entity_ID, Accepted_species, status) %>%
-    full_join(gift_socioecovars, by = "entity_ID") %>%
+    right_join(gift_socioecovars, by = "entity_ID") %>%
     group_by(Accepted_species) %>%
     summarise(
       across(
-        mean_hf_v2geo:mean_access_cities_2015, .fns = ~ mean(.x, na.rm = TRUE)
+        mean_hf_v2geo:mean_access_cities_2015,
+        .fns = list(
+          mean            = ~ mean(.x, na.rm = TRUE),
+          sd              = ~ sd(.x, na.rm = TRUE)
+        )
       ),
-      area          = sum(as.numeric(area)),
-      n_total       = n(),
-      n_native      = sum(status == "native"),
-      n_naturalized = sum(status == "naturalized"),
-      n_non_native  = sum(status == "non-native"),
-      n_unknown     = sum(status == "unknown")
+      area                = sum(as.numeric(area)),
+      gdp_mean_native     = mean(
+        mean_GDP_PPP_2015[status == "native"], na.rm = TRUE
+      ),
+      gdp_mean_non_native = mean(
+        mean_GDP_PPP_2015[status != "native"], na.rm = TRUE
+      ),
+      n_biomes            = length(unique(biome)),
+      n_total             = n(),
+      n_native            = sum(status == "native"),
+      n_naturalized       = sum(status == "naturalized"),
+      n_non_native        = sum(status == "non-native"),
+      n_unknown           = sum(status == "unknown")
     )
 
 }
