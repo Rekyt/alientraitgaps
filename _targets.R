@@ -714,5 +714,9 @@ list(
   tar_target(
     pfig4_trait_comb_prop_status_regions,
     assemble_fig4(fig_status_prop_comb, fig_widest_range_trait_comb_prop)
+  ),
+  tar_target(
+    supp_fig2_proportion_species_trait,
+    plot_proportion_species_with_trait(combined_traits, match_glonaf_tnrs)
   )
 )
