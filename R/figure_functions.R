@@ -518,23 +518,52 @@ plot_general_treemap_trait_combination = function(
 
 plot_combined_traits_heatmap = function(combined_traits) {
 
-  # Get combinations of trait measured by species ordered by frequency
-  comb_sp_freq = combined_traits %>%
-    mutate(
-      species_fact = factor(species) %>%
-        forcats::fct_infreq(),
-      trait_fact  = factor(consolidated_name) %>%
-        forcats::fct_infreq(),
-      species_rank = as.numeric(species_fact),
-      trait_rank = as.numeric(trait_fact),
-      value = TRUE
+  # Get all combinations of trait species which shows which has values
+  comb_sp = combined_traits %>%
+    mutate(value = TRUE) %>%
+    full_join(
+      match_glonaf_tnrs %>%
+        distinct(species = Accepted_species) %>%
+        filter(species != "") %>%
+        tidyr::crossing(
+          consolidated_name = combined_traits[["consolidated_name"]]
+        ),
+      by = c("species", "consolidated_name")
     ) %>%
-    select(species_rank, trait_rank, value) %>%
-    tidyr::complete(species_rank, trait_rank,
-                    fill = list(value = FALSE))
+    mutate(value = ifelse(is.na(value), FALSE, value))
+
+  # Species rank
+  sp_rank = comb_sp %>%
+    group_by(species) %>%
+    summarise(n_values = sum(value)) %>%
+    arrange(desc(n_values)) %>%
+    mutate(
+      species_fact = forcats::fct_reorder(
+        species, n_values, max, .desc = TRUE
+      ),
+      species_rank = as.numeric(species_fact)
+    )
+
+  # Trait ranks
+  trait_rank = comb_sp %>%
+    group_by(consolidated_name) %>%
+    summarise(n_values = sum(value)) %>%
+    arrange(desc(n_values)) %>%
+    mutate(
+      trait_fact = forcats::fct_reorder(
+        consolidated_name, n_values, max, .desc = TRUE
+      ),
+      trait_rank = as.numeric(trait_fact)
+    )
+
+  # Get combinations of trait measured by species ordered by frequency
+  comb_sp_freq = comb_sp %>%
+    inner_join(sp_rank, by = "species") %>%
+    inner_join(trait_rank, by = "consolidated_name") %>%
+    distinct(species_rank, trait_rank, value)
 
   # Clean environment
-  rm(combined_traits)
+  rm(combined_traits, sp_rank, trait_rank)
 
   # Plot as a heatmap
   comb_sp_freq %>%
