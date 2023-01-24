@@ -1016,8 +1016,12 @@ plot_map_sd_n_traits_region = function(
       data = island_n_traits,
       size = 2.5, shape = 21, stroke = 1.5
     ) +
-    scale_fill_viridis_b("# Traits SD", trans = "log10") +
-    scale_color_viridis_b("# Traits SD", trans = "log10") +
+    scale_fill_viridis_b(
+      "Standard Deviation of Number of Traits", trans = "log10"
+    ) +
+    scale_color_viridis_b(
+      "Standard Deviation of Number of Traits", trans = "log10"
+    ) +
     guides(
       fill  = guide_bins(title.vjust = 0.8, axis = FALSE, axis.linewidth = 0),
       color = guide_bins(title.vjust = 0.8, axis = FALSE, axis.linewidth = 0)

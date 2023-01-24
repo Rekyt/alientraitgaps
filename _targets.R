@@ -718,5 +718,11 @@ list(
   tar_target(
     supp_fig2_proportion_species_trait,
     plot_proportion_species_with_trait(combined_traits, match_glonaf_tnrs)
+  ),
+  tar_target(
+    supp_fig4_maps_median_sd_n_traits,
+    assemble_maps_number_of_traits(
+      fig_map_median_n_traits_region, fig_map_sd_n_traits_region
+    )
   )
 )

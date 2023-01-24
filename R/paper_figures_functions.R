@@ -74,3 +74,15 @@ plot_proportion_species_with_trait = function(
     theme(aspect.ratio = 1)
 
 }
+
+
+assemble_maps_number_of_traits = function(
+  fig_map_median_n_traits_region, fig_map_sd_n_traits_region
+) {
+  patchwork::wrap_plots(
+    fig_map_median_n_traits_region,
+    fig_map_sd_n_traits_region,
+    nrow = 2, ncol = 1, tag_level = "new"
+  ) +
+    patchwork::plot_annotation(tag_levels = "A")
+}
