@@ -516,7 +516,7 @@ plot_general_treemap_trait_combination = function(
 
 # Missing Traits ---------------------------------------------------------------
 
-plot_combined_traits_heatmap = function(combined_traits) {
+plot_combined_traits_heatmap = function(combined_traits, match_glonaf_tnrs) {
 
   # Get all combinations of trait species which shows which has values
   comb_sp = combined_traits %>%
