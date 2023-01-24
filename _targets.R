@@ -238,15 +238,15 @@ list(
   # Match species names
   tar_target(
     harmonized_gift_glonaf,
-    harmonize_gift_glonaf(match_gift_tnrs, match_glonaf_tnrs)
+    harmonize_gift_glonaf(match_raw_gift_tnrs, match_glonaf_tnrs)
   ),
 
   # GIFT traits for GloNAF species
   tar_target(
     gift_glonaf_traits,
     get_gift_traits_for_glonaf_species(
-      gift_traits_final, gift_names_traits, harmonized_gift_glonaf,
-      gift_traits_meta
+      gift_all_raw_traits, gift_matched_taxonomy, harmonized_gift_glonaf,
+      gift_current_trait_meta
     )
   ),
   tar_target(

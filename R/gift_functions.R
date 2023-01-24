@@ -168,26 +168,31 @@ harmonize_gift_glonaf = function(match_gift_tnrs, match_glonaf_tnrs) {
 }
 
 get_gift_traits_for_glonaf_species = function(
-    gift_traits_final, gift_names_traits, harmonized_gift_glonaf,
-    gift_traits_meta
+    gift_all_raw_traits, gift_matched_taxonomy, harmonized_gift_glonaf,
+    gift_current_trait_meta
 ) {
-  gift_traits_final %>%
+
+
+  # Get raw trait data
+  gift_all_raw_traits %>%
+    distinct(orig_ID, trait_ID) %>%
+    # Add matching name
     inner_join(
-      gift_names_traits %>%
-        distinct(work_ID, species),
-      by = "work_ID"
+      gift_matched_taxonomy,
+      by = "orig_ID"
     ) %>%
+    # Filter GloNAF species
     inner_join(
       harmonized_gift_glonaf %>%
-        distinct(species = name_init_gift, species_accepted_gift),
-      by = "species"
+        distinct(species_accepted_gift),
+      by = c(Accepted_species = "species_accepted_gift")
     ) %>%
     inner_join(
-      gift_traits_meta %>%
+      gift_current_trait_meta %>%
         distinct(trait_ID = Lvl3, Trait2),
       by = "trait_ID"
     ) %>%
-    distinct(species_accepted_gift, Trait2)
+    distinct(species_accepted_gift = Accepted_species, Trait2)
 }
 
 count_gift_species_per_trait = function(gift_glonaf_traits) {
