@@ -352,13 +352,11 @@ plot_taxonomy_treemap_trait_combination = function(
 
   # Pre-process data
   tax_comb = combined_traits_taxonomy %>%
-    mutate(species = ifelse(is.na(species), paste(genus, epithet), species)) %>%
     distinct(species, genus, family) %>%
-    right_join(
+    inner_join(
       contain_trait_combination %>%
         select(-traits),
       by = "species") %>%
-    filter(!is.na(genus)) %>%
     mutate(across(where(is.character), ~iconv(.x, "latin1", to = "UTF-8")))
 
   # Clean environment
@@ -378,16 +376,12 @@ plot_taxonomy_treemap_trait_combination = function(
         )
       )
     ) +
-    treemapify::geom_treemap(color = NA, layout = "scol") +
-    treemapify::geom_treemap_subgroup_border(
-      size = 2, color = "white", layout = "scol"
-    ) +
-    treemapify::geom_treemap_subgroup2_border(
-      size = 1/3, color = "white", layout = "scol"
-    ) +
+    treemapify::geom_treemap(color = NA) +
+    treemapify::geom_treemap_subgroup_border(size = 2, color = "white") +
+    treemapify::geom_treemap_subgroup2_border(size = 1/3, color = "white") +
     treemapify::geom_treemap_subgroup_text(
       place = "centre", grow = TRUE, alpha = 2/3, colour = "black",
-      fontface = "italic", min.size = 7, layout = "scol"
+      fontface = "italic", min.size = 7
     ) +
     scale_fill_manual(
       name = "Trait combination",
@@ -401,8 +395,8 @@ plot_taxonomy_treemap_trait_combination = function(
         "TRUE.TRUE.TRUE.TRUE"     = "Aboveground & Root traits"
       ),
       values = c(
-        "FALSE.FALSE.FALSE.FALSE" = "#f0f0f0",    # No trait
-        "TRUE.FALSE.FALSE.FALSE"  = "#d3d3d3",  # >=1 trait(s)
+        "FALSE.FALSE.FALSE.FALSE" = "#f0f0f0",  # No trait
+        "TRUE.FALSE.FALSE.FALSE"  = "#d3d3d3",  # >=1 trait
         "TRUE.FALSE.FALSE.TRUE"   = "#d25601",  # Root traits
         "TRUE.TRUE.FALSE.FALSE"   = "#9283ac",  # LHS
         "TRUE.TRUE.FALSE.TRUE"    = "#923601",  # LHS + Root
@@ -418,14 +412,15 @@ plot_taxonomy_treemap_number_traits = function(
 ) {
 
   if (logged) {
-    color_scale = scale_fill_viridis_c(
+    color_scale = scale_fill_viridis_b(
       name = "Number of traits",
-      trans = scales::pseudo_log_trans(base = 10),
-      breaks = c(1, 10, 100, 1000)
+      trans = "log10",
+      show.limits = TRUE
     )
   } else {
-    color_scale = scale_fill_viridis_c(
-      name = "Number of traits"
+    color_scale = scale_fill_viridis_b(
+      name = "Number of traits",
+      show.limits = TRUE
     )
   }
 
@@ -433,7 +428,7 @@ plot_taxonomy_treemap_number_traits = function(
   tax_comb = combined_traits_taxonomy %>%
     distinct(species, genus, family) %>%
     inner_join(contain_trait_combination, by = "species") %>%
-    mutate(number_of_traits = purrr::map_int(traits, length)) %>%
+    mutate(n_traits = purrr::map_int(traits, length)) %>%
     mutate(across(where(is.character), ~iconv(.x, "latin1", to = "UTF-8")))
 
 
@@ -443,17 +438,17 @@ plot_taxonomy_treemap_number_traits = function(
   # Actual plot
   tax_comb %>%
     ggplot(
-      aes(area = 1, fill = number_of_traits + 1, label = genus,
-          subgroup = family)
+      aes(area = 1, fill = n_traits + 1, subgroup = family, subgroup2 = genus)
     ) +
     treemapify::geom_treemap(color = NA) +
     treemapify::geom_treemap_subgroup_border(size = 0.5, color = "white") +
     treemapify::geom_treemap_subgroup_text(
-      place = "centre", grow = TRUE, alpha = 0.7, colour = "white",
+      place = "centre", grow = TRUE, alpha = 0.8, colour = "white",
       fontface = "italic", min.size = 0
     ) +
     color_scale +
     theme(legend.position = "top")
+
 }
 
 plot_general_treemap_trait_combination = function(
@@ -485,21 +480,21 @@ plot_general_treemap_trait_combination = function(
         )
       )
     ) +
-    treemapify::geom_treemap(color = NA, layout = "scol") +
+    treemapify::geom_treemap(color = NA) +
     scale_fill_manual(
       name = "Trait combination",
       labels = c(
         "FALSE.FALSE.FALSE.FALSE" = "No trait",
         "TRUE.FALSE.FALSE.FALSE"  = "At least\none trait",
-        "TRUE.FALSE.FALSE.TRUE"   = "Root traits\n(Bergmann et al. 2022)",
-        "TRUE.TRUE.FALSE.FALSE"   = "Leaf-Height-Seed\n(Westoby 1998)",
-        "TRUE.TRUE.FALSE.TRUE"    = "LHS and Root traits",
-        "TRUE.TRUE.TRUE.FALSE"    = "Aboveground traits\n(Díaz et al., 2016)",
-        "TRUE.TRUE.TRUE.TRUE"     = "Aboveground and Root traits"
+        "TRUE.FALSE.FALSE.TRUE"   = "Root traits",
+        "TRUE.TRUE.FALSE.FALSE"   = "Leaf-Height-Seed",
+        "TRUE.TRUE.FALSE.TRUE"    = "LHS & Root traits",
+        "TRUE.TRUE.TRUE.FALSE"    = "Aboveground traits",
+        "TRUE.TRUE.TRUE.TRUE"     = "Aboveground & Root traits"
       ),
       values = c(
-        "FALSE.FALSE.FALSE.FALSE" = "white",    # No trait
-        "TRUE.FALSE.FALSE.FALSE"  = "#d3d3d3",  # >=1 trait(s)
+        "FALSE.FALSE.FALSE.FALSE" = "#f0f0f0",  # No trait
+        "TRUE.FALSE.FALSE.FALSE"  = "#d3d3d3",  # >=1 trait
         "TRUE.FALSE.FALSE.TRUE"   = "#d25601",  # Root traits
         "TRUE.TRUE.FALSE.FALSE"   = "#9283ac",  # LHS
         "TRUE.TRUE.FALSE.TRUE"    = "#923601",  # LHS + Root
