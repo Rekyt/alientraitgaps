@@ -17,7 +17,10 @@ plot_number_species_per_trait_combined = function(combined_traits) {
 
   max_20_traits = combined_traits %>%
     count(consolidated_name, sort = TRUE, name = "n_species") %>%
-    filter(!grepl("Elevational", consolidated_name, fixed = TRUE)) %>%
+    filter(
+      !grepl("Elevational", consolidated_name, fixed = TRUE),
+      !grepl("Habitat", consolidated_name, fixed = TRUE)
+    ) %>%
     slice_max(n_species, n = 20)
 
   total_sp = combined_traits %>%
@@ -33,17 +36,17 @@ plot_number_species_per_trait_combined = function(combined_traits) {
     ggplot(aes(n_species, forcats::fct_reorder(consolidated_name, n_species))) +
     # 50% vertical line
     geom_text(
-      label = "50%", color = "darkblue", x = total_sp/2, y = 20, hjust = -0.5,
-      vjust = 0.6, size = 2.6
+      label = "50%", color = "darkblue", x = total_sp/2, y = 20, hjust = 0.5,
+      vjust = -2, size = rel(3.2)
     ) +
     geom_vline(
-      xintercept = total_sp/2, linetype = 2, color = "darkblue", linewidth = 1
+      xintercept = total_sp/2, linetype = 2, color = "darkblue", linewidth = 2/3
     ) +
     # 100% vertical line
     geom_vline(
-      xintercept = total_sp, linetype = 2, color = "darkred", linewidth = 1
+      xintercept = total_sp, linetype = 2, color = "darkred", linewidth = 2/3
     ) +
-    geom_point() +
+    geom_point(size = 1.2) +
     geom_text(
       aes(label = paste0(round((n_species/total_sp) * 100, 0), "%")),
       hjust = -0.1, size = 2.6, vjust = 0
@@ -60,27 +63,29 @@ plot_number_species_per_trait_combined = function(combined_traits) {
         life_form                    = "Growth Form (cat.)",
         woodiness                    = "Woodiness (cat.)",
         life_history                 = "Life History (cat.)",
-        leaf_type                    = "Leaf Type (cat.)",
         plant_height                 = "Plant Height (cont.)",
+        leaf_type                    = "Leaf Type (cat.)",
         leaf_compoundness            = "Leaf Compoundness (cat.)",
         photosynthetic_pathway       = "Photosynthetic Pathway (cat.)",
         diaspore_mass                = "Seed Mass (cont.)",
-        `Leaflet number per leaf`    = "Leaflet number per leaf (cont.)",
-        dispersal_appendage          = "Fruit Type (cat.)",
-        leaf_phenology               = "Leaf Phenology (cat.)",
-        `Species tolerance to frost` = "Species tolerance to frost (cat.)",
         flowering_time               = "Flowering Phenology (cat.)",
+        dispersal_appendage          = "Fruit Type (cat.)",
+        `Leaflet number per leaf`    = "Leaflet number per leaf (cont.)",
+        leaf_phenology               = "Leaf Phenology (cat.)",
         dispersal_syndrome           = "Fruit Dispersal Syndrome (cat.)",
-        nitrogen_fixing              = "Nitrogen Fixer (bin.)",
+        `Species tolerance to frost` = "Species tolerance to frost (cat.)",
         leaf_length                  = "Leaf Length (cont.)",
-        leaf_width                   = "Leaf Width (cont.)",
+        nitrogen_fixing              = "Nitrogen Fixer (bin.)",
         pollination_syndrome         = "Pollination Syndrome (cat.)",
-        leaf_arrangement             = "Leaf Arrangement (cat.)",
-        sex_type                     = "Flower Sex Syndrome (cat.)"
+        sex_type                     = "Flower Sex Syndrome (cat.)",
+        leaf_width                   = "Leaf Width (cont.)",
+        leaf_arrangement             = "Leaf Arrangement (cat.)"
       )
     ) +
-    labs(title = "20 most frequently measured traits") +
-    theme_bw()
+    theme_bw() +
+    theme(panel.grid.major.x = element_blank(),
+          panel.grid.minor.x = element_blank()) +
+    coord_cartesian(clip = "off")
 }
 
 
