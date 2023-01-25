@@ -410,14 +410,17 @@ get_bergmann_combs = function() {
     purrr::map(as.character)
 }
 
-count_specific_trait_combinations = function(combined_traits, match_glonaf_tnrs,
-                                             bergmann_comb_df) {
+count_specific_trait_combinations = function(
+    combined_traits, match_glonaf_tnrs, bergmann_comb_df
+) {
+
   combined_traits %>%
     group_by(species) %>%
     summarise(traits = list(consolidated_name)) %>%
     right_join(
       match_glonaf_tnrs %>%
-        select(species = Accepted_species),
+        distinct(species = Accepted_species) %>%
+        filter(species != ""),
       by = "species"
     ) %>%
     rowwise() %>%
@@ -436,6 +439,7 @@ count_specific_trait_combinations = function(combined_traits, match_glonaf_tnrs,
         purrr::map_lgl(~ all(.x %in% traits)) %>%
         any()
     )
+
 }
 
 

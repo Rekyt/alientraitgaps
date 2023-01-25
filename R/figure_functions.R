@@ -394,14 +394,14 @@ plot_taxonomy_treemap_trait_combination = function(
       labels = c(
         "FALSE.FALSE.FALSE.FALSE" = "No trait",
         "TRUE.FALSE.FALSE.FALSE"  = "At least\none trait",
-        "TRUE.FALSE.FALSE.TRUE"   = "Root traits\n(Bergmann et al. 2022)",
-        "TRUE.TRUE.FALSE.FALSE"   = "Leaf-Height-Seed\n(Westoby 1998)",
-        "TRUE.TRUE.FALSE.TRUE"    = "LHS and Root traits",
-        "TRUE.TRUE.TRUE.FALSE"    = "Aboveground traits\n(Díaz et al., 2016)",
-        "TRUE.TRUE.TRUE.TRUE"     = "Aboveground and Root traits"
+        "TRUE.FALSE.FALSE.TRUE"   = "Root traits",
+        "TRUE.TRUE.FALSE.FALSE"   = "Leaf-Height-Seed",
+        "TRUE.TRUE.FALSE.TRUE"    = "LHS & Root traits",
+        "TRUE.TRUE.TRUE.FALSE"    = "Aboveground traits",
+        "TRUE.TRUE.TRUE.TRUE"     = "Aboveground & Root traits"
       ),
       values = c(
-        "FALSE.FALSE.FALSE.FALSE" = "white",    # No trait
+        "FALSE.FALSE.FALSE.FALSE" = "#f0f0f0",    # No trait
         "TRUE.FALSE.FALSE.FALSE"  = "#d3d3d3",  # >=1 trait(s)
         "TRUE.FALSE.FALSE.TRUE"   = "#d25601",  # Root traits
         "TRUE.TRUE.FALSE.FALSE"   = "#9283ac",  # LHS
@@ -431,11 +431,9 @@ plot_taxonomy_treemap_number_traits = function(
 
   # Pre-process data
   tax_comb = combined_traits_taxonomy %>%
-    mutate(species = ifelse(is.na(species), paste(genus, epithet), species)) %>%
     distinct(species, genus, family) %>%
-    right_join(contain_trait_combination, by = "species") %>%
+    inner_join(contain_trait_combination, by = "species") %>%
     mutate(number_of_traits = purrr::map_int(traits, length)) %>%
-    filter(!is.na(genus)) %>%
     mutate(across(where(is.character), ~iconv(.x, "latin1", to = "UTF-8")))
 
 
@@ -464,13 +462,11 @@ plot_general_treemap_trait_combination = function(
 
   # Preprocess data
   tax_comb = combined_traits_taxonomy %>%
-    mutate(species = ifelse(is.na(species), paste(genus, epithet), species)) %>%
     distinct(species, genus, family) %>%
-    right_join(
+    inner_join(
       contain_trait_combination %>%
         select(-traits),
       by = "species") %>%
-    filter(!is.na(genus)) %>%
     mutate(across(where(is.character), ~iconv(.x, "latin1", to = "UTF-8")))
 
   # Clean environment

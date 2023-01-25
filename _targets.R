@@ -368,9 +368,7 @@ list(
   # Get higher taxonomy for combined traits
   tar_target(
     combined_traits_taxonomy,
-    get_glonaf_higher_taxonomy_combined_traits(
-      combined_traits, match_glonaf_tnrs, glonaf_alien_species, glonaf_list
-    )
+    get_glonaf_higher_taxonomy_combined_traits(match_glonaf_tnrs)
   ),
 
   # Count number of traits per database

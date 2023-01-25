@@ -74,57 +74,14 @@ extract_glonaf_list = function(glonaf_alien_species) {
     unique()
 }
 
-get_glonaf_higher_taxonomy_combined_traits = function(
-    combined_traits, match_glonaf_tnrs, glonaf_alien_species, glonaf_list
-) {
+get_glonaf_higher_taxonomy_combined_traits = function(match_glonaf_tnrs) {
 
-  # Reconstruct GloNAF df
-  glonaf_names_df = data.frame(
-    id           = paste0("glonaf-", seq_along(glonaf_list)),
-    species_name = glonaf_list
-  )
+  match_glonaf_tnrs %>%
+    distinct(species = Accepted_species, family = Accepted_family) %>%
+    filter(species != "") %>%
+    mutate(genus = stringr::word(species, 1)) %>%
+    select(species, genus, family)
 
-  glonaf_con = connect_glonaf_db()
-
-  combined_traits %>%
-    distinct(species) %>%
-    full_join(
-      match_glonaf_tnrs %>%
-        inner_join(glonaf_names_df, by = c(ID = "id")) %>%
-        select(Name_submitted = species_name, species = Accepted_species),
-      by = "species"
-    ) %>%
-    full_join(
-      glonaf_alien_species %>%
-        select(tpl_id, genus, epithet, author_name) %>%
-        mutate(Name_submitted = paste(genus, epithet, author_name) %>%
-                 iconv("utf-8", "latin1")),
-      by = "Name_submitted"
-    ) %>%
-    left_join(
-      tbl(glonaf_con, "genus") %>%
-        select(genus_id = id, genus = name, family_tpl_id) %>%
-        collect(),
-      by = "genus"
-    ) %>%
-    left_join(
-      tbl(glonaf_con, "family_tpl") %>%
-        rename(family_tpl_id = id, family = name) %>%
-        collect(),
-      by = "family_tpl_id"
-    ) %>%
-    left_join(
-      tbl(glonaf_con, "family_apg") %>%
-        rename(family_apg_id = id, family_apg = name) %>%
-        collect(),
-      by = "family_apg_id"
-    ) %>%
-    left_join(
-      tbl(glonaf_con, "order_apg") %>%
-        rename(order_id = id, order = name) %>%
-        collect(),
-      by = "order_id"
-    )
 }
 
 
