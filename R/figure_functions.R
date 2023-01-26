@@ -467,7 +467,15 @@ plot_general_treemap_trait_combination = function(
       contain_trait_combination %>%
         select(-traits),
       by = "species") %>%
-    mutate(across(where(is.character), ~iconv(.x, "latin1", to = "UTF-8")))
+    mutate(across(where(is.character), ~iconv(.x, "latin1", to = "UTF-8"))) %>%
+    mutate(
+      trait_category = interaction(
+        has_at_least_one_trait, has_lhs, has_diaz, has_bergmann
+      )
+    ) %>%
+    count(trait_category, name = "n_species")
+
+  total = sum(tax_comb[["n_species"]])
 
   # Clean environment
   rm(combined_traits_taxonomy, contain_trait_combination)
@@ -476,16 +484,15 @@ plot_general_treemap_trait_combination = function(
   tax_comb %>%
     ggplot(
       aes(
-        area = 1,
-        fill = interaction(
-          has_at_least_one_trait, has_lhs, has_diaz, has_bergmann
+        area  = n_species, fill = trait_category,
+        label = paste0(
+          "n = ", n_species, "\n(", round(100 * n_species/total, 0), "%)"
         ),
-        label = genus, subgroup = interaction(
-          has_at_least_one_trait, has_lhs, has_diaz, has_bergmann
-        )
+        subgroup = trait_category
       )
     ) +
     treemapify::geom_treemap(color = NA) +
+    treemapify::geom_treemap_text(place = "center") +
     scale_fill_manual(
       name = "Trait combination",
       labels = c(
