@@ -23,7 +23,7 @@ assemble_fig2 = function(fig_treemap_general, fig_trait_combination_taxonomy) {
 assemble_fig3 = function(fig_map_alien_richness, fig_map_prop_trait_regions) {
   patchwork::wrap_plots(
     fig_map_alien_richness, fig_map_prop_trait_regions,
-    tag_level = "new", ncol = 1
+    tag_level = "new", ncol = 1, heights = c(1/3, 2/3)
   ) +
     patchwork::plot_annotation(tag_levels = "A")
 }

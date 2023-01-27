@@ -806,9 +806,9 @@ plot_map_proportion_trait_by_region = function(
       vars(prop_name),
       labeller = labeller(
         prop_name = c(
-          has_bergmann_prop = "Root Traits\n(4 traits, Bergmann et al. 2020)",
-          has_diaz_prop     = "Aboveground traits\n(6 traits, Díaz et al. 2016)",
-          has_lhs_prop      = "Leaf-Height-Seed mass\n(3 traits, Westoby 2002)",
+          has_bergmann_prop   = "Root Traits",
+          has_diaz_prop       = "Aboveground traits",
+          has_lhs_prop        = "Leaf-Height-Seed mass (LHS)",
           prop_with_any_trait = "Any trait"
         )
       )
@@ -826,8 +826,7 @@ plot_map_proportion_trait_by_region = function(
     theme(
       legend.position = "top",
       legend.key.width = unit(2, "lines"),
-      strip.background = element_blank(),
-      plot.margin      = margin(b = 3/11)
+      strip.background = element_blank()
     )
 }
 
