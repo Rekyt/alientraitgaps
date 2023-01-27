@@ -362,7 +362,18 @@ plot_taxonomy_treemap_trait_combination = function(
       contain_trait_combination %>%
         select(-traits),
       by = "species") %>%
-    mutate(across(where(is.character), ~iconv(.x, "latin1", to = "UTF-8")))
+    mutate(
+      across(where(is.character), ~iconv(.x, "latin1", to = "UTF-8")),
+      trait_category = interaction(
+        has_at_least_one_trait, has_lhs, has_diaz, has_bergmann
+      )) %>%
+    count(family, trait_category, name = "n_species") %>%
+    group_by(family) %>%
+    mutate(prop = 100 * n_species/sum(n_species)) %>%
+    ungroup() %>%
+    mutate(
+      plot_label = format(n_species, big.mark = ",", trim = TRUE)
+    )
 
   # Clean environment
   rm(combined_traits_taxonomy, contain_trait_combination)
@@ -371,33 +382,38 @@ plot_taxonomy_treemap_trait_combination = function(
   tax_comb %>%
     ggplot(
       aes(
-        area = 1,
-        fill = interaction(
-          has_at_least_one_trait, has_lhs, has_diaz, has_bergmann
-        ),
-        label = genus, subgroup = family,
-        subgroup2 =  interaction(
-          has_at_least_one_trait, has_lhs, has_diaz, has_bergmann
-        )
+        area  = n_species, fill = trait_category, label = plot_label,
+        subgroup = family, subgroup2 = trait_category
       )
     ) +
+    # Fill the trait combination squares
     treemapify::geom_treemap(color = NA) +
-    treemapify::geom_treemap_subgroup_border(size = 2, color = "white") +
-    treemapify::geom_treemap_subgroup2_border(size = 1/3, color = "white") +
+    # Organize by family
+    treemapify::geom_treemap_subgroup_border(
+      show.legend = FALSE, size = 2, color = "white"
+    ) +
+    # Organize by trait combination
+    treemapify::geom_treemap_subgroup2_border(
+      show.legend = FALSE, size = 1/3, color = "white"
+    ) +
+    # Add numbers in tiles
+  treemapify::geom_treemap_text(show.legend = FALSE, size = 7.5, alpha = 2/3) +
+    # Add family labels
     treemapify::geom_treemap_subgroup_text(
       place = "centre", grow = TRUE, alpha = 2/3, colour = "black",
-      fontface = "italic", min.size = 7
+      fontface = "bold.italic", min.size = 6.5, show.legend = FALSE
     ) +
+    # Scales & theme
     scale_fill_manual(
       name = "Trait combination",
       labels = c(
         "FALSE.FALSE.FALSE.FALSE" = "No trait",
         "TRUE.FALSE.FALSE.FALSE"  = "At least\none trait",
         "TRUE.FALSE.FALSE.TRUE"   = "Root traits",
-        "TRUE.TRUE.FALSE.FALSE"   = "Leaf-Height-Seed",
-        "TRUE.TRUE.FALSE.TRUE"    = "LHS & Root traits",
+        "TRUE.TRUE.FALSE.FALSE"   = "Leaf-Height-Seed (LHS)",
+        "TRUE.TRUE.FALSE.TRUE"    = "LHS\n& Root traits",
         "TRUE.TRUE.TRUE.FALSE"    = "Aboveground traits",
-        "TRUE.TRUE.TRUE.TRUE"     = "Aboveground & Root traits"
+        "TRUE.TRUE.TRUE.TRUE"     = "Aboveground\n& Root traits"
       ),
       values = c(
         "FALSE.FALSE.FALSE.FALSE" = "#f0f0f0",  # No trait
@@ -409,6 +425,7 @@ plot_taxonomy_treemap_trait_combination = function(
         "TRUE.TRUE.TRUE.TRUE"     = "#551601"   # Aboveground + Root
       )
     ) +
+    # Make the plot squared
     theme(legend.position = "top", aspect.ratio = 1)
 }
 
@@ -477,6 +494,22 @@ plot_general_treemap_trait_combination = function(
 
   total = sum(tax_comb[["n_species"]])
 
+  tax_comb = tax_comb %>%
+    mutate(
+      prop       = 100 * (n_species/total),
+      plot_label = ifelse(
+        round(prop, 0) > 0,
+        paste0(
+          "n = ", format(n_species, big.mark = ",", trim = TRUE),
+          "\n(", round(prop, 0), "%)"
+        ),
+        paste0(
+          "n = ", format(n_species, big.mark = ",", trim = TRUE),
+          "\n(", round(prop, 1), "%)"
+        )
+      )
+    )
+
   # Clean environment
   rm(combined_traits_taxonomy, contain_trait_combination)
 
@@ -484,25 +517,25 @@ plot_general_treemap_trait_combination = function(
   tax_comb %>%
     ggplot(
       aes(
-        area  = n_species, fill = trait_category,
-        label = paste0(
-          "n = ", n_species, "\n(", round(100 * n_species/total, 0), "%)"
-        ),
+        area  = n_species, fill = trait_category, label = plot_label,
         subgroup = trait_category
       )
     ) +
     treemapify::geom_treemap(color = NA) +
-    treemapify::geom_treemap_text(place = "center") +
+    treemapify::geom_treemap_text(
+      place = "center", show.legend = FALSE,
+      padding.x = grid::unit(1/2, "mm"), padding.y = grid::unit(1/2, "mm")
+    ) +
     scale_fill_manual(
       name = "Trait combination",
       labels = c(
         "FALSE.FALSE.FALSE.FALSE" = "No trait",
         "TRUE.FALSE.FALSE.FALSE"  = "At least\none trait",
         "TRUE.FALSE.FALSE.TRUE"   = "Root traits",
-        "TRUE.TRUE.FALSE.FALSE"   = "Leaf-Height-Seed",
-        "TRUE.TRUE.FALSE.TRUE"    = "LHS & Root traits",
+        "TRUE.TRUE.FALSE.FALSE"   = "Leaf-Height-Seed (LHS)",
+        "TRUE.TRUE.FALSE.TRUE"    = "LHS\n& Root traits",
         "TRUE.TRUE.TRUE.FALSE"    = "Aboveground traits",
-        "TRUE.TRUE.TRUE.TRUE"     = "Aboveground & Root traits"
+        "TRUE.TRUE.TRUE.TRUE"     = "Aboveground\n& Root traits"
       ),
       values = c(
         "FALSE.FALSE.FALSE.FALSE" = "#f0f0f0",  # No trait

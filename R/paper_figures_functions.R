@@ -13,13 +13,11 @@ assemble_fig1 = function(
 
 assemble_fig2 = function(fig_treemap_general, fig_trait_combination_taxonomy) {
 
-  patchwork::guide_area() /
-    (
-      (fig_treemap_general + theme(legend.position = "none"))
-      + fig_trait_combination_taxonomy
-    ) +
-    patchwork::plot_annotation(tag_levels = "A") +
-    patchwork::plot_layout(guides = 'collect', heights = c(1/10, 9/10))
+  patchwork::wrap_plots(fig_treemap_general, fig_trait_combination_taxonomy,
+                        guides = "collect", ncol = 1) +
+    patchwork::plot_annotation(tag_levels = "A") &
+    theme(legend.position = "right", legend.direction = "vertical")
+
 }
 
 assemble_fig3 = function(fig_map_alien_richness, fig_map_prop_trait_regions) {
