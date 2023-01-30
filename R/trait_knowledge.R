@@ -60,7 +60,7 @@ assemble_trait_knowledge_df = function(
 
 model_alien_trait_knowledge = function(trait_knowledge_df) {
 
-  trait_knowledge_df %>%
+  trait_knowledge_df = trait_knowledge_df %>%
     filter(
       !is.na(mean_hii_v2geo_mean), !is.na(gdp_mean_native),
       !is.na(gdp_mean_non_native), !is.na(mean_access_cities_2015_mean)
@@ -82,17 +82,16 @@ model_alien_trait_knowledge = function(trait_knowledge_df) {
       avg_gdp_over_native_range     = gdp_mean_native,
       avg_gdp_over_non_native_range = gdp_mean_non_native,
       avg_accessibility             = mean_access_cities_2015_mean
-    ) %>%
-    {
-      glmmTMB::glmmTMB(
-        n_traits ~ growth_form + total_range_size + non_native_range_size +
-          n_biomes + avg_human_influence_index + sd_human_influence_index +
-          avg_gdp_over_native_range + avg_gdp_over_non_native_range +
-          avg_accessibility,
-        family    = glmmTMB::nbinom2,
-        ziformula = ~ 0,
-        data      = .
-      )
-    }
+    )
+
+  glmmTMB::glmmTMB(
+    n_traits ~ growth_form + total_range_size + non_native_range_size +
+      n_biomes + avg_human_influence_index + sd_human_influence_index +
+      avg_gdp_over_native_range + avg_gdp_over_non_native_range +
+      avg_accessibility,
+    family    = glmmTMB::nbinom2,
+    ziformula = ~ 0,
+    data      = trait_knowledge_df
+  )
 
 }
