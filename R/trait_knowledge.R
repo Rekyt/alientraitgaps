@@ -108,7 +108,10 @@ create_trait_knowledge_table = function(trait_knowledge_model) {
            !is.na(Parameter)) %>%
     mutate(
       Coeff_95CI = paste0(
-        round(Coefficient, 2), " [", round(CI_low, 2), " – ", round(CI_high, 2),
+        ifelse(Coefficient > 0, " ", ""),
+        round(Coefficient, 2), " [",
+        ifelse(Coefficient > 0, " ", ""), round(CI_low, 2), " – ",
+        ifelse(Coefficient > 0, " ", ""), round(CI_high, 2),
         "]"
       ),
       p_val = case_when(
