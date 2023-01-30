@@ -696,7 +696,7 @@ list(
   ),
 
 
-  # Assembling Figures for Paper -----------------------------------------------
+  # Assembling Figs. & Models for Paper ----------------------------------------
   tar_target(
     pfig1_trait_heatmap_and_freq,
     assemble_fig1(fig_combined_trait_heatmap, fig_species_per_trait_combined)
@@ -712,6 +712,10 @@ list(
   tar_target(
     pfig4_trait_comb_prop_status_regions,
     assemble_fig4(fig_status_prop_comb, fig_widest_range_trait_comb_prop)
+  ),
+  tar_target(
+    ptab2_trait_knowledge_model_summary,
+    create_trait_knowledge_table(trait_knowledge_model)
   ),
   tar_target(
     supp_fig2_proportion_species_trait,

@@ -828,6 +828,7 @@ plot_map_proportion_trait_by_region = function(
       legend.key.width = unit(2, "lines"),
       strip.background = element_blank()
     )
+
 }
 
 

@@ -73,15 +73,66 @@ model_alien_trait_knowledge = function(trait_knowledge_df) {
     mutate(
       across(n_total:mean_access_cities_2015_mean, ~ as.numeric(scale(.x)))
     ) %>%
+    rename(
+      growth_form                   = simp_form,
+      total_range_size              = n_total,
+      non_native_range_size         = n_total_non_native,
+      avg_human_influence_index     = mean_hii_v2geo_mean,
+      sd_human_influence_index      = mean_hii_v2geo_sd,
+      avg_gdp_over_native_range     = gdp_mean_native,
+      avg_gdp_over_non_native_range = gdp_mean_non_native,
+      avg_accessibility             = mean_access_cities_2015_mean
+    ) %>%
     {
       glmmTMB::glmmTMB(
-        n_traits ~ simp_form + n_total + n_total_non_native + n_biomes +
-          mean_hii_v2geo_mean + mean_hii_v2geo_sd + gdp_mean_native +
-          gdp_mean_non_native + mean_access_cities_2015_mean,
+        n_traits ~ growth_form + total_range_size + non_native_range_size +
+          n_biomes + avg_human_influence_index + sd_human_influence_index +
+          avg_gdp_over_native_range + avg_gdp_over_non_native_range +
+          avg_accessibility,
         family    = glmmTMB::nbinom2,
         ziformula = ~ 0,
         data      = .
       )
     }
+
+}
+
+
+create_trait_knowledge_table = function(trait_knowledge_model) {
+
+  first_table = as.data.frame(report::report_table(trait_knowledge_model))
+
+  first_table %>%
+    select(-df_error, -c(Component:Fit)) %>%
+    filter(!(Parameter %in% c("AIC", "AICc", "BIC", "Sigma")),
+           !is.na(Parameter)) %>%
+    mutate(
+      Coeff_95CI = paste0(
+        round(Coefficient, 2), " [", round(CI_low, 2), " – ", round(CI_high, 2),
+        "]"
+      ),
+      p_val = case_when(
+        is.na(p)  ~ NA_character_,
+        p <= 1e-3 ~ "p < 0.001",
+        TRUE      ~ as.character(round(p, 3))
+      ),
+      z = round(z, 1),
+      Parameter = case_when(
+        Parameter == "(Intercept)" & is.na(z) ~ "Intercept (dispersion)",
+        Parameter == "(Intercept)"            ~ "Intercept",
+        TRUE ~ tools::toTitleCase(Parameter)
+      )
+    ) %>%
+    select(-Coefficient, -starts_with("CI"), -p) %>%
+    select(Parameter, Coeff_95CI, z, p_val) %>%
+    mutate(
+      Parameter = Parameter %>%
+        gsub("Gdp", "GDP", ., fixed = TRUE) %>%
+        gsub("Avg", "Average", ., fixed = TRUE) %>%
+        gsub("Sd", "Standard Deviation of", ., fixed = TRUE) %>%
+        gsub("^n", "Number of", .) %>%
+        gsub("Non Native", "Non-native", ., fixed = TRUE)
+    ) %>%
+    rename(`Coefficient (95% CI)` = Coeff_95CI)
 
 }
