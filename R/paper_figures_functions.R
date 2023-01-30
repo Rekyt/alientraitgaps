@@ -84,6 +84,22 @@ assemble_fig4 = function(
 
 # Supplementary Figures --------------------------------------------------------
 
+plot_partial_residuals = function(trait_knowledge_model) {
+
+  sjPlot::set_theme(base = ggplot2::theme_bw())
+
+  all_plots = sjPlot::plot_model(
+    trait_knowledge_model, type = "pred", title = "", case = "title"
+  )
+
+  patchwork::wrap_plots(all_plots) &
+    ggplot2::theme(
+      axis.title = element_text(color = "black"),
+      axis.text  = element_text(color = "black")
+    )
+
+}
+
 plot_proportion_species_with_trait = function(
     combined_traits, match_glonaf_tnrs
 ) {

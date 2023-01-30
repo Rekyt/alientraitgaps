@@ -718,6 +718,10 @@ list(
     create_trait_knowledge_table(trait_knowledge_model)
   ),
   tar_target(
+    supp_fig1_model_partial_residuals,
+    plot_partial_residuals(trait_knowledge_model)
+  ),
+  tar_target(
     supp_fig2_proportion_species_trait,
     plot_proportion_species_with_trait(combined_traits, match_glonaf_tnrs)
   ),
