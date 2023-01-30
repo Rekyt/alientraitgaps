@@ -726,6 +726,12 @@ list(
     plot_proportion_species_with_trait(combined_traits, match_glonaf_tnrs)
   ),
   tar_target(
+    supp_fig3_treemap_number_trait,
+    plot_treemaps_with_number_of_traits(
+      combined_traits_taxonomy, contain_trait_combination
+    )
+  ),
+  tar_target(
     supp_fig4_maps_median_sd_n_traits,
     assemble_maps_number_of_traits(
       fig_map_median_n_traits_region, fig_map_sd_n_traits_region

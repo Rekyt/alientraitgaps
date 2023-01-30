@@ -469,7 +469,10 @@ plot_taxonomy_treemap_number_traits = function(
       fontface = "italic", min.size = 0
     ) +
     color_scale +
-    theme(legend.position = "top")
+    theme(
+      aspect.ratio = 1,
+      legend.position = "top"
+    )
 
 }
 

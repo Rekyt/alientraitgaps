@@ -133,6 +133,94 @@ plot_proportion_species_with_trait = function(
 }
 
 
+plot_treemaps_with_number_of_traits = function(
+  combined_traits_taxonomy, contain_trait_combination
+) {
+
+  tax_comb = combined_traits_taxonomy %>%
+    distinct(species, genus, family) %>%
+    inner_join(contain_trait_combination, by = "species") %>%
+    mutate(n_traits = purrr::map_int(traits, length)) %>%
+    mutate(across(where(is.character), ~iconv(.x, "latin1", to = "UTF-8"))) %>%
+    select(species, family, n_traits) %>%
+    mutate(
+      trait_category = case_when(
+        n_traits <= 10   ~ "1 - 10",
+        n_traits <= 100  ~ "10 - 100",
+        n_traits <= 1000 ~ "100 - 1000"
+      )
+    ) %>%
+    count(family, trait_category, name = "n_species")
+
+  # Clean environment
+  rm(combined_traits_taxonomy, contain_trait_combination)
+
+  # Only by trait category
+  general_treemap = tax_comb %>%
+    group_by(trait_category) %>%
+    summarise(n_species = sum(n_species)) %>%
+    mutate(proportion = n_species/sum(n_species)) %>%
+    ggplot(
+      aes(
+        area = n_species, fill = trait_category,
+        label = paste0(
+          "n = ", format(n_species, big.mark = ",", trim = TRUE),
+          "\n(", round(proportion * 100, 0), "%)"
+        )
+      )
+    ) +
+    treemapify::geom_treemap(color = NA) +
+    treemapify::geom_treemap_text(
+      color = "white", place = "centre", show.legend = FALSE
+    ) +
+    scale_fill_manual(
+      "Number\nof Known Traits",
+      values = c("1 - 10"     = "#440154FF",
+                 "10 - 100"   = "#21908CFF",
+                 "100 - 1000" = "#FDE725FF")
+    ) +
+    theme(
+      aspect.ratio = 1,
+      legend.position = "top"
+    )
+
+  # By family by trait category
+  family_treemap = tax_comb %>%
+    ggplot(
+      aes(area = n_species, label = n_species, fill = trait_category,
+          subgroup = family)
+    ) +
+    treemapify::geom_treemap(color = NA) +
+    treemapify::geom_treemap_text(
+      size = 12, color = "white", show.legend = FALSE, place = "centre"
+    ) +
+    treemapify::geom_treemap_subgroup_border(
+      size = 0.5, color = "white", show.legend = FALSE
+    ) +
+    treemapify::geom_treemap_subgroup_text(
+      place = "centre", grow = TRUE, alpha = 0.8, colour = "white",
+      fontface = "bold.italic", min.size = 0, show.legend = FALSE
+    ) +
+    scale_fill_manual(
+      "Number\nof Known Traits",
+      values = c("1 - 10"     = "#440154FF",
+                 "10 - 100"   = "#21908CFF",
+                 "100 - 1000" = "#FDE725FF")
+    ) +
+    theme(
+      aspect.ratio = 1,
+      legend.position = "top"
+    )
+
+  patchwork::wrap_plots(
+    general_treemap, family_treemap, nrow = 2, ncol = 1, guides = "collect"
+  ) +
+    patchwork::plot_annotation(tag_levels = "A") &
+    theme(legend.position = "right")
+
+}
+
+
 assemble_maps_number_of_traits = function(
   fig_map_median_n_traits_region, fig_map_sd_n_traits_region
 ) {
