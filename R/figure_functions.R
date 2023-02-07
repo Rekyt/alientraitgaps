@@ -1148,6 +1148,10 @@ plot_data_origin_intersect_top_20_traits = function(
     trait_database_euler_diagrams
 ) {
 
+  # Remove some non-functional traits
+  trait_database_euler_diagrams = trait_database_euler_diagrams %>%
+    filter(!(consolidated_name %in% c("Elevational_range_min", "Habitat_1")))
+
   # Needed data
   n_traits = seq(1, 20, by = 1)
 
