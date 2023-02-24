@@ -397,7 +397,14 @@ plot_taxonomy_treemap_trait_combination = function(
       show.legend = FALSE, size = 1/3, color = "white"
     ) +
     # Add numbers in tiles
-  treemapify::geom_treemap_text(show.legend = FALSE, size = 7.5, alpha = 2/3) +
+  treemapify::geom_treemap_text(
+    aes(
+      color = trait_category %in% c(
+        "TRUE.TRUE.FALSE.TRUE", "TRUE.TRUE.TRUE.FALSE", "TRUE.TRUE.TRUE.TRUE"
+      )
+    ),
+    show.legend = FALSE, size = 7.5, alpha = 2/3
+  ) +
     # Add family labels
     treemapify::geom_treemap_subgroup_text(
       place = "centre", grow = TRUE, alpha = 2/3, colour = "black",
@@ -424,6 +431,9 @@ plot_taxonomy_treemap_trait_combination = function(
         "TRUE.TRUE.TRUE.FALSE"    = "#563787",  # Aboveground
         "TRUE.TRUE.TRUE.TRUE"     = "#551601"   # Aboveground + Root
       )
+    ) +
+    scale_color_manual(
+      values = c(`TRUE` = "white", `FALSE` = "black"), guide = NULL
     ) +
     # Make the plot squared
     theme(legend.position = "top", aspect.ratio = 1)
@@ -526,9 +536,15 @@ plot_general_treemap_trait_combination = function(
     ) +
     treemapify::geom_treemap(color = NA) +
     treemapify::geom_treemap_text(
+      aes(
+        color = trait_category %in% c(
+          "TRUE.TRUE.FALSE.TRUE", "TRUE.TRUE.TRUE.FALSE", "TRUE.TRUE.TRUE.TRUE"
+        )
+      ),
       place = "center", show.legend = FALSE,
       padding.x = grid::unit(1/2, "mm"), padding.y = grid::unit(1/2, "mm")
     ) +
+    # Theme & Scales
     scale_fill_manual(
       name = "Trait combination",
       labels = c(
@@ -549,6 +565,9 @@ plot_general_treemap_trait_combination = function(
         "TRUE.TRUE.TRUE.FALSE"    = "#563787",  # Aboveground
         "TRUE.TRUE.TRUE.TRUE"     = "#551601"   # Aboveground + Root
       )
+    ) +
+    scale_color_manual(
+      values = c(`TRUE` = "white", `FALSE` = "black"), guide = NULL
     ) +
     theme(legend.position = "top", aspect.ratio = 1)
 }
