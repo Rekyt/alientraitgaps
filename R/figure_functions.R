@@ -408,7 +408,7 @@ plot_taxonomy_treemap_trait_combination = function(
     # Add family labels
     treemapify::geom_treemap_subgroup_text(
       place = "centre", grow = TRUE, alpha = 2/3, colour = "black",
-      fontface = "bold.italic", min.size = 6.5, show.legend = FALSE
+      fontface = "bold", min.size = 6.5, show.legend = FALSE
     ) +
     # Scales & theme
     scale_fill_manual(
