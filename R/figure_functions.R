@@ -380,6 +380,9 @@ plot_taxonomy_treemap_trait_combination = function(
 
   # Actual Plot
   tax_comb %>%
+    # Account for species with no family to avoid error in 'ggfittext'
+    mutate(family = ifelse(family == "", "Other", family)) %>%
+    # Rest of the plot
     ggplot(
       aes(
         area  = n_species, fill = trait_category, label = plot_label,
@@ -403,12 +406,12 @@ plot_taxonomy_treemap_trait_combination = function(
         "TRUE.TRUE.FALSE.TRUE", "TRUE.TRUE.TRUE.FALSE", "TRUE.TRUE.TRUE.TRUE"
       )
     ),
-    show.legend = FALSE, size = 7.5, alpha = 2/3
+    show.legend = FALSE, size = 7.5
   ) +
     # Add family labels
     treemapify::geom_treemap_subgroup_text(
-      place = "centre", grow = TRUE, alpha = 2/3, colour = "black",
-      fontface = "bold", min.size = 6.5, show.legend = FALSE
+      place = "centre", grow = TRUE, alpha = 4/5, colour = "black",
+      fontface = "bold.italic", min.size = 6.5, show.legend = FALSE
     ) +
     # Scales & theme
     scale_fill_manual(

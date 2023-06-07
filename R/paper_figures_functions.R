@@ -16,7 +16,10 @@ assemble_fig2 = function(fig_treemap_general, fig_trait_combination_taxonomy) {
   patchwork::wrap_plots(fig_treemap_general, fig_trait_combination_taxonomy,
                         guides = "collect", ncol = 1) +
     patchwork::plot_annotation(tag_levels = "A") &
-    theme(legend.position = "right", legend.direction = "vertical")
+    theme(legend.position = "right", legend.direction = "vertical",
+          legend.spacing.y = unit(0.5, "lines")) &
+    # Allows to space legend vertically
+    guides(fill = guide_legend(byrow = TRUE))
 
 }
 
