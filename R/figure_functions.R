@@ -1057,12 +1057,12 @@ plot_map_median_n_traits_region = function(
     ) +
     # Fixed manual breaks to sync color & fill scales
     scale_fill_viridis_b(
-      name = "Median Number of Traits",
+      name = "Median Number of Traits\nacross Species per Region",
       breaks = c(10, 30, 50, 100, 300),
       limits = c(10, 300), show.limits = TRUE
     ) +
     scale_color_viridis_b(
-      name = "Median Number of Traits",
+      name = "Median Number of Traits\nacross Species per Region",
       breaks = c(10, 30, 50, 100, 300),
       limits = c(10, 300), show.limits = TRUE
     ) +
@@ -1112,7 +1112,7 @@ plot_map_sd_n_traits_region = function(
       aes(color = n_traits_sd),
       fill = NA,
       data = island_n_traits,
-      size = 2.5, shape = 21, stroke = 1.5
+      size = 2.5, shape = 21, stroke = 1.5, show.legend = FALSE
     ) +
     scale_fill_viridis_b(
       "Standard Deviation of Number of Traits", trans = "log10"
