@@ -174,7 +174,12 @@ plot_treemaps_with_number_of_traits = function(
     ) +
     treemapify::geom_treemap(color = NA) +
     treemapify::geom_treemap_text(
-      color = "white", place = "centre", show.legend = FALSE
+      aes(color = trait_category), place = "centre", show.legend = FALSE
+    ) +
+    scale_color_manual(
+      values = c("1 - 10"     = "white",
+                 "10 - 100"   = "white",
+                 "100 - 1000" = "black")
     ) +
     scale_fill_manual(
       "Number\nof Known Traits",
@@ -189,20 +194,26 @@ plot_treemaps_with_number_of_traits = function(
 
   # By family by trait category
   family_treemap = tax_comb %>%
+    mutate(family = ifelse(family == "", "Other", family)) %>%
     ggplot(
       aes(area = n_species, label = n_species, fill = trait_category,
           subgroup = family)
     ) +
     treemapify::geom_treemap(color = NA) +
     treemapify::geom_treemap_text(
-      size = 12, color = "white", show.legend = FALSE, place = "centre"
+      aes(colour = trait_category), size = 7.5, show.legend = FALSE
     ) +
     treemapify::geom_treemap_subgroup_border(
       size = 0.5, color = "white", show.legend = FALSE
     ) +
     treemapify::geom_treemap_subgroup_text(
-      place = "centre", grow = TRUE, alpha = 0.8, colour = "white",
-      fontface = "bold.italic", min.size = 0, show.legend = FALSE
+      place = "centre", grow = TRUE, alpha = 4/5, colour = "white",
+      fontface = "bold.italic", min.size = 6.5, show.legend = FALSE
+    ) +
+    scale_color_manual(
+      values = c("1 - 10"     = "white",
+                 "10 - 100"   = "white",
+                 "100 - 1000" = "black")
     ) +
     scale_fill_manual(
       "Number\nof Known Traits",
