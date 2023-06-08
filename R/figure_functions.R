@@ -37,7 +37,7 @@ plot_number_species_per_trait_combined = function(combined_traits) {
     # 50% vertical line
     geom_text(
       label = "50%", color = "darkblue", x = total_sp/2, y = 20, hjust = 0.5,
-      vjust = -2, size = rel(3.2)
+      vjust = -2.2, size = rel(3.2)
     ) +
     geom_vline(
       xintercept = total_sp/2, linetype = 2, color = "darkblue", linewidth = 2/3
@@ -46,15 +46,22 @@ plot_number_species_per_trait_combined = function(combined_traits) {
     geom_vline(
       xintercept = total_sp, linetype = 2, color = "darkred", linewidth = 2/3
     ) +
-    geom_point(size = 1.2) +
+    geom_text(
+      label = "100%", color = "darkred", x = total_sp, y = 20, hjust = 0.5,
+      vjust = -2.2, size = rel(3.2)
+    ) +
+    # Actual geoms
     geom_text(
       aes(label = paste0(round((n_species/total_sp) * 100, 0), "%")),
-      hjust = -0.1, size = 2.6, vjust = 0
+      hjust = -0.1, size = 2.8, vjust = 0
     ) +
+    geom_point(size = 1.2) +
+    # Scales and Themes
     scale_x_continuous(
       name = "Number of species with traits",
       sec.axis = sec_axis(
-        trans = ~.x/total_sp, labels = scales::percent_format()
+        trans = ~.x/total_sp, labels = scales::percent_format(),
+        breaks = c(0.4, 0.6, 0.8)
       )
     ) +
     scale_y_discrete(
