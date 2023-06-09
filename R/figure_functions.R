@@ -1203,7 +1203,8 @@ plot_data_origin_intersect_top_20_traits = function(
                "#377eb8",  # (BIEN)      Blue
                "#4daf4a",  # (GIFT)      Green
                "#984ea3"), # (TRY)       Purple
-      col = "#333333"
+      col = "#333333",
+      fontsize = 8
     ),
     draw = TRUE
   )
@@ -1223,11 +1224,11 @@ plot_data_origin_intersect_top_20_traits = function(
               gsub("_", " ", .) %>%
               tools::toTitleCase()
           ),
-          fontsize = 10, cex = 1, lineheight = 0.9, check.overlap = TRUE,
+          fontsize = 8, cex = 1, lineheight = 0.9, check.overlap = TRUE,
           vjust = 1
         ),
         # Style other elements
-        quantities = list(type = "counts", fontsize = 7),
+        quantities = list(type = "counts", fontsize = 6),
         edges = list(lwd = 0.5, lex = 1, col = "#333333"),
         labels = list(labels = ""),
         fills = list(fill = db_fills)
@@ -1244,6 +1245,6 @@ plot_data_origin_intersect_top_20_traits = function(
     patchwork::wrap_plots(list = euler_plots) +
       theme(plot.margin = margin(5.5, 5.5, 5.5, 35)) +
       coord_cartesian(clip = "off"),
-    nrow = 2, heights = c(1/14, 13/14)
+    nrow = 2, heights = c(1/20, 19/20)
   )
 }
