@@ -1193,6 +1193,21 @@ plot_data_origin_intersect_top_20_traits = function(
     "#984ea3"   # (TRY)       Purple
   )
 
+  # Create a horizontal common legend for the whole plot
+  common_legend = grid::grid.legend(
+    labels = c("AusTraits", "BIEN", "GIFT", "TRY"),
+    nrow = 1, ncol = 4,
+    pch = 21,
+    gp = grid::gpar(
+      fill = c("#e41a1c",  # (AusTraits) Red
+               "#377eb8",  # (BIEN)      Blue
+               "#4daf4a",  # (GIFT)      Green
+               "#984ea3"), # (TRY)       Purple
+      col = "#333333"
+    ),
+    draw = TRUE
+  )
+
   # Plots
   eulerr::eulerr_options(padding = grid::unit(2/3, "lines"))
 
@@ -1213,10 +1228,9 @@ plot_data_origin_intersect_top_20_traits = function(
         ),
         # Style other elements
         quantities = list(type = "counts", fontsize = 7),
-        edges = list(lwd = 0.1, lex = 1),
-        labels = list(fontsize = 7),
-        fills = list(fill = db_fills),
-        adjust_labels = TRUE
+        edges = list(lwd = 0.5, lex = 1, col = "#333333"),
+        labels = list(labels = ""),
+        fills = list(fill = db_fills)
       )
     }
   )
@@ -1225,6 +1239,11 @@ plot_data_origin_intersect_top_20_traits = function(
   rm(trait_database_euler_diagrams)
 
   # Actual final plot
-  patchwork::wrap_plots(list = euler_plots) +
-    theme(plot.margin = margin(5.5, 5.5, 5.5, 35))
+  patchwork::wrap_plots(
+    common_legend,
+    patchwork::wrap_plots(list = euler_plots) +
+      theme(plot.margin = margin(5.5, 5.5, 5.5, 35)) +
+      coord_cartesian(clip = "off"),
+    nrow = 2, heights = c(1/14, 13/14)
+  )
 }
