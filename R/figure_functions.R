@@ -1248,3 +1248,103 @@ plot_data_origin_intersect_top_20_traits = function(
     nrow = 2, heights = c(1/20, 19/20)
   )
 }
+
+plot_relative_database_importance_traits = function(
+    trait_database_euler_diagrams, same_scale_across_facets = TRUE,
+    bar_type = c("stack", "fill")
+) {
+
+  bar_type = match.arg(bar_type)
+
+  # Get number of observation for each database & intersections
+  simplified_df = trait_database_euler_diagrams %>%
+    mutate(
+      number_table = purrr::map(
+        euler, \(x) tibble::enframe(x$original.values, "database", "n_obs")
+      ),
+      trait_group = (row_number() %/% 15) + 1
+    ) %>%
+    select(-euler) %>%
+    tidyr::unnest(number_table) %>%
+    mutate(
+      n_inter = stringr::str_count(database, "&"),
+      final_name = case_when(
+        n_inter == 0 ~ database,
+        n_inter != 0 ~ paste0(n_inter + 1, "-DBs intersection")
+      )
+    ) %>%
+    mutate(
+      final_name = factor(
+        final_name, levels = c(
+          "AusTraits", "BIEN", "GIFT", "TRY",
+          "2-DBs intersection", "3-DBs intersection", "4-DBs intersection"
+        )
+      )
+    )
+
+  # Count number of times of 4 panels with 15 traits each are necessary
+  n_pages = (nrow(trait_database_euler_diagrams) %/% (4 * 15)) + 1
+
+  # Clean environment
+  rm(trait_database_euler_diagrams)
+
+  # Actual figure
+  lapply(seq(n_pages), function(page_number) {
+
+    simplified_df %>%
+      mutate(
+        final_name = factor(
+          final_name, levels = c(
+            "AusTraits", "BIEN", "GIFT", "TRY",
+            "2-DBs intersection", "3-DBs intersection", "4-DBs intersection"
+          )
+        )
+      ) %>%
+      ggplot(
+        aes(n_obs, forcats::fct_reorder(consolidated_name, n_all),
+            fill = final_name)
+      ) +
+      geom_col(position = bar_type) +
+      ggforce::facet_wrap_paginate(
+        vars(trait_group), nrow = 2, ncol = 2, page = page_number,
+        scales = ifelse(same_scale_across_facets, "free_y", "free")
+      ) +
+      labs(
+        x =  ifelse(
+          bar_type == "stack",
+          "Number of species found in one or more database",
+          "Proportion of species found in one or more database"
+        ),
+        y = "Trait Name",
+        fill = "Database"
+      ) +
+      scale_x_continuous(
+        labels = ifelse(bar_type == "fill", scales::label_percent(), identity)
+      ) +
+      scale_y_discrete(labels = label_wrap_gen(40)) +
+      scale_fill_manual(
+        values = c(
+          AusTraits            = "#e41a1c",  # (AusTraits) Red
+          BIEN                 = "#377eb8",  # (BIEN)      Blue
+          GIFT                 = "#4daf4a",  # (GIFT)      Green
+          TRY                  = "#984ea3", # (TRY)       Purple
+          "2-DBs intersection" = "#AAAAAA",
+          "3-DBs intersection" = "#777777",
+          "4-DBs intersection" = "#444444"
+        ),
+        labels = c(
+          austraits = "AusTraits", bien = "BIEN", gift = "GIFT", try = "TRY"
+        ),
+        guide = guide_legend(nrow = 1)
+      ) +
+      theme_bw() +
+      theme(
+        legend.position = "top",
+        strip.background = element_blank(),
+        strip.text = element_blank()
+      )
+
+  })
+
+
+}

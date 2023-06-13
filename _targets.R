@@ -694,6 +694,16 @@ list(
     fig_euler_diagrams_top_20_traits_database,
     plot_data_origin_intersect_top_20_traits(trait_database_euler_diagrams),
   ),
+  tar_target(
+    fig_bars_absolute_database_importance_traits,
+    plot_relative_database_importance_traits(trait_database_euler_diagrams)
+  ),
+  tar_target(
+    fig_bars_relative_database_importance_traits,
+    plot_relative_database_importance_traits(
+      trait_database_euler_diagrams, FALSE, "fill"
+    )
+  ),
 
 
   # Assembling Figs. & Models for Paper ----------------------------------------
