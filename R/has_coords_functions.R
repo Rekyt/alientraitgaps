@@ -32,19 +32,17 @@ get_bien_traits_with_coords = function(glonaf_bien_traits) {
 get_try_traits_with_coords = function(full_try_df) {
 
   full_try_df %>%
+    collect() %>%
     # Add column has_coords
     full_join(
       # Get list of datasets with coordinates
       full_try_df %>%
         filter(DataID %in% c(59, 60)) %>%  # Latitude and longitude
+        chunk_distinct(DatasetID, has_coords = TRUE) %>%
         collect() %>%
-        distinct(DatasetID, has_coords = TRUE),
+        distinct(DatasetID, has_coords),
       by = "DatasetID") %>%
     mutate(has_coords = ifelse(is.na(has_coords), FALSE, has_coords)) %>%
-    disk.frame::chunk_distinct(
-      AccSpeciesID, AccSpeciesName, TraitID, TraitName, has_coords
-    ) %>%
-    collect() %>%
     distinct(AccSpeciesID, AccSpeciesName, TraitID, TraitName, has_coords)
 
 }
