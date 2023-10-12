@@ -5,7 +5,7 @@ read_correspondence_tables = function(raw_correspondence_tables) {
   )
 
   lapply(raw_correspondence_tables, function(x) {
-    readODS::read_ods(x) %>%
+    readODS::read_ods(x, na = c("", "NA")) %>%
       as_tibble()
   })
 }
