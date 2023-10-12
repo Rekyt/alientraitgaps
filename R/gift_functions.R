@@ -53,7 +53,7 @@ extract_gift_names_with_traits = function(gift_traits_final, gift_names) {
 }
 
 retrieve_all_gift_checklists = function(gift_api, gift_version) {
-  GIFT::GIFT_checklist(
+  GIFT::GIFT_checklists(
     taxon_name = "Tracheophyta",
     complete_taxon = FALSE,
     floristic_group = "all",
