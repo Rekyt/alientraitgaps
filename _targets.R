@@ -272,11 +272,11 @@ list(
   ),
   tar_target(
     gift_current_trait_meta,
-    GIFT::GIFT_traits_meta(gift_api, gift_version)
+    GIFT::GIFT_traits_meta(gift_api, GIFT_version = gift_version)
   ),
   tar_target(
     gift_shape,
-    GIFT::GIFT_shape(api = gift_api, GIFT_version = gift_version)
+    GIFT::GIFT_shapes(api = gift_api, GIFT_version = gift_version)
   ),
   tar_target(
     gift_all_raw_traits,
