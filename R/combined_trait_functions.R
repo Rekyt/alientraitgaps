@@ -39,8 +39,8 @@ check_correspondence_tables = function(
     distinct(identical, similar)
 
 
-  if (ident_similar[["identical"]] != c("no", "yes", NA) ||
-      ident_similar[["similar"]] != c("yes", "yes", NA)) {
+  if (!identical(ident_similar[["identical"]], c("no", "yes", NA_character_)) |
+      !identical(ident_similar[["similar"]], c("yes", "yes", NA))) {
     stop("Issue with identical and similar columns")
   }
 
@@ -445,7 +445,7 @@ count_specific_trait_combinations = function(
 
 # Function to create a unified growth form dataset to use downstream
 extract_growth_form = function(
-  combined_traits, glonaf_bien_traits, gift_traits_final, gift_names_traits,
+  combined_traits, glonaf_bien_traits, gift_all_raw_traits, gift_names_traits,
   harmonized_gift_glonaf, match_glonaf_tnrs, glonaf_list
 ) {
   # Reconstruct GloNAF df
@@ -462,7 +462,7 @@ extract_growth_form = function(
     )
 
   # Extract growth form data from GIFT
-  gift_growth_form = gift_traits_final %>%
+  gift_growth_form = gift_all_raw_traits %>%
     filter(trait_ID == "1.2.1") %>%
     distinct(work_ID, trait_value) %>%
     # Add back species names

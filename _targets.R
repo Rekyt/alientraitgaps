@@ -109,47 +109,6 @@ list(
     unique(austraits_species[["taxon_name"]])
   ),
 
-  # Load GIFT data -------------------------------------------------------------
-  tar_target(
-    gift_names,
-    read.csv(
-      here::here("inst", "exdata", "gift", "GIFT_names_matched.csv"),
-      fileEncoding = "utf-8"
-    )
-  ),
-  tar_target(
-    gift_traits,
-    read.csv(
-      here::here("inst", "exdata", "gift", "GIFT_traits_derived.csv"),
-      fileEncoding = "utf-8"
-    )
-  ),
-  tar_target(
-    gift_traits_final,
-    read.csv(
-      here::here("inst", "exdata", "gift", "GIFT_traits_final.csv"),
-      fileEncoding = "utf-8"
-    )
-  ),
-  tar_target(
-    gift_traits_meta,
-    read.csv(
-      here::here("inst", "exdata", "gift", "GIFT_traits_meta.csv"),
-      fileEncoding = "utf-8"
-    )
-  ),
-  tar_target(
-    gift_names_traits,
-    extract_gift_names_with_traits(gift_traits_final, gift_names)
-  ),
-  tar_target(
-    gift_list,
-    extract_gift_species_names(gift_names)
-  ),
-  tar_target(
-    gift_sublist,
-    unique(gift_names_traits[["species"]])
-  ),
 
   # TNRS Matching: Harmonize Taxonomies against TNRS ---------------------------
   tar_target(
@@ -160,9 +119,6 @@ list(
   ),
   tar_target(
     match_austraits_tnrs, get_tnrs_values(austraits_list, "austraits"),
-  ),
-  tar_target(
-    match_gift_tnrs, get_tnrs_values(gift_sublist, "gift")
   ),
   tar_target(
     match_raw_gift_tnrs, get_tnrs_values(gift_raw_list, "gift-raw")
@@ -312,6 +268,7 @@ list(
     simplify_gift_distribution(gift_matched_checklists)
   ),
 
+
   # Consolidate Trait Names ----------------------------------------------------
   tar_target(
     raw_correspondence_tables,
@@ -326,13 +283,13 @@ list(
   tar_target(
     correspondence_tables_check,
     check_correspondence_tables(
-      correspondence_tables, austraits, gift_traits_meta, try_traits
+      correspondence_tables, austraits, gift_current_trait_meta, try_traits
     )
   ),
   tar_target(
     trait_network,
     create_trait_network(
-      correspondence_tables_check, austraits, gift_traits_meta, try_traits
+      correspondence_tables_check, austraits, gift_current_trait_meta, try_traits
     )
   ),
   tar_target(
@@ -356,8 +313,8 @@ list(
   tar_target(
     combined_growth_form,
     extract_growth_form(
-      combined_traits, glonaf_bien_traits, gift_traits_final, gift_names_traits,
-      harmonized_gift_glonaf, match_glonaf_tnrs, glonaf_list
+      combined_traits, glonaf_bien_traits, gift_all_raw_traits,
+      gift_names_traits, harmonized_gift_glonaf, match_glonaf_tnrs, glonaf_list
     )
   ),
   tar_target(
