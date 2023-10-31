@@ -314,7 +314,8 @@ list(
     combined_growth_form,
     extract_growth_form(
       combined_traits, glonaf_bien_traits, gift_all_raw_traits,
-      gift_names_traits, harmonized_gift_glonaf, match_glonaf_tnrs, glonaf_list
+      gift_matched_taxonomy, harmonized_gift_glonaf, match_glonaf_tnrs,
+      glonaf_list
     )
   ),
   tar_target(

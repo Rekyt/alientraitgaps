@@ -468,7 +468,7 @@ extract_growth_form = function(
     # Add back species names
     inner_join(
       gift_names_traits %>%
-        distinct(work_ID, species),
+        distinct(work_ID, species = Accepted_species),
       by = "work_ID"
     ) %>%
     # Re-add harmonized species names
