@@ -177,8 +177,8 @@ plot_trait_comb_proportion_per_invasion_status = function(
     select(is_invasive_or_never, n) %>%
     mutate(
       better_status = case_when(
-        is_invasive_or_never == TRUE  ~ "Referenced as invasive at least once",
-        is_invasive_or_never == FALSE ~ "Never referenced as invasive"
+        is_invasive_or_never == TRUE  ~ "Ref. as invasive at least once",
+        is_invasive_or_never == FALSE ~ "Never ref. as invasive"
       ),
       labels = paste0(better_status, "\n(n = ", format(n, big.mark = ","), ")")
     ) %>%
@@ -221,9 +221,9 @@ plot_trait_comb_proportion_per_invasion_status = function(
       "Trait Combination",
       labels = c(
         has_bergmann_prop           = "Root traits",
-        has_diaz_prop               = "Aboveground spectrum",
+        has_diaz_prop               = "Aboveground\nspectrum",
         has_lhs_prop                = "LHS traits",
-        has_at_least_one_trait_prop = "At least one trait"
+        has_at_least_one_trait_prop = "At least\none trait"
       )
     ) +
     scale_y_continuous(
@@ -305,9 +305,9 @@ plot_trait_combination_per_range_size = function(
       "Trait Combination",
       labels = c(
         has_bergmann_prop           = "Root traits",
-        has_diaz_prop               = "Aboveground spectrum",
+        has_diaz_prop               = "Aboveground\nspectrum",
         has_lhs_prop                = "LHS traits",
-        has_at_least_one_trait_prop = "At least one trait"
+        has_at_least_one_trait_prop = "At least\none trait"
       )
     ) +
     scale_y_continuous(
