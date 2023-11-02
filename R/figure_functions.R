@@ -37,7 +37,7 @@ plot_number_species_per_trait_combined = function(combined_traits) {
     # 50% vertical line
     geom_text(
       label = "50%", color = "darkblue", x = total_sp/2, y = 20, hjust = 0.5,
-      vjust = -2.2, size = rel(3.2)
+      vjust = -2.2, size = rel(4.2)
     ) +
     geom_vline(
       xintercept = total_sp/2, linetype = 2, color = "darkblue", linewidth = 2/3
@@ -48,12 +48,12 @@ plot_number_species_per_trait_combined = function(combined_traits) {
     ) +
     geom_text(
       label = "100%", color = "darkred", x = total_sp, y = 20, hjust = 0.5,
-      vjust = -2.2, size = rel(3.2)
+      vjust = -2.2, size = rel(4.2)
     ) +
     # Actual geoms
     geom_text(
       aes(label = paste0(round((n_species/total_sp) * 100, 0), "%")),
-      hjust = -0.1, size = 2.8, vjust = 0
+      hjust = -0.1, size = 4.2, vjust = 0
     ) +
     geom_point(size = 1.2) +
     # Scales and Themes
@@ -89,7 +89,7 @@ plot_number_species_per_trait_combined = function(combined_traits) {
         leaf_arrangement             = "Leaf Arrangement (cat.)"
       )
     ) +
-    theme_bw() +
+    theme_bw(16) +
     theme(panel.grid.major.x = element_blank(),
           panel.grid.minor.x = element_blank()) +
     coord_cartesian(clip = "off")
@@ -143,8 +143,8 @@ plot_number_specific_trait_combination = function(contain_trait_combination) {
       labels = c(
         in_glonaf = "In GloNAF",
         has_at_least_one_trait = "At least one trait",
-        has_lhs   = "Leaf-Height-Seed\n(3 traits, Westoby 1998)",
-        has_diaz  = "Aboveground traits\n(6 traits, Díaz et al., 2016)",
+        has_lhs   = "LHS\n(3 traits, Westoby 1998)",
+        has_diaz  = "Aboveground spectrum\n(6 traits, Díaz et al., 2016)",
         has_bergmann = "Root traits\n(4 traits, Bergmann et al., 2020)"
       )
     ) +
@@ -160,7 +160,8 @@ plot_trait_comb_proportion_per_invasion_status = function(
 
   # Pre-process data
   trait_comb_prop_status = glonaf_status_trait_cat %>%
-    group_by(status_name) %>%
+    mutate(is_invasive_or_never = invasive > 0) %>%
+    group_by(is_invasive_or_never) %>%
     summarise(
       across(
         has_at_least_one_trait:has_bergmann,
@@ -173,12 +174,11 @@ plot_trait_comb_proportion_per_invasion_status = function(
     )
 
   status_labels = trait_comb_prop_status %>%
-    select(status_name, n) %>%
+    select(is_invasive_or_never, n) %>%
     mutate(
       better_status = case_when(
-        status_name == "invasive"    ~ "invasive",
-        status_name == "naturalized" ~ "non-invasive",
-        status_name == "alien"       ~ "undetermined"
+        is_invasive_or_never == TRUE  ~ "Referenced as invasive at least once",
+        is_invasive_or_never == FALSE ~ "Never referenced as invasive"
       ),
       labels = paste0(better_status, "\n(n = ", format(n, big.mark = ","), ")")
     ) %>%
@@ -186,13 +186,13 @@ plot_trait_comb_proportion_per_invasion_status = function(
     tibble::deframe()
 
   trait_comb_prop_status = trait_comb_prop_status %>%
-    select(status_name, ends_with("prop")) %>%
+    select(is_invasive_or_never, ends_with("prop")) %>%
     tidyr::pivot_longer(
       ends_with("prop"), names_to = "comb_name", values_to = "comb_value"
     ) %>%
     mutate(
-      status_name = factor(
-        status_name, levels = c("alien", "naturalized", "invasive")
+      is_invasive_or_never = factor(
+        is_invasive_or_never, levels = c(FALSE, TRUE)
       ),
       comb_name = factor(
         comb_name,
@@ -208,19 +208,20 @@ plot_trait_comb_proportion_per_invasion_status = function(
   # Actual Plot
   trait_comb_prop_status %>%
     ggplot(
-      aes(comb_name, comb_value, shape = status_name, color = status_name)
+      aes(comb_name, comb_value, shape = is_invasive_or_never,
+          color = is_invasive_or_never)
     ) +
     geom_point(position = position_dodge(width = 0.5), size = 2) +
     geom_linerange(
       aes(x = comb_name, ymin = 0, ymax = comb_value,
-          group = interaction(status_name, comb_name)),
+          group = interaction(is_invasive_or_never, comb_name)),
       position = position_dodge(width = 0.5)
     ) +
     scale_x_discrete(
       "Trait Combination",
       labels = c(
         has_bergmann_prop           = "Root traits",
-        has_diaz_prop               = "Aboveground traits",
+        has_diaz_prop               = "Aboveground spectrum",
         has_lhs_prop                = "LHS traits",
         has_at_least_one_trait_prop = "At least one trait"
       )
@@ -234,7 +235,7 @@ plot_trait_comb_proportion_per_invasion_status = function(
       labels = status_labels
     ) +
     scale_color_manual("Species Status", values = c(
-      invasive = "#E69F00", naturalized = "#56B4E9", alien = "#009E73"
+      `TRUE` = "#E69F00", `FALSE` = "#56B4E9"
     ), guide = guide_legend(reverse = TRUE), labels = status_labels
     ) +
     coord_flip() +
@@ -304,7 +305,7 @@ plot_trait_combination_per_range_size = function(
       "Trait Combination",
       labels = c(
         has_bergmann_prop           = "Root traits",
-        has_diaz_prop               = "Aboveground traits",
+        has_diaz_prop               = "Aboveground spectrum",
         has_lhs_prop                = "LHS traits",
         has_at_least_one_trait_prop = "At least one trait"
       )
@@ -418,7 +419,7 @@ plot_taxonomy_treemap_trait_combination = function(
     # Add family labels
     treemapify::geom_treemap_subgroup_text(
       place = "centre", grow = TRUE, alpha = 4/5, colour = "black",
-      fontface = "bold.italic", min.size = 6.5, show.legend = FALSE
+      fontface = "bold.italic", min.size = 1, show.legend = FALSE
     ) +
     # Scales & theme
     scale_fill_manual(
@@ -427,10 +428,10 @@ plot_taxonomy_treemap_trait_combination = function(
         "FALSE.FALSE.FALSE.FALSE" = "No trait",
         "TRUE.FALSE.FALSE.FALSE"  = "At least\none trait",
         "TRUE.FALSE.FALSE.TRUE"   = "Root traits",
-        "TRUE.TRUE.FALSE.FALSE"   = "Leaf-Height-Seed (LHS)",
+        "TRUE.TRUE.FALSE.FALSE"   = "LHS",
         "TRUE.TRUE.FALSE.TRUE"    = "LHS\n& Root traits",
-        "TRUE.TRUE.TRUE.FALSE"    = "Aboveground traits",
-        "TRUE.TRUE.TRUE.TRUE"     = "Aboveground\n& Root traits"
+        "TRUE.TRUE.TRUE.FALSE"    = "Aboveground\nspectrum",
+        "TRUE.TRUE.TRUE.TRUE"     = "Aboveground\nspectrum\n& Root traits"
       ),
       values = c(
         "FALSE.FALSE.FALSE.FALSE" = "#f0f0f0",  # No trait
@@ -561,10 +562,10 @@ plot_general_treemap_trait_combination = function(
         "FALSE.FALSE.FALSE.FALSE" = "No trait",
         "TRUE.FALSE.FALSE.FALSE"  = "At least\none trait",
         "TRUE.FALSE.FALSE.TRUE"   = "Root traits",
-        "TRUE.TRUE.FALSE.FALSE"   = "Leaf-Height-Seed (LHS)",
+        "TRUE.TRUE.FALSE.FALSE"   = "LHS",
         "TRUE.TRUE.FALSE.TRUE"    = "LHS\n& Root traits",
-        "TRUE.TRUE.TRUE.FALSE"    = "Aboveground traits",
-        "TRUE.TRUE.TRUE.TRUE"     = "Aboveground\n& Root traits"
+        "TRUE.TRUE.TRUE.FALSE"    = "Aboveground\nspectrum",
+        "TRUE.TRUE.TRUE.TRUE"     = "Aboveground\nspectrum\n& Root traits"
       ),
       values = c(
         "FALSE.FALSE.FALSE.FALSE" = "#f0f0f0",  # No trait
@@ -642,9 +643,10 @@ plot_combined_traits_heatmap = function(combined_traits, match_glonaf_tnrs) {
       y    = "Species Rank",
       fill = "Was trait measured?"
     ) +
-    scale_fill_viridis_d(labels = c(`TRUE` = "Yes", `FALSE` = "No")) +
+    scale_fill_manual(labels = c(`TRUE` = "Yes", `FALSE` = "No"),
+                      values = c(`TRUE` = "#222222", `FALSE` = "white")) +
     coord_cartesian(expand = FALSE) +
-    theme_bw() +
+    theme_bw(16) +
     theme(legend.position = "top")
 }
 
@@ -686,8 +688,8 @@ plot_prop_trait_per_richness = function(
       labeller = labeller(
         prop_name = c(
           has_bergmann     = "Root Traits\n(4 traits, Bergmann et al. 2020)",
-          has_diaz         = "Aboveground traits\n(6 traits, Díaz et al. 2016)",
-          has_lhs          = "Leaf-Height-Seed mass\n(3 traits, Westoby 2002)",
+          has_diaz         = "Aboveground spectrum\n(6 traits, Díaz et al. 2016)",
+          has_lhs          = "LHS\n(3 traits, Westoby 2002)",
           prop_with_any_trait = "Any trait",
           flower              = "Flower",
           height              = "Height",
@@ -745,8 +747,8 @@ plot_proportion_known_combination_per_richness = function(
       labeller = labeller(
         comb_name = c(
           has_bergmann_prop = "Root Traits\n(4 traits, Bergmann et al. 2020)",
-          has_diaz_prop     = "Aboveground traits\n(6 traits, Díaz et al. 2016)",
-          has_lhs_prop      = "Leaf-Height-Seed mass\n(3 traits, Westoby 2002)"
+          has_diaz_prop     = "Aboveground spectrum\n(6 traits, Díaz et al. 2016)",
+          has_lhs_prop      = "LHS\n(3 traits, Westoby 2002)"
         ),
         rich_name = c(
           num_invasive_spp    = "Number\nof invasive sp.",
@@ -839,20 +841,22 @@ plot_map_proportion_trait_by_region = function(
       labeller = labeller(
         prop_name = c(
           has_bergmann_prop   = "Root Traits",
-          has_diaz_prop       = "Aboveground traits",
-          has_lhs_prop        = "Leaf-Height-Seed mass (LHS)",
+          has_diaz_prop       = "Aboveground spectrum",
+          has_lhs_prop        = "LHS",
           prop_with_any_trait = "Any trait"
         )
       )
     ) +
     scale_fill_viridis_b(
-      name = "Prop. of aliens species\nwith trait combination",
+      name = "Prop. of alien species\nwith trait combination",
       labels = scales::percent_format(), n.breaks = 6, show.limits = TRUE
     ) +
     scale_color_viridis_b(
-      name = "Prop. of aliens species\nwith trait combination",
+      name = "Prop. of alien species\nwith trait combination",
       labels = scales::percent_format(), n.breaks = 6, show.limits = TRUE
     ) +
+    guides(fill = guide_colorsteps(title.vjust = 0.8),
+           color = guide_colorsteps(title.vjust = 0.8)) +
     ylim(-5747986, NA) +  # Remove whatever is below 60°S
     theme_void() +
     theme(
@@ -908,22 +912,28 @@ plot_map_alien_richness_region = function(
       data = island_richness,
       size = 2.5, shape = 21, stroke = 0.75
     ) +
-    scale_fill_viridis_b(
+    scale_fill_fermenter(
       name = "Alien Species Richness", trans = "log10", n.breaks = 5,
+      palette = "YlOrRd", direction = 1,
       show.limits = TRUE,
       # Force limit to merge axes
       limits = richness_range
     ) +
-    scale_color_viridis_b(
+    scale_color_fermenter(
       name = "Alien Species Richness", trans = "log10", n.breaks = 5,
+      palette = "YlOrRd", direction = 1,
       show.limits = TRUE,
       # Force limit to merge axes
       limits = richness_range
     ) +
     ylim(-5747986, NA) +  # Remove whatever is below 60°S
     theme_void() +
+    guides(fill = guide_colorsteps(title.vjust = 0.8),
+           color = guide_colorsteps(title.vjust = 0.8)) +
     theme(
       legend.position  = "top",
+      # legend.title.align = 0.5,
+      # legend.justification = "center",
       legend.key.width = unit(2, "lines"),
       plot.margin      = margin(b = 3, unit = "pt")
     )
@@ -985,9 +995,9 @@ plot_map_europe_proportion_trait = function(
         prop_name = c(
           has_bergmann_prop       = paste0("Root Traits\n",
                                            "(4 traits, Bergmann et al. 2020)"),
-          has_diaz_prop           = paste0("Aboveground traits\n",
+          has_diaz_prop           = paste0("Aboveground spectrum\n",
                                            "(6 traits, Díaz et al. 2016)"),
-          has_lhs_prop            = paste0("Leaf-Height-Seed mass\n",
+          has_lhs_prop            = paste0("LHS\n",
                                            "(3 traits, Westoby 2002)"),
           prop_with_any_trait     = "Any trait",
           flower_prop_trait       = "Prop. Aliens\nFlower",

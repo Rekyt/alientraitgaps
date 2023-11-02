@@ -335,12 +335,15 @@ get_trait_combinations_and_cat_per_invasion_status = function(
     glonaf_species_regions_status, contain_trait_combination
 ) {
   glonaf_species_regions_status %>%
-    distinct(species, status_name) %>%
     mutate(
       status_name = ifelse(
         status_name == "naturalized_archeophyte", "naturalized", status_name
       )
     ) %>%
+    count(species, status_name) %>%
+    tidyr::complete(species, status_name, fill = list(n = 0)) %>%
+    arrange(species, status_name) %>%
+    tidyr::pivot_wider(names_from = status_name, values_from = n) %>%
     inner_join(
       contain_trait_combination %>%
         mutate(n_traits = length(traits)) %>%
