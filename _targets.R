@@ -356,18 +356,6 @@ list(
   ),
 
 
-  # Traits with Coordinates ----------------------------------------------------
-  tar_target(
-    austraits_coords, get_austraits_traits_with_coords(austraits)
-  ),
-  tar_target(
-    bien_traits_coords, get_bien_traits_with_coords(glonaf_bien_traits)
-  ),
-  tar_target(
-    try_traits_coords, get_try_traits_with_coords(full_try_df)
-  ),
-
-
   # Trait Knowledge Model ------------------------------------------------------
   tar_target(
     alien_range_size,
