@@ -848,11 +848,11 @@ plot_map_proportion_trait_by_region = function(
       )
     ) +
     scale_fill_viridis_b(
-      name = "Prop. of alien species\nwith trait combination",
+      name = "Prop. of known alien species",
       labels = scales::percent_format(), n.breaks = 6, show.limits = TRUE
     ) +
     scale_color_viridis_b(
-      name = "Prop. of alien species\nwith trait combination",
+      name = "Prop. of known alien species",
       labels = scales::percent_format(), n.breaks = 6, show.limits = TRUE
     ) +
     guides(fill = guide_colorsteps(title.vjust = 0.8),
@@ -860,8 +860,10 @@ plot_map_proportion_trait_by_region = function(
     ylim(-5747986, NA) +  # Remove whatever is below 60°S
     theme_void() +
     theme(
-      legend.position = "top",
-      legend.key.width = unit(2, "lines"),
+      legend.position = "bottom",
+      legend.key.width = unit(1.5, "lines"),
+      legend.key.height = unit(0.5, "lines"),
+      panel.grid.major = element_line(color = "lightgrey", linetype = 3),
       strip.background = element_blank(),
       strip.clip = "off"
     )
@@ -931,11 +933,10 @@ plot_map_alien_richness_region = function(
     guides(fill = guide_colorsteps(title.vjust = 0.8),
            color = guide_colorsteps(title.vjust = 0.8)) +
     theme(
-      legend.position  = "top",
-      # legend.title.align = 0.5,
-      # legend.justification = "center",
-      legend.key.width = unit(2, "lines"),
-      plot.margin      = margin(b = 3, unit = "pt")
+      legend.position  = "bottom",
+      legend.key.width = unit(1.5, "lines"),
+      legend.key.height = unit(0.5, "lines"),
+      panel.grid.major = element_line(color = "lightgrey", linetype = 3)
     )
 }
 
