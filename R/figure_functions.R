@@ -13,20 +13,27 @@ plot_trait_number_try_glonaf_species = function(try_number_trait) {
           panel.grid = element_blank())
 }
 
-plot_number_species_per_trait_combined = function(combined_traits) {
+plot_number_species_per_trait_combined = function(
+    combined_traits, match_glonaf_tnrs
+) {
 
   max_20_traits = combined_traits %>%
     count(consolidated_name, sort = TRUE, name = "n_species") %>%
     filter(
       !grepl("Elevational", consolidated_name, fixed = TRUE),
-      !grepl("Habitat", consolidated_name, fixed = TRUE)
+      !grepl("Habitat", consolidated_name, fixed = TRUE),
+      !grepl(
+        "Species occurrence range: native vs invasive", consolidated_name,
+        fixed = TRUE
+      )
     ) %>%
     slice_max(n_species, n = 20)
 
-  total_sp = combined_traits %>%
-    pull(species) %>%
+  total_sp = match_glonaf_tnrs %>%
+    pull(Accepted_species) %>%
     unique() %>%
     length()
+  total_sp = total_sp - 1  # Remove names that are resolved to ""
 
   # Clean environment
   rm(combined_traits)
@@ -75,18 +82,18 @@ plot_number_species_per_trait_combined = function(combined_traits) {
         leaf_compoundness            = "Leaf Compoundness (cat.)",
         photosynthetic_pathway       = "Photosynthetic Pathway (cat.)",
         diaspore_mass                = "Seed Mass (cont.)",
-        flowering_time               = "Flowering Phenology (cat.)",
-        dispersal_appendage          = "Fruit Type (cat.)",
         `Leaflet number per leaf`    = "Leaflet number per leaf (cont.)",
+        flowering_time               = "Flowering Phenology (cat.)",
         leaf_phenology               = "Leaf Phenology (cat.)",
-        dispersal_syndrome           = "Fruit Dispersal Syndrome (cat.)",
         `Species tolerance to frost` = "Species tolerance to frost (cat.)",
+        dispersal_syndrome           = "Fruit Dispersal Syndrome (cat.)",
+        dispersal_appendage          = "Fruit Type (cat.)",
         leaf_length                  = "Leaf Length (cont.)",
         nitrogen_fixing              = "Nitrogen Fixer (bin.)",
         pollination_syndrome         = "Pollination Syndrome (cat.)",
-        sex_type                     = "Flower Sex Syndrome (cat.)",
+        leaf_shape                   = "Leaf Shape (cat.)",
         leaf_width                   = "Leaf Width (cont.)",
-        leaf_arrangement             = "Leaf Arrangement (cat.)"
+        germination                  = "Seed Germination Rate (cont.)"
       )
     ) +
     theme_bw(16) +

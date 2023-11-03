@@ -529,7 +529,7 @@ list(
   ),
   tar_target(
     fig_species_per_trait_combined,
-    plot_number_species_per_trait_combined(combined_traits)
+    plot_number_species_per_trait_combined(combined_traits, match_glonaf_tnrs)
   ),
   tar_target(
     fig_combined_trait_heatmap,
