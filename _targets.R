@@ -691,5 +691,95 @@ list(
     assemble_maps_number_of_traits(
       fig_map_median_n_traits_region, fig_map_sd_n_traits_region
     )
+  ),
+
+
+  # Save Plots for paper -------------------------------------------------------
+  # Figure 1
+  tar_target(
+    pfig1_trait_heat_map_and_frequency_pdf,
+    ggsave(
+      here::here("inst", "figures","figure1_trait_heatmap_and_frequency.pdf"),
+      pfig1_trait_heatmap_and_freq, height = 7.5, width = 5.4, units = "in",
+      scale = 2
+    ),
+    format = "file"
+  ),
+  tar_target(
+    pfig1_trait_heat_map_and_frequency_png,
+    ggsave(
+      here::here("inst", "figures","figure1_trait_heatmap_and_frequency.png"),
+      pfig1_trait_heatmap_and_freq, height = 7.5, width = 5.4, units = "in",
+      scale = 2, dpi = 300
+    ),
+    format = "file"
+  ),
+
+  # Figure 2
+  tar_target(
+    pfig2_treemap_trait_combination_pdf,
+    ggsave(
+      here::here("inst", "figures","figure2_treemap_trait_combination.pdf"),
+      pfig2_treemap_trait_combination, height = 7.5, width = 5.4, units = "in",
+      scale = 1.2
+    ),
+    format = "file"
+  ),
+  tar_target(
+    pfig2_treemap_trait_combination_png,
+    ggsave(
+      here::here("inst", "figures","figure2_treemap_trait_combination.png"),
+      pfig2_treemap_trait_combination, height = 7.5, width = 5.4, units = "in",
+      scale = 1.2, dpi = 300
+    ),
+    format = "file"
+  ),
+
+  # Figure 3
+  tar_target(
+    pfig3_maps_trait_prop_and_richness_pdf,
+    ggsave(
+      here::here("inst", "figures","figure3_maps_trait_prop_and_richness.pdf"),
+        pfig3_maps_trait_prop_and_richness, height = 6.2, width = 6.5,
+      units = "in", scale = 4/5
+    ),
+    format = "file"
+  ),
+  tar_target(
+    pfig3_maps_trait_prop_and_richness_png,
+    ggsave(
+      here::here("inst", "figures","figure3_maps_trait_prop_and_richness.png"),
+      pfig3_maps_trait_prop_and_richness, height = 6.2, width = 6.5,
+      units = "in", scale = 4/5, dpi = 300
+    ),
+    format = "file"
+  ),
+
+  # Figure 4
+  tar_target(
+    pfig4_trait_comb_prop_status_regions_pdf,
+    ggsave(
+      here::here(
+        "inst", "figures","figure4_trait_comb_prop_status_regions.pdf"
+      ),
+      pfig4_trait_comb_prop_status_regions, height = 3.7, width = 6.2,
+      units = "in", scale = 1.8
+    ),
+    format = "file"
+  ),
+  tar_target(
+    pfig4_trait_comb_prop_status_regions_png,
+    ggsave(
+      here::here(
+        "inst", "figures","figure4_trait_comb_prop_status_regions.png"
+      ),
+      pfig4_trait_comb_prop_status_regions, height = 3.7, width = 6.2,
+      units = "in", scale = 1.8, dpi = 300
+    ),
+    format = "file"
   )
+  # Figure 5
+  # Supp. Fig.
+  # Supp. Fig.
+  # Supp. Fig.
 )

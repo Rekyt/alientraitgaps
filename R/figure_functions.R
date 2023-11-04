@@ -184,8 +184,8 @@ plot_trait_comb_proportion_per_invasion_status = function(
     select(is_invasive_or_never, n) %>%
     mutate(
       better_status = case_when(
-        is_invasive_or_never == TRUE  ~ "Ref. as invasive at least once",
-        is_invasive_or_never == FALSE ~ "Never ref. as invasive"
+        is_invasive_or_never == TRUE  ~ "Ref. invasive ≥ 1",
+        is_invasive_or_never == FALSE ~ "Never invasive"
       ),
       labels = paste0(better_status, "\n(n = ", format(n, big.mark = ","), ")")
     ) %>%
@@ -654,7 +654,10 @@ plot_combined_traits_heatmap = function(combined_traits, match_glonaf_tnrs) {
                       values = c(`TRUE` = "#222222", `FALSE` = "white")) +
     coord_cartesian(expand = FALSE) +
     theme_bw(16) +
-    theme(legend.position = "top")
+    theme(
+      legend.position = "top",
+      legend.key = element_rect(colour = "#222222")
+    )
 }
 
 
@@ -919,7 +922,7 @@ plot_map_alien_richness_region = function(
       aes(color = n_species),
       fill = NA,
       data = island_richness,
-      size = 2.5, shape = 21, stroke = 0.75
+      size = 1.2, shape = 21, stroke = 0.5
     ) +
     scale_fill_fermenter(
       name = "Alien Species Richness", trans = "log10", n.breaks = 5,

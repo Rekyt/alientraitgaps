@@ -6,7 +6,7 @@ assemble_fig1 = function(
 ) {
   patchwork::wrap_plots(
     fig_combined_trait_heatmap, fig_species_per_trait_combined,
-    tag_level = "new", nrow = 1, widths = c(2/5, 3/5)
+    tag_level = "new", nrow = 2, ncol = 1
   ) +
     patchwork::plot_annotation(tag_levels = "A")
 }
