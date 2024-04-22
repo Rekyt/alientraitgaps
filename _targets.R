@@ -34,23 +34,17 @@ list(
   # Full TRY extract
   tar_target(
     raw_full_try,
-    {
-      disk.frame::csv_to_disk.frame(
-        here::here("inst", "exdata", "try", "17144.txt"),
-        here::here("inst", "exdata", "try", "17144.df")
-      )
-      here::here("inst", "exdata", "try", "17144.df")
-    },
+    here::here("inst", "exdata", "try", "large_try"),
     format = "file"
   ),
   tar_target(
     full_try_df,
-    disk.frame::disk.frame(raw_full_try)
+    arrow::read_parquet(raw_full_try)
   ),
   # TRY trait number and trait id file
   tar_target(
     raw_try_traits,
-    here::here("inst", "exdata", "try", "try_trait_table_tde20211027142952.txt"),
+    here::here("inst", "exdata", "try", "inst/exdata/try/tde2024422162351.txt"),
     format = "file"
   ),
   tar_target(
@@ -109,6 +103,24 @@ list(
   ),
 
 
+  # Load APD (Australian Plant Traits Dictionary) ------------------------------
+  tar_target(
+    raw_apd_online,
+    {
+      loc <- here::here("inst", "exdata", "apd", "apd_flat_traits.csv")
+      download.file(
+        "https://github.com/traitecoevo/APD/raw/master/data/APD_traits_input.csv",
+        loc
+      )
+      loc
+    },
+    format = "file"
+  ),
+  tar_target(
+    raw_apd, tibble::as_tibble(read.csv(raw_apd_online))
+  ),
+
+
   # TNRS Matching: Harmonize Taxonomies against TNRS ---------------------------
   tar_target(
     match_try_tnrs, get_tnrs_values(try_list, "try")
@@ -141,10 +153,6 @@ list(
   tar_target(
     glonaf_try_traits_available,
     list_all_traits_glonaf(harmonized_try_glonaf, try_species, full_try_df)
-  ),
-  tar_target(
-    glonaf_species_per_trait,
-    count_species_per_trait(glonaf_try_traits_available)
   ),
 
 
@@ -215,7 +223,7 @@ list(
   # Getting GIFT up-to-date
   tar_target(
     gift_version,
-    "2.2"
+    "3.1"
   ),
   tar_target(
     gift_api,
