@@ -45,7 +45,7 @@ list(
   # TRY trait number and trait id file
   tar_target(
     raw_try_traits,
-    here::here("inst", "exdata", "try", "inst/exdata/try/tde2024422162351.txt"),
+    here::here("inst", "exdata", "try", "tde2024422162351.txt"),
     format = "file"
   ),
   tar_target(
