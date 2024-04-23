@@ -17,6 +17,7 @@ source("R/trait_knowledge.R")
 source("R/try_functions.R")
 
 # Initial options --------------------------------------------------------------
+options(crayon.enabled = TRUE)
 tar_option_set(
   packages = c("data.table", "disk.frame", "dplyr", "ggplot2", "here", "TNRS",
                "TR8", "treemapify", "sf")
@@ -88,10 +89,63 @@ list(
   ),
 
 
+  # Load GIFT data -------------------------------------------------------------
+  #  # Getting GIFT up-to-date
+  tar_target(
+    gift_version,
+    "3.1"
+  ),
+  tar_target(
+    gift_api,
+    Sys.getenv("GIFT_RESTRICTED_API")
+  ),
+  tar_target(
+    gift_all_species,
+    GIFT::GIFT_species(gift_api, GIFT_version = gift_version)
+  ),
+  tar_target(
+    gift_current_trait_meta,
+    GIFT::GIFT_traits_meta(gift_api, GIFT_version = gift_version)
+  ),
+  tar_target(
+    gift_shape,
+    GIFT::GIFT_shapes(api = gift_api, GIFT_version = gift_version)
+  ),
+  tar_target(
+    gift_all_raw_traits,
+    GIFT::GIFT_traits_raw(
+      gift_current_trait_meta[["Lvl3"]], api = gift_api,
+      GIFT_version = gift_version
+    )
+  ),
+  tar_target(
+    gift_checklists,
+    retrieve_all_gift_checklists(gift_api, gift_version)
+  ),
+  tar_target(
+    gift_raw_species,
+    extract_raw_gift_species(gift_all_raw_traits, gift_checklists)
+  ),
+  tar_target(
+    gift_raw_list,
+    gift_raw_species[["full_name"]]
+  ),
+  tar_target(
+    gift_matched_taxonomy,
+    match_taxonomy_checklists_raw(
+      gift_all_raw_traits, gift_raw_species, gift_raw_list, match_raw_gift_tnrs
+    )
+  ),
+  tar_target(
+    gift_matched_checklists,
+    match_checklist(gift_matched_taxonomy, gift_checklists)
+  ),
+
+
   # Load AusTraits data --------------------------------------------------------
   tar_target(
     austraits,
-    austraits::load_austraits(version = "3.0.2", path = "inst/exdata/austraits")
+    austraits::load_austraits(version = "5.0.0", path = "inst/exdata/austraits")
   ),
   tar_target(
     austraits_species,
@@ -219,56 +273,6 @@ list(
   tar_target(
     gift_trait_per_species,
     count_gift_trait_per_species(gift_glonaf_traits)
-  ),
-  # Getting GIFT up-to-date
-  tar_target(
-    gift_version,
-    "3.1"
-  ),
-  tar_target(
-    gift_api,
-    Sys.getenv("GIFT_RESTRICTED_API")
-  ),
-  tar_target(
-    gift_all_species,
-    GIFT::GIFT_species(gift_api, GIFT_version = gift_version)
-  ),
-  tar_target(
-    gift_current_trait_meta,
-    GIFT::GIFT_traits_meta(gift_api, GIFT_version = gift_version)
-  ),
-  tar_target(
-    gift_shape,
-    GIFT::GIFT_shapes(api = gift_api, GIFT_version = gift_version)
-  ),
-  tar_target(
-    gift_all_raw_traits,
-    GIFT::GIFT_traits_raw(
-      gift_current_trait_meta[["Lvl3"]], api = gift_api,
-      GIFT_version = gift_version
-    )
-  ),
-  tar_target(
-    gift_checklists,
-    retrieve_all_gift_checklists(gift_api, gift_version)
-  ),
-  tar_target(
-    gift_raw_species,
-    extract_raw_gift_species(gift_all_raw_traits, gift_checklists)
-  ),
-  tar_target(
-    gift_raw_list,
-    gift_raw_species[["full_name"]]
-  ),
-  tar_target(
-    gift_matched_taxonomy,
-    match_taxonomy_checklists_raw(
-      gift_all_raw_traits, gift_raw_species, gift_raw_list, match_raw_gift_tnrs
-    )
-  ),
-  tar_target(
-    gift_matched_checklists,
-    match_checklist(gift_matched_taxonomy, gift_checklists)
   ),
   tar_target(
     gift_unified_distribution,
