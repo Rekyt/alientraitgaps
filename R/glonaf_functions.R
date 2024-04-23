@@ -14,7 +14,7 @@ discon = function(con) {
 }
 
 get_glonaf_alien_species_count = function(glonaf_con) {
-  species_count = tbl(glonaf_con, "flora_orig") %>%
+  species_count = tbl(glonaf_con, "flora_orig_2_0") %>%
     select(taxon_orig_id, status_id) %>%
     distinct() %>%
     count(status_id, sort = TRUE) %>%
@@ -27,15 +27,15 @@ get_glonaf_alien_species_count = function(glonaf_con) {
 }
 
 get_glonaf_species_list = function(glonaf_con) {
-  species_list = tbl(glonaf_con, "flora_orig") %>%
+  species_list = tbl(glonaf_con, "flora_orig_2_0") %>%
     # Get taxa that are referenced as naturalized, alien, or invasive
     filter(status_id %in% c(2, 4, 5, 7)) %>%
     distinct(taxon_orig_id) %>%
     # Get species names and ids
-    inner_join(tbl(glonaf_con, "taxon_orig"), by = c(taxon_orig_id = "id")) %>%
+    inner_join(tbl(glonaf_con, "taxon_wcvp"), by = c(taxon_orig_id = "id")) %>%
     # Corrected names after matching TPL
     distinct(species_id) %>%
-    inner_join(tbl(glonaf_con, "species"), by = c(species_id = "id")) %>%
+    inner_join(tbl(glonaf_con, "species_list_2_0"), by = c(species_id = "id")) %>%
     select(-species_id) %>%
     # Add Name status from TPL
     inner_join(
@@ -92,11 +92,11 @@ get_glonaf_region_correspondence = function(glonaf_alien_species) {
   ## Get a list of species <-> region ids
   glonaf_con %>%
     ## Get list of species
-    tbl("flora_orig") %>%
+    tbl("flora_orig_2_0") %>%
     filter(status_id %in% c(2, 4, 5, 7)) %>%
     distinct(taxon_orig_id) %>%
     # Get species names and ids
-    inner_join(tbl(glonaf_con, "taxon_orig"), by = c(taxon_orig_id = "id")) %>%
+    inner_join(tbl(glonaf_con, "taxon_wcvp"), by = c(taxon_orig_id = "id")) %>%
     collect() %>%
     ## Merge extracted species
     inner_join(
@@ -106,7 +106,7 @@ get_glonaf_region_correspondence = function(glonaf_alien_species) {
     ## Get region ids
     inner_join(
       glonaf_con %>%
-        tbl("flora_orig") %>%
+        tbl("flora_orig_2_0") %>%
         filter(status_id %in% c(2, 4, 5, 7)) %>%
         distinct(list_id, taxon_orig_id) %>%
         inner_join(
@@ -122,7 +122,7 @@ get_glonaf_region_correspondence = function(glonaf_alien_species) {
         ) %>%
         collect()
     ) %>%
-    select(taxon_orig_id, taxon_orig, taxon_corrected, genus, epithet, hybrid,
+    select(taxon_orig_id, taxon_wcvp, taxon_corrected, genus, epithet, hybrid,
            author_name, OBJIDsic)
 }
 
@@ -220,7 +220,7 @@ extract_species_regions_table = function(
   )
 
   # Extract all regions for all species referenced in GloNAF
-  species_regions = tbl(glonaf_con, "flora_orig") %>%
+  species_regions = tbl(glonaf_con, "flora_orig_2_0") %>%
     # Get taxa that are referenced as naturalized, alien, or invasive
     filter(status_id %in% c(2, 4, 5, 7)) %>%
     distinct(taxon_orig_id, list_id, status_id) %>%
@@ -250,10 +250,10 @@ extract_species_regions_table = function(
     ) %>%
     distinct(taxon_orig_id, status_name, OBJIDsic) %>%
     # Get species names and ids
-    inner_join(tbl(glonaf_con, "taxon_orig"), by = c(taxon_orig_id = "id")) %>%
+    inner_join(tbl(glonaf_con, "taxon_wcvp"), by = c(taxon_orig_id = "id")) %>%
     # Corrected names after matching TPL
     distinct(species_id, taxon_orig_id, status_name, OBJIDsic) %>%
-    inner_join(tbl(glonaf_con, "species"), by = c(species_id = "id")) %>%
+    inner_join(tbl(glonaf_con, "species_list_2_0"), by = c(species_id = "id")) %>%
     select(-species_id) %>%
     # Add Name status from TPL
     inner_join(tbl(glonaf_con, "name_status"), by = c(name_status_id = "id")) %>%
