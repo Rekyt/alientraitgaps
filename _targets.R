@@ -153,7 +153,12 @@ list(
   ),
   tar_target(
     austraits_list,
-    unique(austraits_species[["taxon_name"]])
+    unique(
+      paste(
+        austraits_species[["taxon_name"]],
+        austraits_species[["scientificNameAuthorship"]]
+      )
+    )
   ),
 
 

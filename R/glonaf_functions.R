@@ -29,36 +29,24 @@ get_glonaf_alien_species_count = function(glonaf_con) {
 get_glonaf_species_list = function(glonaf_con) {
   species_list = tbl(glonaf_con, "flora_orig_2_0") %>%
     # Get taxa that are referenced as naturalized, alien, or invasive
-    filter(status_id %in% c(2, 4, 5, 7)) %>%
-    distinct(taxon_orig_id) %>%
-    # Get species names and ids
-    inner_join(tbl(glonaf_con, "taxon_wcvp"), by = c(taxon_orig_id = "id")) %>%
-    # Corrected names after matching TPL
+    filter(status_id %in% c(2, 4, 5, 7, 11, 12, 14:16)) %>%
+    # Keep only lists that are not outdated
+    semi_join(
+      tbl(glonaf_con, "list") %>%
+        select(list_id = id, outdated) %>%
+        filter(outdated == 0),
+      by = "list_id"
+    ) %>%
+    distinct(taxon_wcvp_id, taxon_orig_id) %>%
+    # Get species names
+    inner_join(
+      tbl(glonaf_con, "taxon_wcvp"),
+      by = c("taxon_orig_id", "taxon_wcvp_id" = "id")
+    ) %>%
+    # Corrected names after matching WCWP
     distinct(species_id) %>%
     inner_join(tbl(glonaf_con, "species_list_2_0"), by = c(species_id = "id")) %>%
     select(-species_id) %>%
-    # Add Name status from TPL
-    inner_join(
-      tbl(glonaf_con, "name_status"),
-      by = c(name_status_id = "id")
-    ) %>%
-    select(-name_status_id) %>%
-    # Get only binomial name
-    filter(infra_rank_id == 4) %>%
-    # Add full genus name
-    inner_join(
-      tbl(glonaf_con, "genus") %>%
-        select(genus_id = id, genus = name),
-      by = "genus_id"
-    ) %>%
-    select(-genus_id) %>%
-    # Add author name
-    inner_join(
-      tbl(glonaf_con, "author") %>%
-        select(author_id = id, author_name = name),
-      by = "author_id"
-    ) %>%
-    select(-author_id) %>%
     collect()
 
   discon(glonaf_con)
