@@ -87,10 +87,33 @@ query_with_prefixes %>%
   spq_perform()
 
 # All traits that may have or not close, exact or related matches
-query_with_prefixes %>%
+trait_equivalents = query_with_prefixes %>%
   spq_add("?trait_uri rdfs:label ?trait_label") %>%
   spq_add("?trait_uri skos:altLabel ?alternative_label") %>%
   spq_add("?trait_uri skos:exactMatch ?exact_match", .required = FALSE) %>%
   spq_add("?trait_uri skos:closeMatch ?close_match", .required = FALSE) %>%
   spq_add("?trait_uri skos:relatedMatch ?related_match", .required = FALSE) %>%
+  spq_perform()
+
+# Give trait categories and context
+trait_categories = query_with_prefixes %>%
+  spq_add("?trait_uri rdfs:label ?trait_label") %>%
+  spq_add("?trait_uri skos:altLabel ?alternative_label") %>%
+  spq_add("?trait_uri skos:broader ?broader_trait", .required = FALSE) %>%
+  spq_label(broader_trait) %>%
+  spq_add(
+    "?trait_uri ont:hasContextObject ?trait_context", .required = FALSE
+  ) %>%
+  spq_label(trait_context) %>%
+  spq_perform()
+
+# All categories inheriting plant traits
+# 'skos:broader+' means all subject AND THEIR children inheriting from
+# 'APD:trait_group_0000000' = plant traits
+trait_groups =  query_with_prefixes |>
+  spq_add("?uris skos:broader+ APD:trait_group_0000000") |>
+  spq_label(uris) |>
+  spq_add("?uris dcterms:identifier ?id", .required = FALSE) |>
+  # Keep only the ones that have 'trait_group' in them
+  spq_filter(spq('regex(?id, \"trait_group\")')) |>
   spq_perform()

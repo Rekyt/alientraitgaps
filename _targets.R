@@ -61,6 +61,18 @@ list(
   tar_target(
     try_list, extract_try_list(try_species)
   ),
+  tar_target(
+    raw_try_harmonized_species,
+    here::here(
+      "inst", "exdata", "try",
+      "Try202442513363549_TRY6.0_SpeciesList_TaxonomicHarmonization.xlsx"
+    ),
+    format = "file"
+  ),
+  tar_target(
+    try_harmonized_species,
+    readxl::read_xlsx(raw_try_harmonized_species)
+  ),
 
   # Load GloNAF data -----------------------------------------------------------
   tar_target(
@@ -79,8 +91,8 @@ list(
   tar_target(
     glonaf_regions,
     sf::read_sf(
-      here::here("inst", "exdata", "glonaf", "regions_2020-10-28",
-                 "regions_2020-10-28.shp")
+      here::here("inst", "exdata", "glonaf", "regions_2023-10-17",
+                 "regions_2023_10_17.shp")
     )
   ),
   tar_target(
@@ -90,7 +102,7 @@ list(
 
 
   # Load GIFT data -------------------------------------------------------------
-  #  # Getting GIFT up-to-date
+  # Getting GIFT up-to-date version
   tar_target(
     gift_version,
     "3.1"
@@ -100,11 +112,11 @@ list(
     Sys.getenv("GIFT_RESTRICTED_API")
   ),
   tar_target(
-    gift_all_species,
+    gift_species,
     GIFT::GIFT_species(gift_api, GIFT_version = gift_version)
   ),
   tar_target(
-    gift_current_trait_meta,
+    gift_trait_meta,
     GIFT::GIFT_traits_meta(gift_api, GIFT_version = gift_version)
   ),
   tar_target(
@@ -112,9 +124,9 @@ list(
     GIFT::GIFT_shapes(api = gift_api, GIFT_version = gift_version)
   ),
   tar_target(
-    gift_all_raw_traits,
+    gift_raw_traits,
     GIFT::GIFT_traits_raw(
-      gift_current_trait_meta[["Lvl3"]], api = gift_api,
+      gift_trait_meta[["Lvl3"]], api = gift_api,
       GIFT_version = gift_version
     )
   ),
@@ -124,7 +136,7 @@ list(
   ),
   tar_target(
     gift_raw_species,
-    extract_raw_gift_species(gift_all_raw_traits, gift_checklists)
+    extract_raw_gift_species(gift_raw_traits, gift_checklists)
   ),
   tar_target(
     gift_raw_list,
@@ -133,7 +145,7 @@ list(
   tar_target(
     gift_matched_taxonomy,
     match_taxonomy_checklists_raw(
-      gift_all_raw_traits, gift_raw_species, gift_raw_list, match_raw_gift_tnrs
+      gift_raw_traits, gift_raw_species, gift_raw_list
     )
   ),
   tar_target(
@@ -267,8 +279,8 @@ list(
   tar_target(
     gift_glonaf_traits,
     get_gift_traits_for_glonaf_species(
-      gift_all_raw_traits, gift_matched_taxonomy, harmonized_gift_glonaf,
-      gift_current_trait_meta
+      gift_raw_traits, gift_matched_taxonomy, harmonized_gift_glonaf,
+      gift_trait_meta
     )
   ),
   tar_target(
@@ -299,13 +311,13 @@ list(
   tar_target(
     correspondence_tables_check,
     check_correspondence_tables(
-      correspondence_tables, austraits, gift_current_trait_meta, try_traits
+      correspondence_tables, austraits, gift_trait_meta, try_traits
     )
   ),
   tar_target(
     trait_network,
     create_trait_network(
-      correspondence_tables_check, austraits, gift_current_trait_meta, try_traits
+      correspondence_tables_check, austraits, gift_trait_meta, try_traits
     )
   ),
   tar_target(
@@ -329,7 +341,7 @@ list(
   tar_target(
     combined_growth_form,
     extract_growth_form(
-      combined_traits, glonaf_bien_traits, gift_all_raw_traits,
+      combined_traits, glonaf_bien_traits, gift_raw_traits,
       gift_matched_taxonomy, harmonized_gift_glonaf, match_glonaf_tnrs,
       glonaf_list
     )
