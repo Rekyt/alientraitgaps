@@ -17,7 +17,7 @@ source("R/trait_knowledge.R")
 source("R/try_functions.R")
 
 # Initial options --------------------------------------------------------------
-options(crayon.enabled = TRUE)
+
 tar_option_set(
   packages = c("data.table", "disk.frame", "dplyr", "ggplot2", "here", "TNRS",
                "TR8", "treemapify", "sf")
@@ -83,16 +83,13 @@ list(
     glonaf_alien_species, get_glonaf_species_list(connect_glonaf_db())
   ),
   tar_target(
-    glonaf_list, extract_glonaf_list(glonaf_alien_species)
-  ),
-  tar_target(
     glonaf_regions_list, get_glonaf_region_correspondence(glonaf_alien_species)
   ),
   tar_target(
     glonaf_regions,
     sf::read_sf(
       here::here("inst", "exdata", "glonaf", "regions_2023-10-17",
-                 "regions_2023_10_17.shp")
+                 "regions_2023_17_10.shp")
     )
   ),
   tar_target(
