@@ -4,6 +4,7 @@
 library("targets")
 library("magrittr")
 
+source("R/apd_functions.R")
 source("R/austraits_functions.R")
 source("R/bien_functions.R")
 source("R/combined_trait_functions.R")
@@ -186,6 +187,18 @@ list(
   ),
   tar_target(
     raw_apd, tibble::as_tibble(read.csv(raw_apd_online))
+  ),
+  tar_target(
+    apd_subset, subset_apd(raw_apd)
+  ),
+  tar_target(
+    apd_bien, match_apd_bien(apd_subset)
+  ),
+  tar_target(
+    apd_gift, match_apd_gift(apd_subset)
+  ),
+  tar_target(
+    apd_try, match_apd_try(apd_subset)
   ),
 
 
