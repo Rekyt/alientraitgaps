@@ -117,3 +117,10 @@ trait_groups =  query_with_prefixes |>
   # Keep only the ones that have 'trait_group' in them
   spq_filter(spq('regex(?id, \"trait_group\")')) |>
   spq_perform()
+
+query_with_prefixes |>
+  spq_add("?trait_uri rdfs:label ?trait_label") |>
+  spq_add("?trait_uri skos:altLabel ?alternative_label") |>
+  spq_add("?trait_uri ont:hasContextObject obo:PO_0025034") |>
+  spq_add("?trait_uri dcterms:identifier APD:trait_0010111") |>
+  spq_perform()
