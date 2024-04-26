@@ -311,7 +311,8 @@ list(
   tar_target(
     raw_correspondence_tables,
     list.files(
-      here::here("inst", "exdata", "correspondence_tables"), full.names = TRUE
+      here::here("inst", "exdata", "correspondence_tables"),
+      pattern = ".*correspondence\\.ods", full.names = TRUE
     ),
     format = "file"
   ),
