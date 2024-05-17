@@ -21,7 +21,8 @@ tidy_apd = function(apd_subset, dbname = "") {
     tidyr::pivot_longer(
       contains(dbname), names_to = "match_type", values_to = "match_value"
     ) |>
-    filter(match_value != "")
+    filter(match_value != "") |>
+    mutate(match_type = stringr::str_extract(match_type, "[:alpha:]+$"))
 
 }
 
@@ -31,10 +32,9 @@ match_apd_bien = function(apd_subset) {
     tidy_apd("BIEN") |>
     mutate(
       extracted_trait = match_value |>
-        stringr::str_extract("([\\w,\\s,;]+)") |>
-        stringr::str_split(";") |>
-        purrr::map(trimws),
-      match_type = stringr::str_extract(match_type, "[:alpha:]+")
+        stringr::str_extract("([\\w,\\s,;,\\(, \\)]+)") |>
+        stringr::str_split(";|,") |>
+        purrr::map(trimws)
     ) |>
     select(-match_value) |>
     tidyr::unnest(extracted_trait)
@@ -49,8 +49,7 @@ match_apd_gift = function(apd_subset) {
       extracted_trait = match_value |>
         stringr::str_extract_all("\\[GIFT:[\\d,\\.]+\\]") |>
         purrr::map(stringr::str_remove, "\\[GIFT:") |>
-        purrr::map(stringr::str_remove,"\\]"),
-      match_type =  stringr::str_extract(match_type, "[:alpha:]+")
+        purrr::map(stringr::str_remove,"\\]")
     ) |>
     select(-match_value) |>
     tidyr::unnest(extracted_trait) |>
@@ -70,31 +69,17 @@ match_apd_try = function(apd_subset) {
         stringr::str_extract_all("\\[TRY:\\d+\\]") |>
         purrr::map(stringr::str_remove, "\\[TRY:") |>
         purrr::map(stringr::str_remove,"\\]"),
-      match_type =  stringr::str_extract(match_type, "[:alpha:]+"),
       # Count number of match traits
       length_extracted = purrr::map_int(extracted_trait, length)
     )
 
-  apd_try_traits_no_problem = apd_try |>
-    filter(length_extracted != 0) |>
+  if (nrow(filter(apd_try, length_extracted == 0)) > 0) {
+    stop("Some TRY traits were matched 0 times")
+  }
+
+  apd_try |>
     select(-length_extracted, -match_value) |>
     tidyr::unnest(extracted_trait)
-
-  apd_try_traits_problem = apd_try |>
-    filter(length_extracted == 0) |>
-    # Remove traits for which no correspondence is clear
-    filter(!(trait %in% c("leaf_lamina_mass_per_area", "life_history"))) |>
-    mutate(
-      extracted_trait = case_when(
-        trait == "cell_cross-sectional_area" ~ lst(c("338", "573")),
-        trait == "bark_thickness"            ~ lst(c("24", "3355", "3356")),
-        trait == "bark_thickness_index"      ~ lst(c("24", "3355", "3356"))
-      )
-    ) |>
-    select(-length_extracted, -match_value) |>
-    tidyr::unnest(extracted_trait)
-
-  bind_rows(apd_try_traits_no_problem, apd_try_traits_problem)
 
 }
 
