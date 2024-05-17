@@ -1,7 +1,7 @@
 read_correspondence_tables = function(raw_correspondence_tables) {
 
   names(raw_correspondence_tables) = gsub(
-    "_correspondence.ods", "", basename(raw_correspondence_tables), fixed = TRUE
+    "_correspondence_v2.ods", "", basename(raw_correspondence_tables), fixed = TRUE
   )
 
   lapply(raw_correspondence_tables, function(x) {
@@ -11,103 +11,95 @@ read_correspondence_tables = function(raw_correspondence_tables) {
 }
 
 check_correspondence_tables = function(
-  correspondence_tables, austraits, gift_traits_meta, try_traits
+  correspondence_tables, bien_trait_list, gift_trait_meta, try_traits,
+  apd_bien, apd_gift, apd_try
 ) {
 
   corres_df = correspondence_tables
 
-  # Define Trait Names
-  aus_names = names(austraits$definitions$traits$elements)
-
-  bien_names = BIEN::BIEN_trait_list()[["trait_name"]] %>%
+  bien_names = bien_trait_list[["trait_name"]] %>%
     na.omit() %>%
     as.character()
 
-  gift_names = gift_traits_meta %>%
-    distinct(Trait2, Lvl3)
+  gift_names = gift_trait_meta %>%
+    distinct(Trait1, Lvl2, Trait2, Lvl3)
 
 
   # Check values in columns 'identical' and 'similar'
   ident_similar = corres_df %>%
     purrr::imap_dfr(
       ~.x %>%
-                      distinct(identical, similar) %>%
+                      distinct(identical, similar, match) %>%
                       mutate(table = .y) %>%
                       select(table, everything()) %>%
-                      arrange(table, identical, similar)
+                      arrange(table, identical, similar, match)
   ) %>%
-    distinct(identical, similar)
+    distinct(identical, similar, match) |>
+    arrange(identical)
 
 
-  if (!identical(ident_similar[["identical"]], c("no", "yes", NA_character_)) |
-      !identical(ident_similar[["similar"]], c("yes", "yes", NA))) {
-    stop("Issue with identical and similar columns")
+  if (
+    !identical(ident_similar[["identical"]], c("no", "no", "yes", "yes", NA)) |
+    !identical(ident_similar[["similar"]], c(rep("yes", 4), NA)) |
+    !identical(
+      ident_similar[["match"]], c("close", "related", "exact", "close", NA)
+    )
+  ) {
+    stop("Issue with identical, similar, and match columns")
   }
 
+  # Check that trait names in correspondence tables are referenced
+  # BIEN
+  names_bien_austraits = apd_bien |>
+    filter(!(extracted_trait %in% bien_names))
 
-  # Check that trait names are indeed in database
-  # Check AusTraits names
-  aus_1 = corres_df$austraits_bien %>%
-    filter(!(austraits_trait_name %in% aus_names))
-
-  aus_2 = corres_df$austraits_try %>%
-    filter(!(austraits_trait_name %in% aus_names))
-
-  aus_3 = corres_df$gift_austraits %>%
-    filter(
-      !(austraits_trait_name %in% aus_names) & !is.na(austraits_trait_name)
-  )
-
-  # Check BIEN names
-  bien_1 = corres_df$austraits_bien %>%
+  names_bien_gift = corres_df$bien_gift %>%
     filter(!(bien_trait_name %in% bien_names) & !is.na(bien_trait_name))
 
-  bien_2 = corres_df$bien_gift %>%
-    filter(!(bien_trait_name %in% bien_names) & !is.na(bien_trait_name))
-
-  bien_3 = corres_df$bien_try %>%
+  names_bien_try = corres_df$bien_try %>%
     filter(!(bien_trait_name) %in% bien_names)
 
   # Check GIFT names
-  gift_1 = corres_df$bien_gift %>%
+  names_gift_austraits = apd_gift |>
     filter(
-      (!(gift_trait_id %in% gift_names$Lvl3) |
-         !(gift_trait_name %in% gift_names$Trait2)) & (!is.na(gift_trait_id) &
-                                                         !is.na(gift_trait_name))
+      !(extracted_trait %in% c(gift_trait_meta$Lvl2, gift_trait_meta$Lvl3))
     )
 
-  gift_2 = corres_df$gift_austraits %>%
-    filter(!(gift_trait_id %in% gift_names$Lvl3) |
-             !(gift_trait_name %in% gift_names$Trait2))
+  names_gift_bien = corres_df$bien_gift %>%
+    filter(
+      (!(gift_trait_id %in% gift_names$Lvl3) |
+         !(gift_trait_name %in% gift_names$Trait2)) &
+        (!is.na(gift_trait_id) & !is.na(gift_trait_name))
+    )
 
-  gift_3 = corres_df$gift_try %>%
+  names_gift_try = corres_df$gift_try %>%
     filter(!(gift_trait_name %in% gift_names$Trait2))
 
   # Check TRY names
-  try_1 = corres_df$austraits_try %>%
+  names_try_austraits = apd_try %>%
+    filter(!(extracted_trait %in% try_traits$TraitID))
+
+  names_try_bien = corres_df$bien_try %>%
     filter(
-      (!(try_trait_id %in% try_traits$TraitID)) &
+      (!(try_trait_id %in% try_traits$TraitID) |
+         !(try_trait_name %in% trimws(try_traits$Trait))) &
         (!is.na(try_trait_id) & !is.na(try_trait_name))
     )
 
-  try_2 = corres_df$bien_try %>%
+  names_try_gift = corres_df$gift_try %>%
     filter(
       (!(try_trait_id %in% try_traits$TraitID) |
          !(try_trait_name %in% try_traits$Trait)) &
         (!is.na(try_trait_id) & !is.na(try_trait_name))
     )
 
-  try_3 = corres_df$gift_try %>%
-    filter(
-      (!(try_trait_id %in% try_traits$TraitID) |
-         !(try_trait_name %in% try_traits$Trait)) &
-        (!is.na(try_trait_id) & !is.na(try_trait_name))
-    )
+  correspondence_list = list(
+    names_bien_austraits, names_bien_gift, names_bien_try, names_gift_austraits,
+    names_gift_bien, names_gift_try, names_try_austraits, names_try_bien,
+    names_try_gift
+  )
 
-  rows = list(
-    aus_1, aus_2, aus_3, bien_1, bien_2, bien_3, gift_1, gift_2, gift_3, try_1,
-    try_2, try_3
-  ) %>%
+  rows = correspondence_list |>
     vapply(nrow, 1L)
 
   if (any(rows != 0)) {
@@ -119,20 +111,21 @@ check_correspondence_tables = function(
 
 
 create_trait_network = function(
-  correspondence_tables_check, austraits, gift_traits_meta, try_traits
+  correspondence_tables_check, bien_trait_list, gift_trait_meta, try_traits,
+  apd_subset, apd_bien, apd_gift, apd_try
 ) {
 
   corres_df = correspondence_tables_check
 
   # Get back trait names
-  aus_names = names(austraits$definitions$traits$elements)
+  aus_names = apd_subset[["trait"]]
 
-  bien_names = BIEN::BIEN_trait_list()[["trait_name"]] %>%
+  bien_names = bien_trait_list[["trait_name"]] %>%
     na.omit() %>%
     as.character()
 
-  gift_names = gift_traits_meta %>%
-    distinct(Trait2, Lvl3)
+  gift_names = gift_trait_meta %>%
+    distinct(Trait1, Lvl2, Trait2, Lvl3)
 
 
   # Create nodes data.frame
@@ -147,9 +140,6 @@ create_trait_network = function(
   )
 
   # Unified edge data.frame
-  corres_df$gift_austraits = corres_df$gift_austraits %>%
-    select(-gift_trait_id)
-
   corres_df$bien_gift = corres_df$bien_gift %>%
     select(-gift_trait_id)
 
@@ -157,15 +147,29 @@ create_trait_network = function(
     purrr::map_dfr(
       function(x) {
         smaller_df = x %>%
-          select(1:2, identical, similar) %>%
-          mutate(across(.fns = as.character))
+          select(1:2, match_type = match) %>%
+          mutate(across(everything(), .fns = as.character))
 
         colnames(smaller_df)[1:2] = c("from", "to")
 
         smaller_df %>%
           filter(!is.na(to))
+    })
+
+  apd_edge_df = list(
+    apd_bien, apd_gift, apd_try
+  ) |>
+    purrr::map_dfr(
+      function(x) {
+        smaller_df = x %>%
+          select(from = trait, to = extracted_trait, match_type) %>%
+          mutate(across(everything(), .fns = as.character))
+
+        smaller_df %>%
+          filter(!is.na(to))
       })
 
+  edge_df = bind_rows(edge_df, apd_edge_df)
 
   # Create trait network
   trait_network = tidygraph::tbl_graph(
