@@ -32,7 +32,7 @@ match_apd_bien = function(apd_subset) {
     tidy_apd("BIEN") |>
     mutate(
       extracted_trait = match_value |>
-        stringr::str_extract("([\\w,\\s,;,\\(, \\)]+)") |>
+        stringr::str_extract("([\\w,\\s,;,\\(, \\), \\.]+)") |>
         stringr::str_split(";|,") |>
         purrr::map(trimws)
     ) |>
