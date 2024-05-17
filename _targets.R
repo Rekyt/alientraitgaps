@@ -186,10 +186,10 @@ list(
     format = "file"
   ),
   tar_target(
-    raw_apd, tibble::as_tibble(read.csv(raw_apd_online))
+    apd_raw, tibble::as_tibble(read.csv(raw_apd_online))
   ),
   tar_target(
-    apd_subset, subset_apd(raw_apd)
+    apd_subset, subset_apd(apd_raw)
   ),
   tar_target(
     apd_bien, match_apd_bien(apd_subset)
@@ -324,7 +324,7 @@ list(
     raw_correspondence_tables,
     list.files(
       here::here("inst", "exdata", "correspondence_tables"),
-      pattern = ".*correspondence\\.ods", full.names = TRUE
+      pattern = ".*correspondence_v2.ods", full.names = TRUE
     ),
     format = "file"
   ),
@@ -334,13 +334,15 @@ list(
   tar_target(
     correspondence_tables_check,
     check_correspondence_tables(
-      correspondence_tables, austraits, gift_trait_meta, try_traits
+      correspondence_tables, bien_trait_list, gift_trait_meta, try_traits,
+      apd_bien, apd_gift, apd_try
     )
   ),
   tar_target(
     trait_network,
     create_trait_network(
-      correspondence_tables_check, austraits, gift_trait_meta, try_traits
+      correspondence_tables_check, bien_trait_list, gift_trait_meta, try_traits,
+      apd_subset, apd_bien, apd_gift, apd_try
     )
   ),
   tar_target(
