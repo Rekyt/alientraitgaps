@@ -127,6 +127,18 @@ create_trait_network = function(
   gift_names = gift_trait_meta %>%
     distinct(Trait1, Lvl2, Trait2, Lvl3)
 
+  # Manage the issue of APD-GIFT matching Lvl2 and Lvl3 traits
+  apd_gift_lvl3 = apd_gift |>
+    filter(gift_lvl == "Lvl3")
+
+  apd_gift_lvl2 = apd_gift |>
+    filter(gift_lvl == "Lvl2") |>
+    inner_join(
+      gift_names |>
+        select(Lvl2, Trait2, Lvl3),
+      by = c(extracted_trait = "Lvl2")
+    )
+
 
   # Create nodes data.frame
   node_df = data.frame(
