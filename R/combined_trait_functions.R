@@ -136,8 +136,19 @@ create_trait_network = function(
     inner_join(
       gift_names |>
         select(Lvl2, Trait2, Lvl3),
-      by = c(extracted_trait = "Lvl2")
-    )
+      by = c(extracted_trait = "Lvl2"),
+      relationship = "many-to-many"
+    ) |>
+  select(-extracted_trait, -Trait2) |>
+  rename(extracted_trait = Lvl3)
+
+  apd_gift_updated = bind_rows(apd_gift_lvl3, apd_gift_lvl2) |>
+    inner_join(
+      gift_names |>
+    distinct(Trait2, Lvl3),
+    by = c(extracted_trait = "Lvl3")
+    ) |>
+  select(-extracted_trait, extracted_trait = Trait2)
 
 
   # Create nodes data.frame
@@ -169,7 +180,7 @@ create_trait_network = function(
     })
 
   apd_edge_df = list(
-    apd_bien, apd_gift, apd_try
+    apd_bien, apd_gift_updated, apd_try
   ) |>
     purrr::map_dfr(
       function(x) {
