@@ -239,6 +239,18 @@ list(
 
   # BIEN traits ----------------------------------------------------------------
 
+  # List of traits in BIEN
+  tar_target(
+    bien_trait_list, BIEN::BIEN_trait_list()
+  ),
+
+  tar_target(
+    bien_traits,
+    BIEN::BIEN_trait_trait(
+      na.omit(bien_trait_list$trait_name), all.taxonomy = TRUE
+    )
+  ),
+
   # Query BIEN traits for GloNAF species
   tar_target(
     glonaf_bien_traits_count,
