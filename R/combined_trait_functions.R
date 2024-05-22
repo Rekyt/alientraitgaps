@@ -142,6 +142,7 @@ create_trait_network = function(
   select(-extracted_trait, -Trait2) |>
   rename(extracted_trait = Lvl3)
 
+  # Transform GIFT APD Lvl2 traits into their Lvl3 equivalent
   apd_gift_updated = bind_rows(apd_gift_lvl3, apd_gift_lvl2) |>
     inner_join(
       gift_names |>
@@ -159,6 +160,10 @@ create_trait_network = function(
       rep("BIEN",      length.out = length(bien_names)),
       rep("GIFT",      length.out = nrow(gift_names)),
       rep("TRY",       length.out = nrow(try_traits))
+    ),
+    alternative_name = c(
+      apd_subset[["label"]], bien_names, gift_names[["Trait2"]],
+      try_traits[["Trait"]]
     )
   )
 
@@ -195,7 +200,7 @@ create_trait_network = function(
   edge_df = bind_rows(edge_df, apd_edge_df)
 
   # Create trait network
-  trait_network = tidygraph::tbl_graph(
+  tidygraph::tbl_graph(
     nodes = node_df %>%
       mutate(name = gsub(" ", "__", name, fixed = TRUE)),
     edges = edge_df %>%

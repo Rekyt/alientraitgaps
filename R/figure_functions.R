@@ -1160,13 +1160,10 @@ plot_map_sd_n_traits_region = function(
 plot_network_trait = function(trait_name_network) {
 
   ggraph::ggraph(trait_name_network, layout = 'graphopt') +
-    ggraph::geom_edge_link(aes(colour = identical), edge_width = 1) +
+    ggraph::geom_edge_link(aes(colour = match_type), edge_width = 1) +
     ggraph::geom_node_point(aes(shape = database)) +
     labs(
-      shape = "Trait Database", edge_colour = "Are Traits Identical or Similar?"
-    ) +
-    ggraph::scale_edge_color_discrete(
-      labels = c(yes = "identical", no = "similar")
+      shape = "Trait Database", edge_colour = "Match type"
     ) +
     theme_void() +
     theme(legend.position = "top")
