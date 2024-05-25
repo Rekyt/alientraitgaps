@@ -5,11 +5,8 @@ library("targets")
 tar_load(apd_subset)
 tar_load(try_traits)
 
-try_traits = readr::read_delim("tde2024422162351.txt", skip = 3, col_select = -6)
-
-apd_try_detailed = tibble::as_tibble(read.csv("APD_traits_input.csv")) |>
-  select(identifier:label, starts_with("TRY")) |>
-  rename(trait_id = identifier) |>
+apd_try_detailed = apd_subset |>
+  select(trait_id:label, starts_with("TRY")) |>
   tidyr::pivot_longer(
     starts_with("TRY"), names_to = "match_type", values_to = "matched_trait"
   ) |>
@@ -41,7 +38,7 @@ apd_try_smaller = apd_try_detailed |>
     try_traits |>
       distinct(code_matched_on_name = TraitID, Trait),
     by = c(extracted_trait = "Trait")
-  )
+  ) |>
   select(trait, extracted_trait, extracted_code, name_matched_on_code, code_matched_on_name)
 
 ## Potentially problematic traits
