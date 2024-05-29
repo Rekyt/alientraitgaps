@@ -351,9 +351,20 @@ list(
     write_network_file(trait_network, here::here("inst", "trait_network.graphml")),
     format = "file"
   ),
+  tarchetypes::tar_map(
+    list(match_type = c("full", "close", "exact")),
+    tar_target(
+      trait_names_nested,
+      consolidate_trait_names_from_network(trait_network, match_type)
+    ),
+    tar_target(
+      trait_names,
+      unnest_names(trait_names_nested)
+    )
+  ),
   tar_target(
     network_consolidated_trait_names,
-    consolidate_trait_names_from_network(trait_network, try_traits)
+    consolidate_trait_names_from_network(trait_network, "full")
   ),
 
 

@@ -217,22 +217,36 @@ write_network_file = function(trait_network, filepath) {
 }
 
 
-consolidate_trait_names_from_network = function(trait_network, try_traits) {
+name_connected_components = function(trait_network) {
 
-  # Extract all connected components seperately
-  all_components = trait_network %>%
-    tidygraph::to_components()
+  trait_network |>
+    tidygraph::activate(nodes) |>
+    mutate(component = tidygraph::group_components()) |>
+    arrange(component, database) |>
+    group_by(component) |>
+    mutate(component_name = alternative_name[[1]],
+           component_size = n()) |>
+    ungroup() |>
+    as_tibble()
 
-  component_size = all_components %>%
-    purrr::map_dbl(
-      ~.x %>%
-        tidygraph::activate(nodes) %>%
-        length()
-    )
+}
 
-  # Look at some of the biggest connected component
-  all_components[which(component_size > 10)]
 
+consolidate_trait_names_from_network = function(trait_network, match_type = c("full", "close", "exact")) {
+
+  if (match_type == "close") {
+
+    trait_network = trait_network |>
+      tidygraph::activate(edges) |>
+      filter(match_type != "related")
+
+  } else if (match_type == "exact") {
+
+    trait_network = trait_network |>
+      tidygraph::activate(edges) |>
+      filter(match_type == "exact")
+
+  }
 
   db_df = data.frame(
     database = c("AusTraits", "BIEN", "GIFT", "TRY"),
@@ -242,79 +256,27 @@ consolidate_trait_names_from_network = function(trait_network, try_traits) {
     )
   )
 
-  # Get unified trait table
-  all_traits = purrr::map_dfr(all_components, function(x) {
-    node_df = x %>%
-      tidygraph::activate(nodes) %>%
-      as.data.frame()
-
-    has_only_try = length(node_df[["database"]]) == 1 &
-      ("TRY" %in% node_df[["database"]])
-
-    node_df = node_df %>%
-      full_join(db_df, by = "database") %>%
-      arrange(trait_name)
-
-    node_df$name = gsub("__", " ", node_df$name, fixed = TRUE)
-
-    # Add Consolidated Name
-    if (!has_only_try) {
-
-      first_non_na_trait = node_df %>%
-        filter(!is.na(name)) %>%
-        pull(name) %>%
-        .[1]
-
-      node_df = node_df %>%
-        add_row(
-          name = first_non_na_trait,
-          trait_name = "consolidated_name"
-        )
-
-    } else {
-
-
-      first_try_trait = node_df %>%
-        filter(database == "TRY") %>%
-        slice(1)
-
-      try_name = try_traits %>%
-        filter(TraitID == first_try_trait[["name"]]) %>%
-        pull(Trait) %>%
-        .[1]
-
-      node_df = node_df %>%
-        add_row(
-          name = try_name,
-          trait_name = "consolidated_name"
-        )
-    }
-
-    node_df %>%
-      select(-database) %>%
-      tidyr::pivot_wider(
-        names_from = trait_name, values_from = name, values_fn = list
-      )
-  }) %>%
-    tidyr::unnest(austraits_trait_name) %>%
-    tidyr::unnest(bien_trait_name) %>%
-    tidyr::unnest(gift_trait_name) %>%
-    tidyr::unnest(try_trait_id) %>%
-    tidyr::unnest(consolidated_name) %>%
-    left_join(
-      try_traits %>%
-        distinct(try_trait_id = TraitID, try_trait_name = Trait) %>%
-        mutate(try_trait_id = as.character(try_trait_id)),
-      by = "try_trait_id"
+  nodes_df = name_connected_components(trait_network) |>
+    left_join(db_df, by = "database") |>
+    select(-database, -alternative_name) |>
+    rename(consolidated_name = component_name) |>
+    tidyr::pivot_wider(
+      names_from = trait_name, values_from = name, values_fn = list, values_fill = list(NA_character_)
     )
 
-  # Rename and re-order column as the initial consolidated trait name df
-  all_traits %>%
-    rename(aus_trait_name = austraits_trait_name) %>%
-    select(
-      bien_trait_name, aus_trait_name, try_trait_id, try_trait_name,
-      gift_trait_name, consolidated_name
+}
+
+unnest_names = function(trait_names_df) {
+
+  trait_names_df |>
+    tidyr::unnest(austraits_trait_name) |>
+    tidyr::unnest(bien_trait_name) |>
+    tidyr::unnest(gift_trait_name) |>
+    tidyr::unnest(try_trait_id) |>
+    mutate(
+      bien_trait_name = gsub("__", " ", bien_trait_name, fixed = TRUE)
     )
+
 }
 
 
