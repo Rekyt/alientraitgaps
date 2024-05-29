@@ -13,6 +13,17 @@ get_bien_traits = function(harmonized_try_glonaf) {
     filter(!is.na(trait_name))
 }
 
+get_bien_taxonomy = function(bien_traits) {
+
+  bien_traits |>
+    select(
+      scrubbed_species_binomial,
+      verbatim_family:scrubbed_species_binomial_with_morphospecies
+    ) |>
+    distinct()
+
+}
+
 count_bien_species_per_trait = function(glonaf_bien_traits_count) {
   glonaf_bien_traits_count %>%
     distinct(species = scrubbed_species_binomial, trait_name) %>%

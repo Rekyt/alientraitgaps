@@ -252,6 +252,10 @@ list(
     )
   ),
 
+  tar_target(
+    bien_species,
+    get_bien_taxonomy(bien_traits)
+  ),
   # Query BIEN traits for GloNAF species
   tar_target(
     glonaf_bien_traits_count,
