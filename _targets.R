@@ -183,7 +183,8 @@ list(
       )
       loc
     },
-    format = "file"
+    format = "file",
+    cue = tar_cue(mode = "never")
   ),
   tar_target(
     apd_raw, tibble::as_tibble(read.csv(raw_apd_online))
@@ -344,6 +345,11 @@ list(
       correspondence_tables_check, bien_trait_list, gift_trait_meta, try_traits,
       apd_subset, apd_bien, apd_gift, apd_try
     )
+  ),
+  tar_target(
+    trait_network_file,
+    write_network_file(trait_network, here::here("inst", "trait_network.graphml")),
+    format = "file"
   ),
   tar_target(
     network_consolidated_trait_names,

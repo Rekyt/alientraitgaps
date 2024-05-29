@@ -209,6 +209,14 @@ create_trait_network = function(
   )
 }
 
+write_network_file = function(trait_network, filepath) {
+
+  igraph::write_graph(trait_network, filepath, "graphml")
+
+  filepath
+}
+
+
 consolidate_trait_names_from_network = function(trait_network, try_traits) {
 
   # Extract all connected components seperately
