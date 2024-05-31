@@ -148,6 +148,13 @@ simplify_gift_distribution = function(gift_matched_checklists) {
 
 }
 
+simplify_gift_traits = function(gift_raw_traits) {
+
+  gift_raw_traits |>
+    distinct(work_ID, work_species, trait_ID)
+
+}
+
 harmonize_gift_glonaf = function(match_gift_tnrs, match_glonaf_tnrs) {
   match_gift_tnrs %>%
     distinct(

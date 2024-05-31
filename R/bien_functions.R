@@ -1,3 +1,10 @@
+simplify_bien_traits = function(bien_traits) {
+
+  bien_traits |>
+    distinct(scrubbed_species_binomial, trait_name)
+
+}
+
 count_bien_traits_per_species = function(harmonized_try_glonaf) {
   harmonized_try_glonaf %>%
     pull(species_accepted_try) %>%

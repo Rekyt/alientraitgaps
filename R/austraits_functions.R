@@ -1,3 +1,10 @@
+simplify_austraits_traits = function(austraits) {
+
+  austraits$traits |>
+    distinct(taxon_name, trait_name)
+
+}
+
 harmonize_austraits_glonaf = function(match_austraits_tnrs, match_glonaf_tnrs) {
   match_austraits_tnrs %>%
     distinct(

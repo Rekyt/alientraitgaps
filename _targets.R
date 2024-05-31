@@ -263,6 +263,11 @@ list(
 
 
   # AusTraits traits -----------------------------------------------------------
+  # Simplify AusTraits traits
+  tar_target(
+    austraits_traits_simple,
+    simplify_austraits_traits(austraits)
+  ),
   # Match GloNAF to AusTraits
   tar_target(
     harmonized_austraits_glonaf,
@@ -300,6 +305,10 @@ list(
     )
   ),
   tar_target(
+    bien_traits_simple,
+    simplify_bien_traits(bien_traits)
+  ),
+  tar_target(
     bien_species,
     get_bien_taxonomy(bien_traits)
   ),
@@ -320,6 +329,11 @@ list(
 
 
   # GIFT traits ----------------------------------------------------------------
+  # Simplify GIFT traits
+  tar_target(
+    gift_traits_simple,
+    simplify_gift_traits(gift_raw_traits)
+  ),
   # Match species names
   tar_target(
     harmonized_gift_glonaf,
@@ -348,6 +362,12 @@ list(
   ),
 
   # TRY traits -----------------------------------------------------------------
+  # Simplify
+  tar_target(
+    try_traits_simple,
+    simplify_try_traits(full_try_df)
+  ),
+
   # Harmonize TRY and GloNAF
   tar_target(
     harmonized_try_glonaf,
@@ -423,7 +443,8 @@ list(
   tar_target(
     combined_traits,
     combine_bien_try_aus_gift_traits(
-      network_consolidated_trait_names, glonaf_bien_traits,
+      network_consolidated_trait_names, austraits, bien_traits,
+      gift_raw_traits,
       glonaf_try_traits_available, aus_traits, gift_glonaf_traits
     )
   ),
