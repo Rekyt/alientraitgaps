@@ -203,7 +203,49 @@ list(
   ),
 
 
-  # TNRS Matching: Harmonize Taxonomies against TNRS ---------------------------
+  # Harmonizing Taxonomies -----------------------------------------------------
+  # Summarise taxonomies for each database
+  tar_target(
+    austraits_harmonized,
+    get_austraits_taxonomy(austraits_species)
+  ),
+  tar_target(
+    bien_harmonized,
+    get_bien_taxonomy(bien_species)
+  ),
+  tar_target(
+    gift_harmonized,
+    get_gift_taxonomy(gift_species)
+  ),
+  tar_target(
+    try_harmonized,
+    get_try_taxonomy(try_harmonized_species)
+  ),
+  tar_target(
+    glonaf_harmonized,
+    get_glonaf_taxonomy(glonaf_alien_species)
+  ),
+  # Combine each trait taxonomies with GloNAF
+  tar_target(
+    austraits_glonaf,
+    subset_glonaf_species(austraits_harmonized, glonaf_harmonized, "binomial")
+  ),
+  tar_target(
+    bien_glonaf,
+    subset_glonaf_species(
+      bien_harmonized, glonaf_harmonized, "scrubbed_species_binomial"
+    )
+  ),
+  tar_target(
+    gift_glonaf,
+    subset_glonaf_species(gift_harmonized, glonaf_harmonized, "work_species")
+  ),
+  tar_target(
+    try_glonaf,
+    subset_glonaf_species(try_harmonized, glonaf_harmonized, "MatchedName")
+  ),
+
+  # Legacy code
   tar_target(
     match_try_tnrs, get_tnrs_values(try_list, "try")
   ),
@@ -251,11 +293,11 @@ list(
       na.omit(bien_trait_list$trait_name), all.taxonomy = TRUE
     )
   ),
-
   tar_target(
     bien_species,
     get_bien_taxonomy(bien_traits)
   ),
+
   # Query BIEN traits for GloNAF species
   tar_target(
     glonaf_bien_traits_count,
