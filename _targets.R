@@ -26,54 +26,57 @@ tar_option_set(
 
 # Target factory ---------------------------------------------------------------
 list(
-  # Load TRY data --------------------------------------------------------------
-  # Load actual files
+
+  # Load AusTraits data --------------------------------------------------------
   tar_target(
-    raw_try_species,
-    here::here("inst", "exdata", "try", "TryAccSpecies.txt"),
-    format = "file"
-  ),
-  # Full TRY extract
-  tar_target(
-    raw_full_try,
-    here::here("inst", "exdata", "try", "large_try"),
-    format = "file"
+    austraits,
+    austraits::load_austraits(version = "6.0.0", path = "inst/exdata/austraits")
   ),
   tar_target(
-    full_try_df,
-    arrow::read_parquet(raw_full_try)
-  ),
-  # TRY trait number and trait id file
-  tar_target(
-    raw_try_traits,
-    here::here("inst", "exdata", "try", "tde2024422162351.txt"),
-    format = "file"
+    austraits_species,
+    austraits[["taxa"]]
   ),
   tar_target(
-    try_traits,
-    readr::read_delim(raw_try_traits, skip = 3, col_select = -6)
+    austraits_list,
+    unique(
+      paste(
+        austraits_species[["taxon_name"]],
+        austraits_species[["scientificNameAuthorship"]]
+      )
+    )
   ),
-  # Load species file
+
+
+  # Load APD (Australian Plant Traits Dictionary) ------------------------------
   tar_target(
-    try_species,
-    data.table::fread(raw_try_species, encoding = "UTF-8")
-  ),
-  # Get the name list
-  tar_target(
-    try_list, extract_try_list(try_species)
-  ),
-  tar_target(
-    raw_try_harmonized_species,
-    here::here(
-      "inst", "exdata", "try",
-      "Try202442513363549_TRY6.0_SpeciesList_TaxonomicHarmonization.xlsx"
-    ),
-    format = "file"
+    raw_apd_online,
+    {
+      loc <- here::here("inst", "exdata", "apd", "apd_flat_traits.csv")
+      download.file(
+        "https://github.com/traitecoevo/APD/raw/master/data/APD_traits_input.csv",
+        loc
+      )
+      loc
+    },
+    format = "file",
+    cue = tar_cue(mode = "never")
   ),
   tar_target(
-    try_harmonized_species,
-    readxl::read_xlsx(raw_try_harmonized_species)
+    apd_raw, tibble::as_tibble(read.csv(raw_apd_online))
   ),
+  tar_target(
+    apd_subset, subset_apd(apd_raw)
+  ),
+  tar_target(
+    apd_bien, match_apd_bien(apd_subset)
+  ),
+  tar_target(
+    apd_gift, match_apd_gift(apd_subset)
+  ),
+  tar_target(
+    apd_try, match_apd_try(apd_subset)
+  ),
+
 
   # Load GloNAF data -----------------------------------------------------------
   tar_target(
@@ -152,54 +155,53 @@ list(
   ),
 
 
-  # Load AusTraits data --------------------------------------------------------
+  # Load TRY data --------------------------------------------------------------
+  # Load actual files
   tar_target(
-    austraits,
-    austraits::load_austraits(version = "6.0.0", path = "inst/exdata/austraits")
+    raw_try_species,
+    here::here("inst", "exdata", "try", "TryAccSpecies.txt"),
+    format = "file"
+  ),
+  # Full TRY extract
+  tar_target(
+    raw_full_try,
+    here::here("inst", "exdata", "try", "large_try"),
+    format = "file"
   ),
   tar_target(
-    austraits_species,
-    austraits[["taxa"]]
+    full_try_df,
+    arrow::read_parquet(raw_full_try)
+  ),
+  # TRY trait number and trait id file
+  tar_target(
+    raw_try_traits,
+    here::here("inst", "exdata", "try", "tde2024422162351.txt"),
+    format = "file"
   ),
   tar_target(
-    austraits_list,
-    unique(
-      paste(
-        austraits_species[["taxon_name"]],
-        austraits_species[["scientificNameAuthorship"]]
-      )
-    )
+    try_traits,
+    readr::read_delim(raw_try_traits, skip = 3, col_select = -6)
   ),
-
-
-  # Load APD (Australian Plant Traits Dictionary) ------------------------------
+  # Load species file
   tar_target(
-    raw_apd_online,
-    {
-      loc <- here::here("inst", "exdata", "apd", "apd_flat_traits.csv")
-      download.file(
-        "https://github.com/traitecoevo/APD/raw/master/data/APD_traits_input.csv",
-        loc
-      )
-      loc
-    },
-    format = "file",
-    cue = tar_cue(mode = "never")
+    try_species,
+    data.table::fread(raw_try_species, encoding = "UTF-8")
+  ),
+  # Get the name list
+  tar_target(
+    try_list, extract_try_list(try_species)
   ),
   tar_target(
-    apd_raw, tibble::as_tibble(read.csv(raw_apd_online))
+    raw_try_harmonized_species,
+    here::here(
+      "inst", "exdata", "try",
+      "Try202442513363549_TRY6.0_SpeciesList_TaxonomicHarmonization.xlsx"
+    ),
+    format = "file"
   ),
   tar_target(
-    apd_subset, subset_apd(apd_raw)
-  ),
-  tar_target(
-    apd_bien, match_apd_bien(apd_subset)
-  ),
-  tar_target(
-    apd_gift, match_apd_gift(apd_subset)
-  ),
-  tar_target(
-    apd_try, match_apd_try(apd_subset)
+    try_harmonized_species,
+    readxl::read_xlsx(raw_try_harmonized_species)
   ),
 
 
@@ -259,24 +261,28 @@ list(
     match_raw_gift_tnrs, get_tnrs_values(gift_raw_list, "gift-raw")
   ),
 
-  # TRY traits -----------------------------------------------------------------
-  # Harmonize TRY and GloNAF
+
+  # AusTraits traits -----------------------------------------------------------
+  # Match GloNAF to AusTraits
   tar_target(
-    harmonized_try_glonaf,
-    harmonize_try_glonaf_species(match_try_tnrs, match_glonaf_tnrs)
-  ),
-  # Get back AccSpeciesID after matching
-  tar_target(
-    harmonized_try_ids,
-    get_try_ids_from_harmonized_species(harmonized_try_glonaf, try_species)
+    harmonized_austraits_glonaf,
+    harmonize_austraits_glonaf(match_austraits_tnrs, match_glonaf_tnrs)
   ),
 
+  # Get and count trait data
   tar_target(
-    try_total_number_trait, count_trait_try(harmonized_try_glonaf, try_species)
+    aus_traits,
+    get_austraits_traits_for_glonaf_species(
+      austraits, harmonized_austraits_glonaf
+    )
   ),
   tar_target(
-    glonaf_try_traits_available,
-    list_all_traits_glonaf(harmonized_try_glonaf, try_species, full_try_df)
+    aus_species_per_trait,
+    count_austraits_species_per_trait(aus_traits),
+  ),
+  tar_target(
+    aus_trait_per_species,
+    count_austraits_trait_per_species(aus_traits)
   ),
 
 
@@ -313,30 +319,6 @@ list(
   ),
 
 
-  # AusTraits traits -----------------------------------------------------------
-  # Match GloNAF to AusTraits
-  tar_target(
-    harmonized_austraits_glonaf,
-    harmonize_austraits_glonaf(match_austraits_tnrs, match_glonaf_tnrs)
-  ),
-
-  # Get and count trait data
-  tar_target(
-    aus_traits,
-    get_austraits_traits_for_glonaf_species(
-      austraits, harmonized_austraits_glonaf
-    )
-  ),
-  tar_target(
-    aus_species_per_trait,
-    count_austraits_species_per_trait(aus_traits),
-  ),
-  tar_target(
-    aus_trait_per_species,
-    count_austraits_trait_per_species(aus_traits)
-  ),
-
-
   # GIFT traits ----------------------------------------------------------------
   # Match species names
   tar_target(
@@ -363,6 +345,26 @@ list(
   tar_target(
     gift_unified_distribution,
     simplify_gift_distribution(gift_matched_checklists)
+  ),
+
+  # TRY traits -----------------------------------------------------------------
+  # Harmonize TRY and GloNAF
+  tar_target(
+    harmonized_try_glonaf,
+    harmonize_try_glonaf_species(match_try_tnrs, match_glonaf_tnrs)
+  ),
+  # Get back AccSpeciesID after matching
+  tar_target(
+    harmonized_try_ids,
+    get_try_ids_from_harmonized_species(harmonized_try_glonaf, try_species)
+  ),
+
+  tar_target(
+    try_total_number_trait, count_trait_try(harmonized_try_glonaf, try_species)
+  ),
+  tar_target(
+    glonaf_try_traits_available,
+    list_all_traits_glonaf(harmonized_try_glonaf, try_species, full_try_df)
   ),
 
 
