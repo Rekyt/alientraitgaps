@@ -449,6 +449,10 @@ list(
     tar_target(
       database_euler_diagrams,
       intersect_species_list_by_trait_across_database(database_traits)
+    ),
+    tar_target(
+      trait_combinations,
+      count_trait_combinations(simplified_traits, match_type)
     )
   ),
   tar_target(

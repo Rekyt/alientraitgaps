@@ -358,6 +358,218 @@ combine_traits_all_databases = function(
 
 }
 
+count_trait_combinations = function(simplified_traits, match_type) {
+
+  combs = case_when(match_type == "full" ~ get_full_combs(),
+                    match_type == "close" ~ get_close_combs(),
+                    match_type == "exact" ~ get_exact_combs())
+
+  simplified_traits  |>
+    group_by(species) |>
+    summarise(traits = list(consolidated_name)) |>
+    rowwise() |>
+    mutate(
+      in_glonaf              = TRUE,
+      has_at_least_one_trait = length(traits) > 0,
+      # Consider that each combinations can have multiple ways of writing it
+      # first 'any()' means any combination variant
+      # then 'all()' means all traits of given combination variant should be
+      # present to consider that combination is present
+      has_lhs                = ifelse(
+        any(apply(combs$lhs, 1, \(x) all(x %in% traits))), TRUE, FALSE
+      ),
+      has_diaz               = ifelse(
+        any(apply(combs$diaz, 1, \(x) all(x %in% traits))), TRUE, FALSE
+      ),
+      has_bergmann           = ifelse(
+        any(apply(combs$bergmann, 1, \(x) all(x %in% traits))), TRUE, FALSE
+      )
+    )
+
+}
+
+
+get_full_combs = function() {
+
+  # LHS
+  full_sla = "Leaf area per leaf dry mass (specific leaf area, SLA or 1/LMA) of total leaf area"
+  full_height = "Plant vegetative height"
+  full_seed_mass = "Seed dry mass"
+
+  full_lhs = tidyr::expand_grid(
+    sla = full_sla, height = full_height, seed_mass = full_seed_mass
+  )
+
+
+  # Diaz
+  full_leaf_area = "Leaf area"
+  full_wood_density = c("Wood density", "Leaf dry matter content (LDMC)")
+  full_leaf_n_mass = "Leaf nitrogen (N) content per unit leaf dry mass"
+
+  full_diaz = tidyr::expand_grid(
+    full_lhs, leaf_area = full_leaf_area, wood_density = full_wood_density,
+    leaf_n_mass = full_leaf_n_mass
+  )
+
+  # Bergmann
+  full_root_diameter = c(
+    "Root diameter", "Coarse root diameter", "Fine root diameter"
+  )
+  full_root_tissue_density = c(
+    "Belowground plant organ tissue density (belowground plant organ dry mass per belowground plant organ",
+    "Coarse root tissue density (coarse root dry mass per coarse root volume)",
+    "Fine root (absorptive) tissue density (absorptive fine root dry mass per absorptive fine root volume",
+    "Fine root (transport) tissue density (transport fine root dry mass per transport fine root volume)",
+    "Fine root tissue density (fine root dry mass per fine root volume)",
+    "Root dry mass per root volume (root density, root tissue density)"
+  )
+
+  full_root_length = c(
+    "Specific root length (SRL)",
+    "Fine root length per fine root dry mass (specific fine root length, SRL)"
+  )
+  full_root_nitrogen = c(
+    "Root nitrogen (N) content per unit root dry mass",
+    "Coarse root nitrogen (N) content per coarse root dry mass",
+    "Fine root nitrogen (N) content per fine root dry mass"
+  )
+
+  full_bergmann = tidyr::expand_grid(
+    root_diameter = full_root_diameter,
+    root_tissue_density = full_root_tissue_density,
+    root_length = full_root_length,
+    root_nitrogen = full_root_nitrogen
+  )
+
+  list(lhs = full_lhs, diaz = full_diaz, bergmann = full_bergmann)
+
+}
+
+
+get_close_combs = function() {
+
+  # LHS
+  close_sla = "Leaf area per leaf dry mass (specific leaf area, SLA or 1/LMA) of total leaf area"
+  close_height = "Plant vegetative height"
+  close_seed_mass = "Seed dry mass"
+
+  close_lhs = tidyr::expand_grid(
+    sla = close_sla, height = close_height, seed_mass = close_seed_mass
+  )
+
+  # Diaz
+  close_leaf_area = "Leaf area"
+  close_wood_density = c("Wood density", "Leaf dry matter content (LDMC)")
+  close_leaf_n_mass = "Leaf nitrogen (N) content per unit leaf dry mass"
+
+  close_diaz = tidyr::expand_grid(
+    close_lhs, leaf_area = close_leaf_area, wood_density = close_wood_density
+  )
+
+  # Bergmann
+  close_root_diameter = c(
+    "Root diameter", "Coarse root diameter", "Fine root diameter",
+    "Fine root (absorptive) diameter", "Fine root (transport) diameter"
+  )
+  close_root_tissue_density = c(
+    "Belowground plant organ tissue density (belowground plant organ dry mass per belowground plant organ",
+    "Coarse root tissue density (coarse root dry mass per coarse root volume)",
+    "Fine root (absorptive) tissue density (absorptive fine root dry mass per absorptive fine root volume",
+    "Fine root (transport) tissue density (transport fine root dry mass per transport fine root volume)",
+    "Fine root tissue density (fine root dry mass per fine root volume)",
+    "Root dry mass per root volume (root density, root tissue density)"
+  )
+
+  close_root_length = c(
+    "Specific root length (SRL)",
+    "Fine root length per fine root dry mass (specific fine root length, SRL)"
+  )
+  close_root_nitrogen = c(
+    "Root nitrogen (N) content per unit root dry mass",
+    "Coarse root nitrogen (N) content per coarse root dry mass",
+    "Fine root nitrogen (N) content per fine root dry mass"
+  )
+
+  close_bergmann = tidyr::expand_grid(
+    root_diameter = close_root_diameter,
+    root_tissue_density = close_root_tissue_density,
+    root_length = close_root_length,
+    root_nitrogen = close_root_nitrogen
+  )
+
+  list(lhs = close_lhs, diaz = close_diaz, bergmann = close_bergmann)
+
+}
+
+
+get_exact_combs = function() {
+
+  # LHS
+  exact_sla = c(
+    "Leaf area per leaf dry mass (specific leaf area, SLA or 1/LMA) of total leaf area",
+    "Leaf area per leaf dry mass (specific leaf area, SLA or 1/LMA) petiole, rhachis and midrib excluded"
+  )
+  exact_height = "Plant vegetative height"
+  exact_seed_mass = "Seed dry mass"
+
+  exact_lhs = tidyr::expand_grid(
+    sla = exact_sla, height = exact_height, seed_mass = exact_seed_mass
+  )
+
+
+  # Diaz
+  exact_leaf_area = c(
+    "Leaf area",
+    "Leaf area (in case of compound leaves undefined if leaf or leaflet, undefined if petiole is in- or e",
+    "Leaf area (in case of compound leaves: leaf, petiole excluded)",
+    "Leaf area (in case of compound leaves: leaf, petiole included)",
+    "Leaf area (in case of compound leaves: leaflet, petiole excluded)",
+    "Leaf area (in case of compound leaves: leaflet, petiole included)",
+    "Leaf area (in case of compound leaves: leaflet, undefined if petiole is in- or excluded)"
+  )
+  exact_wood_density = c("Wood density", "Leaf dry matter content (LDMC)")
+  exact_leaf_n_mass = "Leaf nitrogen (N) content per unit leaf dry mass"
+
+  exact_diaz = tidyr::expand_grid(
+    exact_lhs, leaf_area = exact_leaf_area, wood_density = exact_wood_density,
+    leaf_n_mass = exact_leaf_n_mass
+  )
+
+  # Bergmann
+  exact_root_diameter = c(
+    "Root diameter", "Coarse root diameter", "Fine root diameter",
+    "Fine root (absorptive) diameter", "Fine root (transport) diameter"
+  )
+  exact_root_tissue_density = c(
+    "Belowground plant organ tissue density (belowground plant organ dry mass per belowground plant organ",
+    "Coarse root tissue density (coarse root dry mass per coarse root volume)",
+    "Fine root (absorptive) tissue density (absorptive fine root dry mass per absorptive fine root volume",
+    "Fine root (transport) tissue density (transport fine root dry mass per transport fine root volume)",
+    "Fine root tissue density (fine root dry mass per fine root volume)",
+    "Root dry mass per root volume (root density, root tissue density)"
+  )
+
+  exact_root_length = c(
+    "Specific root length (SRL)",
+    "Fine root length per fine root dry mass (specific fine root length, SRL)"
+  )
+  exact_root_nitrogen = c(
+    "Root nitrogen (N) content per unit root dry mass",
+    "Coarse root nitrogen (N) content per coarse root dry mass",
+    "Fine root nitrogen (N) content per fine root dry mass"
+  )
+
+  exact_bergmann = tidyr::expand_grid(
+    root_diameter = exact_root_diameter,
+    root_tissue_density = exact_root_tissue_density,
+    root_length = exact_root_length,
+    root_nitrogen = exact_root_nitrogen
+  )
+
+  list(lhs = exact_lhs, diaz = exact_diaz, bergmann = exact_bergmann)
+
+}
+
 combine_bien_try_aus_gift_traits = function(
     consolidated_trait_names, glonaf_bien_traits, glonaf_try_traits_available,
     aus_traits, gift_glonaf_traits
