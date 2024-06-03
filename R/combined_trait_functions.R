@@ -11,8 +11,8 @@ read_correspondence_tables = function(raw_correspondence_tables) {
 }
 
 check_correspondence_tables = function(
-  correspondence_tables, bien_trait_list, gift_trait_meta, try_traits,
-  apd_bien, apd_gift, apd_try
+    correspondence_tables, bien_trait_list, gift_trait_meta, try_traits,
+    apd_bien, apd_gift, apd_try
 ) {
 
   corres_df = correspondence_tables
@@ -29,11 +29,11 @@ check_correspondence_tables = function(
   ident_similar = corres_df %>%
     purrr::imap_dfr(
       ~.x %>%
-                      distinct(identical, similar, match) %>%
-                      mutate(table = .y) %>%
-                      select(table, everything()) %>%
-                      arrange(table, identical, similar, match)
-  ) %>%
+        distinct(identical, similar, match) %>%
+        mutate(table = .y) %>%
+        select(table, everything()) %>%
+        arrange(table, identical, similar, match)
+    ) %>%
     distinct(identical, similar, match) |>
     arrange(identical)
 
@@ -111,8 +111,8 @@ check_correspondence_tables = function(
 
 
 create_trait_network = function(
-  correspondence_tables_check, bien_trait_list, gift_trait_meta, try_traits,
-  apd_subset, apd_bien, apd_gift, apd_try
+    correspondence_tables_check, bien_trait_list, gift_trait_meta, try_traits,
+    apd_subset, apd_bien, apd_gift, apd_try
 ) {
 
   corres_df = correspondence_tables_check
@@ -139,17 +139,17 @@ create_trait_network = function(
       by = c(extracted_trait = "Lvl2"),
       relationship = "many-to-many"
     ) |>
-  select(-extracted_trait, -Trait2) |>
-  rename(extracted_trait = Lvl3)
+    select(-extracted_trait, -Trait2) |>
+    rename(extracted_trait = Lvl3)
 
   # Transform GIFT APD Lvl2 traits into their Lvl3 equivalent
   apd_gift_updated = bind_rows(apd_gift_lvl3, apd_gift_lvl2) |>
     inner_join(
       gift_names |>
-    distinct(Trait2, Lvl3),
-    by = c(extracted_trait = "Lvl3")
+        distinct(Trait2, Lvl3),
+      by = c(extracted_trait = "Lvl3")
     ) |>
-  select(-extracted_trait, extracted_trait = Trait2)
+    select(-extracted_trait, extracted_trait = Trait2)
 
 
   # Create nodes data.frame
@@ -182,7 +182,7 @@ create_trait_network = function(
 
         smaller_df %>%
           filter(!is.na(to))
-    })
+      })
 
   apd_edge_df = list(
     apd_bien, apd_gift_updated, apd_try
@@ -280,9 +280,87 @@ unnest_names = function(trait_names_df) {
 }
 
 
+combine_traits_all_databases = function(
+    trait_names, austraits_traits_simple, bien_traits_simple,
+    gift_traits_simple, try_traits_simple, gift_trait_meta, austraits_glonaf,
+    bien_glonaf, gift_glonaf, try_glonaf
+) {
+
+  ## AusTraits
+  austraits_consolidated = trait_names |>
+    # Add species names to trait table
+    inner_join(
+      austraits_traits_simple, by = c(austraits_trait_name = "trait_name"),
+      relationship = "many-to-many"
+    ) |>
+    distinct(component, consolidated_name, component_size, taxon_name) |>
+    # Keep only matched GloNAF species
+    inner_join(austraits_glonaf, by = "taxon_name") |>
+    distinct(
+      component, consolidated_name, component_size, matched_name = binomial
+    )
+
+  ## BIEN
+  bien_consolidated = trait_names |>
+    # Add species names to trait table
+    inner_join(
+      bien_traits_simple, by = c(bien_trait_name = "trait_name"),
+      relationship = "many-to-many"
+    ) |>
+    distinct(
+      component, consolidated_name, component_size, scrubbed_species_binomial
+    ) |>
+    semi_join(bien_glonaf, by = "scrubbed_species_binomial") |>
+    distinct(
+      component, consolidated_name, component_size,
+      matched_name = scrubbed_species_binomial
+    )
+
+  ## GIFT
+  gift_consolidated = gift_traits_simple |>
+    inner_join(
+      gift_trait_meta |>
+        select(trait_ID = Lvl3, trait_name = Trait2),
+      by = "trait_ID"
+    ) |>
+    inner_join(
+      trait_names, by = c(trait_name = "gift_trait_name"),
+      relationship = "many-to-many"
+    ) |>
+    distinct(component, consolidated_name, component_size, work_species) |>
+    # Keep only matched GloNAF species
+    semi_join(gift_glonaf, by = "work_species") |>
+    rename(matched_name = work_species)
+
+  ## TRY
+  try_consolidated = trait_names |>
+    mutate(try_trait_id = as.integer(try_trait_id)) |>
+    inner_join(
+      try_traits_simple, by = c(try_trait_id = "TraitID"),
+      relationship = "many-to-many"
+    ) |>
+    distinct(component, consolidated_name, component_size, AccSpeciesID) |>
+    # Keep only matched GloNAF species
+    inner_join(try_glonaf, by = "AccSpeciesID") |>
+    distinct(
+      component, consolidated_name, component_size, matched_name = MatchedName
+    )
+
+
+  full_consolidated = list(
+    austraits = austraits_consolidated,
+    bien = bien_consolidated,
+    gift = gift_consolidated,
+    try = try_consolidated
+  ) |>
+    bind_rows(.id = "database") |>
+    rename(species = matched_name)
+
+}
+
 combine_bien_try_aus_gift_traits = function(
-  consolidated_trait_names, glonaf_bien_traits, glonaf_try_traits_available,
-  aus_traits, gift_glonaf_traits
+    consolidated_trait_names, glonaf_bien_traits, glonaf_try_traits_available,
+    aus_traits, gift_glonaf_traits
 ) {
   bien_distinct_traits = glonaf_bien_traits %>%
     distinct(species = scrubbed_species_binomial, bien_trait_name = trait_name)
@@ -319,8 +397,8 @@ combine_bien_try_aus_gift_traits = function(
 }
 
 count_traits_per_database = function(
-  network_consolidated_trait_names, glonaf_bien_traits,
-  glonaf_try_traits_available, aus_traits, gift_glonaf_traits
+    network_consolidated_trait_names, glonaf_bien_traits,
+    glonaf_try_traits_available, aus_traits, gift_glonaf_traits
 ) {
 
   bien_traits = glonaf_bien_traits %>%
@@ -447,8 +525,8 @@ count_specific_trait_combinations = function(
 
 # Function to create a unified growth form dataset to use downstream
 extract_growth_form = function(
-  combined_traits, glonaf_bien_traits, gift_all_raw_traits, gift_names_traits,
-  harmonized_gift_glonaf, match_glonaf_tnrs, glonaf_list
+    combined_traits, glonaf_bien_traits, gift_all_raw_traits, gift_names_traits,
+    harmonized_gift_glonaf, match_glonaf_tnrs, glonaf_list
 ) {
   # Reconstruct GloNAF df
   glonaf_names_df = data.frame(
@@ -563,7 +641,7 @@ simplify_growth_form = function(combined_growth_form) {
 
 # Count Summary of Number of Traits per species per Region
 count_number_of_traits_per_region = function(
-  glonaf_species_regions, combined_traits
+    glonaf_species_regions, combined_traits
 ) {
   glonaf_species_regions %>%
     full_join(
@@ -582,7 +660,7 @@ list_species_by_trait_per_database = function(combined_traits_origin) {
 
   combined_traits_origin %>%
     ungroup() %>%
-    group_by(consolidated_name, origin) %>%
+    group_by(consolidated_name, database) %>%
     # List species per trait per database
     summarise(sp_list = list(species)) %>%
     # Get list of species common across database (with data)

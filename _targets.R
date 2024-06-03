@@ -428,15 +428,33 @@ list(
     tar_target(
       trait_names,
       unnest_names(trait_names_nested)
+    ),
+
+    # Combine Trait Data ---------------------------------------------------------
+    tar_target(
+      combined_traits,
+      combine_traits_all_databases(
+        trait_names, austraits_traits_simple, bien_traits_simple,
+        gift_traits_simple, try_traits_simple, gift_trait_meta,
+        austraits_glonaf, bien_glonaf, gift_glonaf, try_glonaf
+      )
+    ),
+    tar_target(
+      simplified_traits, distinct(combined_traits, consolidated_name, species)
+    ),
+    tar_target(
+      database_traits,
+      list_species_by_trait_per_database(combined_traits)
+    ),
+    tar_target(
+      database_euler_diagrams,
+      intersect_species_list_by_trait_across_database(database_traits)
     )
   ),
   tar_target(
     network_consolidated_trait_names,
     consolidate_trait_names_from_network(trait_network, "full")
   ),
-
-
-  # Combine Trait Data ---------------------------------------------------------
 
   ## Actual tables with trait names
   # Actual table with species names and trait names
