@@ -392,7 +392,10 @@ count_trait_combinations = function(simplified_traits, match_type) {
 get_full_combs = function() {
 
   # LHS
-  full_sla = "Leaf area per leaf dry mass (specific leaf area, SLA or 1/LMA) of total leaf area"
+  full_sla = c(
+    "Leaf area per leaf dry mass (specific leaf area, SLA or 1/LMA) of total leaf area",
+    "Leaf mass per area"
+  )
   full_height = "Plant vegetative height"
   full_seed_mass = "Seed dry mass"
 
@@ -413,7 +416,8 @@ get_full_combs = function() {
 
   # Bergmann
   full_root_diameter = c(
-    "Root diameter", "Coarse root diameter", "Fine root diameter"
+    "Root diameter", "Coarse root diameter", "Fine root diameter",
+    "Fine root (absorptive) diameter", "Fine root (transport) diameter"
   )
   full_root_tissue_density = c(
     "Belowground plant organ tissue density (belowground plant organ dry mass per belowground plant organ",
@@ -449,7 +453,10 @@ get_full_combs = function() {
 get_close_combs = function() {
 
   # LHS
-  close_sla = "Leaf area per leaf dry mass (specific leaf area, SLA or 1/LMA) of total leaf area"
+  close_sla = c(
+    "Leaf area per leaf dry mass (specific leaf area, SLA or 1/LMA) of total leaf area",
+    "Leaf mass per area"
+  )
   close_height = "Plant vegetative height"
   close_seed_mass = "Seed dry mass"
 
@@ -507,7 +514,8 @@ get_exact_combs = function() {
   # LHS
   exact_sla = c(
     "Leaf area per leaf dry mass (specific leaf area, SLA or 1/LMA) of total leaf area",
-    "Leaf area per leaf dry mass (specific leaf area, SLA or 1/LMA) petiole, rhachis and midrib excluded"
+    "Leaf area per leaf dry mass (specific leaf area, SLA or 1/LMA) petiole, rhachis and midrib excluded",
+    "Leaf mass per area"
   )
   exact_height = "Plant vegetative height"
   exact_seed_mass = "Seed dry mass"
