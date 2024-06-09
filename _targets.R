@@ -378,10 +378,6 @@ list(
     harmonized_try_ids,
     get_try_ids_from_harmonized_species(harmonized_try_glonaf, try_species)
   ),
-
-  tar_target(
-    try_total_number_trait, count_trait_try(harmonized_try_glonaf, try_species)
-  ),
   tar_target(
     glonaf_try_traits_available,
     list_all_traits_glonaf(harmonized_try_glonaf, try_species, full_try_df)
@@ -686,12 +682,10 @@ list(
 
   # Make figures ---------------------------------------------------------------
   tar_target(
-    fig_glonaf_species_number_trait,
-    plot_trait_number_try_glonaf_species(try_total_number_trait)
-  ),
-  tar_target(
     fig_species_per_trait_combined,
-    plot_number_species_per_trait_combined(combined_traits, match_glonaf_tnrs)
+    plot_number_species_per_trait_combined(
+      simplified_traits_full, glonaf_harmonized
+    )
   ),
   tar_target(
     fig_combined_trait_heatmap,

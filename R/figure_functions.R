@@ -1,20 +1,8 @@
 # Functions to plot figures
 # Trait Counts -----------------------------------------------------------------
-plot_trait_number_try_glonaf_species = function(try_number_trait) {
-  try_number_trait %>%
-    ggplot(aes(trait_number)) +
-    geom_histogram(color = "white") +
-    scale_x_log10(name = "Number of traits in TRY") +
-    scale_y_continuous(name = "Number of species") +
-    labs(title = "Traits of GloNAF species in TRY (~15k)",
-         caption = "GloNAF species harmonized using TNRS; All TRY open data") +
-    theme_bw() +
-    theme(aspect.ratio = 1,
-          panel.grid = element_blank())
-}
 
 plot_number_species_per_trait_combined = function(
-    combined_traits, match_glonaf_tnrs
+    combined_traits, glonaf_harmonized
 ) {
 
   max_20_traits = combined_traits %>%
@@ -29,8 +17,8 @@ plot_number_species_per_trait_combined = function(
     ) %>%
     slice_max(n_species, n = 20)
 
-  total_sp = match_glonaf_tnrs %>%
-    pull(Accepted_species) %>%
+  total_sp = glonaf_harmonized %>%
+    pull(taxa_binomial) %>%
     unique() %>%
     length()
   total_sp = total_sp - 1  # Remove names that are resolved to ""
@@ -74,14 +62,15 @@ plot_number_species_per_trait_combined = function(
     scale_y_discrete(
       name = "Trait name",
       labels = c(
-        life_form                    = "Growth Form (cat.)",
-        woodiness                    = "Woodiness (cat.)",
-        life_history                 = "Life History (cat.)",
-        plant_height                 = "Plant Height (cont.)",
-        leaf_type                    = "Leaf Type (cat.)",
-        leaf_compoundness            = "Leaf Compoundness (cat.)",
-        photosynthetic_pathway       = "Photosynthetic Pathway (cat.)",
-        diaspore_mass                = "Seed Mass (cont.)",
+        `Plant growth form`                    = "Growth Form (cat.)",
+        Woodiness                    = "Woodiness (cat.)",
+        `Life history`                 = "Life History (cat.)",
+        `Plant vegetative height`                 = "Plant Height (cont.)",
+        `Leaf type`                    = "Leaf Type (cat.)",
+        `Leaf compoundness`            = "Leaf Compoundness (cat.)",
+        `Diaspore dispersal syndrome`  = "Diaspore dispersal syndrome (cat.)",
+        `hotosynthetic_pathway`       = "Photosynthetic Pathway (cat.)",
+        `diaspore_mass`                = "Seed Mass (cont.)",
         `Leaflet number per leaf`    = "Leaflet number per leaf (cont.)",
         flowering_time               = "Flowering Phenology (cat.)",
         leaf_phenology               = "Leaf Phenology (cat.)",
