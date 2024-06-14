@@ -687,10 +687,29 @@ list(
       simplified_traits_full, glonaf_harmonized
     )
   ),
+  # Create trait heatmaps with one trait per species = pixels
+  # include several variations
   tar_target(
     fig_combined_trait_heatmap,
-    plot_combined_traits_heatmap(combined_traits, match_glonaf_tnrs)
+    plot_combined_traits_heatmap(simplified_traits_full, glonaf_harmonized)
   ),
+  tar_target(
+    fig_combined_trait_heatmap_200,
+    plot_combined_traits_heatmap(
+      simplified_traits_full, glonaf_harmonized, 200L
+    )
+  ),
+  tar_target(
+    fig_combined_trait_heatmap_zoomed,
+    fig_combined_trait_heatmap + ggforce::facet_zoom(xlim = c(1, 200))
+  ),
+  tar_target(
+    fig_combined_trait_heatmap_inset,
+    plot_inset_trait_heatmap(
+      fig_combined_trait_heatmap_200, fig_combined_trait_heatmap
+    )
+  ),
+  #
   tar_target(
     fig_number_species_specific_trait_comb,
     plot_number_specific_trait_combination(contain_trait_combination)

@@ -585,17 +585,18 @@ plot_general_treemap_trait_combination = function(
 
 # Missing Traits ---------------------------------------------------------------
 
-plot_combined_traits_heatmap = function(combined_traits, match_glonaf_tnrs) {
+plot_combined_traits_heatmap = function(
+    simplified_traits_full, glonaf_harmonized, first_n_traits = Inf
+) {
 
   # Get all combinations of trait species which shows which has values
-  comb_sp = combined_traits %>%
+  comb_sp = simplified_traits_full %>%
     mutate(value = TRUE) %>%
     full_join(
-      match_glonaf_tnrs %>%
-        distinct(species = Accepted_species) %>%
-        filter(species != "") %>%
+      glonaf_harmonized %>%
+        distinct(species = taxa_binomial) %>%
         tidyr::crossing(
-          consolidated_name = combined_traits[["consolidated_name"]]
+          consolidated_name = simplified_traits_full[["consolidated_name"]]
         ),
       by = c("species", "consolidated_name")
     ) %>%
@@ -632,10 +633,11 @@ plot_combined_traits_heatmap = function(combined_traits, match_glonaf_tnrs) {
     distinct(species_rank, trait_rank, value)
 
   # Clean environment
-  rm(combined_traits, sp_rank, trait_rank)
+  rm(simplified_traits_full, sp_rank, trait_rank, glonaf_harmonized)
 
   # Plot as a heatmap
   comb_sp_freq %>%
+    filter(trait_rank <= first_n_traits) |>
     ggplot(aes(trait_rank, species_rank, fill = value)) +
     geom_raster() +
     labs(
@@ -651,6 +653,26 @@ plot_combined_traits_heatmap = function(combined_traits, match_glonaf_tnrs) {
       legend.position = "top",
       legend.key = element_rect(colour = "#222222")
     )
+}
+
+
+plot_inset_trait_heatmap = function(
+    main_heatmap, inset_heatmap
+) {
+
+  inset_heatmap = inset_heatmap +
+    # Remove junk to make simpler inset
+    theme(
+      axis.text.y     = element_blank(),
+      axis.ticks.y    = element_blank(),
+      axis.title      = element_blank(),
+      plot.background = element_blank(),
+      legend.position = "none"
+    )
+
+  main_heatmap +
+    patchwork::inset_element(inset_heatmap, 0.6, 0.6, 1, 1)
+
 }
 
 

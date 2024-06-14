@@ -35,7 +35,8 @@ get_glonaf_taxonomy = function(glonaf_alien_species) {
     mutate(
       taxa_binomial = stringr::str_extract(taxa_accepted, "^\\w+ [\\w,\\.]+")
     ) |>
-    select(-taxa_accepted)
+    select(-taxa_accepted) |>
+    filter(!is.na(taxa_binomial))  # Remove unmatched GloNAF species
 
 }
 
