@@ -5,7 +5,7 @@ plot_number_species_per_trait_combined = function(
     combined_traits, glonaf_harmonized
 ) {
 
-  max_20_traits = combined_traits %>%
+  max_25_traits = combined_traits %>%
     count(consolidated_name, sort = TRUE, name = "n_species") %>%
     filter(
       !grepl("Elevational", consolidated_name, fixed = TRUE),
@@ -15,23 +15,22 @@ plot_number_species_per_trait_combined = function(
         fixed = TRUE
       )
     ) %>%
-    slice_max(n_species, n = 20)
+    slice_head(n = 25)
 
   total_sp = glonaf_harmonized %>%
     pull(taxa_binomial) %>%
     unique() %>%
     length()
-  total_sp = total_sp - 1  # Remove names that are resolved to ""
 
   # Clean environment
   rm(combined_traits)
 
   # Actual plot
-  max_20_traits %>%
+  max_25_traits %>%
     ggplot(aes(n_species, forcats::fct_reorder(consolidated_name, n_species))) +
     # 50% vertical line
     geom_text(
-      label = "50%", color = "darkblue", x = total_sp/2, y = 20, hjust = 0.5,
+      label = "50%", color = "darkblue", x = total_sp/2, y = 25, hjust = 0.5,
       vjust = -2.2, size = rel(4.2)
     ) +
     geom_vline(
@@ -42,7 +41,7 @@ plot_number_species_per_trait_combined = function(
       xintercept = total_sp, linetype = 2, color = "darkred", linewidth = 2/3
     ) +
     geom_text(
-      label = "100%", color = "darkred", x = total_sp, y = 20, hjust = 0.5,
+      label = "100%", color = "darkred", x = total_sp, y = 25, hjust = 0.5,
       vjust = -2.2, size = rel(4.2)
     ) +
     # Actual geoms
@@ -62,33 +61,38 @@ plot_number_species_per_trait_combined = function(
     scale_y_discrete(
       name = "Trait name",
       labels = c(
-        `Plant growth form`                    = "Growth Form (cat.)",
-        Woodiness                    = "Woodiness (cat.)",
-        `Life history`                 = "Life History (cat.)",
-        `Plant vegetative height`                 = "Plant Height (cont.)",
-        `Leaf type`                    = "Leaf Type (cat.)",
-        `Leaf compoundness`            = "Leaf Compoundness (cat.)",
-        `Diaspore dispersal syndrome`  = "Diaspore dispersal syndrome (cat.)",
-        `hotosynthetic_pathway`       = "Photosynthetic Pathway (cat.)",
-        `diaspore_mass`                = "Seed Mass (cont.)",
-        `Leaflet number per leaf`    = "Leaflet number per leaf (cont.)",
-        flowering_time               = "Flowering Phenology (cat.)",
-        leaf_phenology               = "Leaf Phenology (cat.)",
-        `Species tolerance to frost` = "Species tolerance to frost (cat.)",
-        dispersal_syndrome           = "Fruit Dispersal Syndrome (cat.)",
-        dispersal_appendage          = "Fruit Type (cat.)",
-        leaf_length                  = "Leaf Length (cont.)",
-        nitrogen_fixing              = "Nitrogen Fixer (bin.)",
-        pollination_syndrome         = "Pollination Syndrome (cat.)",
-        leaf_shape                   = "Leaf Shape (cat.)",
-        leaf_width                   = "Leaf Width (cont.)",
-        germination                  = "Seed Germination Rate (cont.)"
+        `Plant growth form`                = "Growth form (cat.)",
+         Woodiness                         = "Woodiness (cat.)",
+        `Life history`                     = "Life history (cat.)",
+        `Plant vegetative height`          = "Plant height (cont.)",
+        `Leaf type`                        = "Leaf type (cat.)",
+        `Leaf compoundness`                = "Leaf compoundness (cat.)",
+        `Diaspore dispersal syndrome`      = "Diaspore dispersal syndrome (cat.)",
+        `Seed dry mass`                    = "Seed mass (cont.)",
+        `Plant photosynthetic pathway`     = "Photosynthetic pathway (cat.)",
+        `Flowering time, by month`         = "Flowering phenology (cat.)",
+        `Plant nitrogen fixation capacity` = "Nitrogen fixer (bin.)",
+        `Fruit type`                       = "Fruit type (cat.)",
+        `Leaflet number per leaf`          = "Leaflet number per leaf (cont.)",
+        `Leaf length`                      = "Leaf length (cont.)",
+        `Leaf phenology`                   = "Leaf phenology (cat.)",
+        `Species tolerance to frost`       = "Frost tolerance (cat.)",
+        `Leaf phyllotaxis`                 = "Leaf phyllotaxis (cat.)",
+        `Leaf width`                       = "Leaf width (cont.)",
+        `Pollination syndrome`             = "Pollination syndrome (cat.)",
+        `Fruit length`                     = "Fruit length (cont.)",
+        `Plant sex type`                   = "Plant sex type (cat.)",
+        `Flower colour`                    = "Flower colour (cat.)",
+        `Leaf mass per area`               = "Leaf mass per area (cont.)",
+        `Leaf area`                        = "Leaf area (cont.)",
+        `Seed germination proportion`      = "Seed Germination Rate (cont.)"
       )
     ) +
     theme_bw(16) +
     theme(panel.grid.major.x = element_blank(),
           panel.grid.minor.x = element_blank()) +
     coord_cartesian(clip = "off")
+
 }
 
 
