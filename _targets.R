@@ -227,6 +227,11 @@ list(
     glonaf_harmonized,
     get_glonaf_taxonomy(glonaf_alien_species)
   ),
+  tar_target(
+    glonaf_family,
+    distinct(glonaf_alien_species, taxon_wcvp_id, taxon_orig_id, taxa_accepted,
+             family_wcvp)
+  ),
   # Combine each trait taxonomies with GloNAF
   tar_target(
     austraits_glonaf,
@@ -247,7 +252,7 @@ list(
     subset_glonaf_species(try_harmonized, glonaf_harmonized, "MatchedName")
   ),
 
-  # Legacy code
+  # Legacy code TO BE DELETED
   tar_target(
     match_try_tnrs, get_tnrs_values(try_list, "try")
   ),
@@ -448,7 +453,7 @@ list(
     ),
     tar_target(
       trait_combinations,
-      count_trait_combinations(simplified_traits, match_type)
+      count_trait_combinations(simplified_traits, match_type, glonaf_harmonized)
     )
   ),
   tar_target(
@@ -709,33 +714,33 @@ list(
       fig_combined_trait_heatmap_200, fig_combined_trait_heatmap
     )
   ),
-  #
+  # Display trait combinations (plot & treemaps)
   tar_target(
     fig_number_species_specific_trait_comb,
-    plot_number_specific_trait_combination(contain_trait_combination)
+    plot_number_specific_trait_combination(trait_combinations_full)
   ),
   tar_target(
     fig_treemap_general,
     plot_general_treemap_trait_combination(
-      combined_traits_taxonomy, contain_trait_combination
+      trait_combinations_full, glonaf_harmonized, glonaf_family
     )
   ),
   tar_target(
     fig_trait_combination_taxonomy,
     plot_taxonomy_treemap_trait_combination(
-      combined_traits_taxonomy, contain_trait_combination
+      trait_combinations_full, glonaf_harmonized, glonaf_family
     )
   ),
   tar_target(
     fig_trait_combination_number_logged,
     plot_taxonomy_treemap_number_traits(
-      combined_traits_taxonomy, contain_trait_combination, logged = TRUE
+      trait_combinations_full, glonaf_harmonized, glonaf_family, logged = TRUE
     )
   ),
   tar_target(
     fig_trait_combination_number_unlogged,
     plot_taxonomy_treemap_number_traits(
-      combined_traits_taxonomy, contain_trait_combination, logged = FALSE
+      trait_combinations_full, glonaf_harmonized, glonaf_family, logged = FALSE
     )
   ),
   tar_target(

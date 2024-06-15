@@ -358,19 +358,26 @@ combine_traits_all_databases = function(
 
 }
 
-count_trait_combinations = function(simplified_traits, match_type) {
+count_trait_combinations = function(
+    simplified_traits, match_type, glonaf_harmonized
+) {
 
   combs = case_when(match_type == "full" ~ get_full_combs(),
                     match_type == "close" ~ get_close_combs(),
                     match_type == "exact" ~ get_exact_combs())
 
   simplified_traits  |>
+    full_join(
+      glonaf_harmonized |>
+        distinct(species = taxa_binomial),
+      by = "species"
+    ) |>
     group_by(species) |>
     summarise(traits = list(consolidated_name)) |>
     rowwise() |>
     mutate(
       in_glonaf              = TRUE,
-      has_at_least_one_trait = length(traits) > 0,
+      has_at_least_one_trait = length(traits) > 0 & all(!is.na(traits)),
       # Consider that each combinations can have multiple ways of writing it
       # first 'any()' means any combination variant
       # then 'all()' means all traits of given combination variant should be
@@ -384,7 +391,8 @@ count_trait_combinations = function(simplified_traits, match_type) {
       has_bergmann           = ifelse(
         any(apply(combs$bergmann, 1, \(x) all(x %in% traits))), TRUE, FALSE
       )
-    )
+    ) |>
+    ungroup()
 
 }
 
