@@ -462,19 +462,6 @@ plot_taxonomy_treemap_number_traits = function(
     logged = TRUE
 ) {
 
-  if (logged) {
-    color_scale = scale_fill_viridis_b(
-      name = "Number of traits",
-      trans = "log10",
-      show.limits = TRUE
-    )
-  } else {
-    color_scale = scale_fill_viridis_b(
-      name = "Number of traits",
-      show.limits = TRUE
-    )
-  }
-
   # Pre-process data
   tax_comb = glonaf_harmonized |>
     inner_join(
@@ -493,6 +480,20 @@ plot_taxonomy_treemap_number_traits = function(
     ) %>%
     mutate(across(where(is.character), ~iconv(.x, "latin1", to = "UTF-8")))
 
+  if (logged) {
+    color_scale = scale_fill_viridis_b(
+      name = "Number of traits",
+      trans = "log10",
+      show.limits = TRUE,
+      limits = range(tax_comb$n_traits) + 1
+    )
+  } else {
+    color_scale = scale_fill_viridis_b(
+      name = "Number of traits",
+      show.limits = TRUE,
+      limits = range(tax_comb$n_traits) + 1
+    )
+  }
 
   # Clean environment
   rm(trait_combinations_full, glonaf_harmonized, glonaf_family)
