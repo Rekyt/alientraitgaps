@@ -743,16 +743,7 @@ list(
       trait_combinations_full, glonaf_harmonized, glonaf_family, logged = FALSE
     )
   ),
-  tar_target(
-    fig_rich_prop_trait,
-    plot_prop_trait_per_richness(regions_trait_prop, unified_glonaf_regions)
-  ),
-  tar_target(
-    fig_rich_ratio_prop_comb,
-    plot_proportion_known_combination_per_richness(
-      regions_trait_prop, glonaf_species_number
-    )
-  ),
+  # Proportion of known species per regions
   tar_target(
     fig_map_glonaf_regions,
     plot_map_glonaf_regions(unified_glonaf_regions)

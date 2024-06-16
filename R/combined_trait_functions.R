@@ -888,6 +888,7 @@ list_species_by_trait_per_database = function(combined_traits_origin) {
 
   combined_traits_origin %>%
     ungroup() %>%
+    distinct(consolidated_name, database, species) |>
     group_by(consolidated_name, database) %>%
     # List species per trait per database
     summarise(sp_list = list(species)) %>%
@@ -912,23 +913,24 @@ intersect_species_list_by_trait_across_database = function(
 
   trait_database_sp_list %>%
     # Sub-select only needed information
-    select(consolidated_name, origin, sp_list, n_all) %>%
+    select(consolidated_name, database, sp_list, n_all) %>%
     # Get all combinations of trait name and database
     tidyr::complete(
-      consolidated_name, origin, fill = list(sp_list = list(""))
+      consolidated_name, database, fill = list(sp_list = list(""))
     ) %>%
     # Fill NAs 'n_all' columns by non empty values
     group_by(consolidated_name) %>%
-    arrange(desc(n_all), consolidated_name, origin) %>%
+    arrange(desc(n_all), consolidated_name, database) %>%
     mutate(n_all = zoo::na.locf(n_all)) %>%
     ungroup() %>%
     # Organize diagrams per number of species/trait name/database name
-    arrange(desc(n_all), consolidated_name, origin) %>%
+    arrange(desc(n_all), consolidated_name, database) %>%
     group_by(consolidated_name) %>%
     # Create actual Euler diagrams
     summarise(
       euler = sp_list %>%
-        setNames(origin) %>%
+        unique() |>
+        setNames(database) %>%
         eulerr::euler() %>%
         lst(),
       n_all = unique(n_all)
