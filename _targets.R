@@ -456,6 +456,20 @@ list(
     tar_target(
       trait_combinations,
       count_trait_combinations(simplified_traits, match_type, glonaf_harmonized)
+    ),
+    tar_target(
+      fig_euler_diagrams_top_20_traits_database,
+      plot_data_origin_intersect_top_20_traits(database_euler_diagrams),
+    ),
+    tar_target(
+      fig_bars_absolute_database_importance_traits,
+      plot_relative_database_importance_traits(database_euler_diagrams)
+    ),
+    tar_target(
+      fig_bars_relative_database_importance_traits,
+      plot_relative_database_importance_traits(
+        database_euler_diagrams, FALSE, "fill"
+      )
     )
   ),
   tar_target(
@@ -806,20 +820,6 @@ list(
     fig_n_traits_n_regions,
     plot_number_of_traits_per_number_of_regions(
       contain_trait_combination, glonaf_species_area
-    )
-  ),
-  tar_target(
-    fig_euler_diagrams_top_20_traits_database,
-    plot_data_origin_intersect_top_20_traits(trait_database_euler_diagrams),
-  ),
-  tar_target(
-    fig_bars_absolute_database_importance_traits,
-    plot_relative_database_importance_traits(trait_database_euler_diagrams)
-  ),
-  tar_target(
-    fig_bars_relative_database_importance_traits,
-    plot_relative_database_importance_traits(
-      trait_database_euler_diagrams, FALSE, "fill"
     )
   ),
 

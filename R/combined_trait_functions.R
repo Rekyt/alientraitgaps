@@ -348,10 +348,10 @@ combine_traits_all_databases = function(
 
 
   full_consolidated = list(
-    austraits = austraits_consolidated,
-    bien = bien_consolidated,
-    gift = gift_consolidated,
-    try = try_consolidated
+    AusTraits = austraits_consolidated,
+    BIEN = bien_consolidated,
+    GIFT = gift_consolidated,
+    TRY = try_consolidated
   ) |>
     bind_rows(.id = "database") |>
     rename(species = matched_name)
@@ -929,7 +929,6 @@ intersect_species_list_by_trait_across_database = function(
     # Create actual Euler diagrams
     summarise(
       euler = sp_list %>%
-        unique() |>
         setNames(database) %>%
         eulerr::euler() %>%
         lst(),
