@@ -34,3 +34,28 @@ try_traits = tar_read(full_try_df) |>
         rename(AccSpeciesID = TRY_SpeciesID),
     by = "AccSpeciesID"
   )
+
+# Save data --------------------------------------------------------------------
+
+saveRDS(
+  austraits_traits,
+  here::here(folder, "austraits_anna.Rds")
+)
+saveRDS(
+  bien_traits,
+  here::here(folder, "bien_anna.Rds")
+)
+saveRDS(
+  gift_traits,
+  here::here(folder, "gift_anna.Rds")
+)
+saveRDS(
+  try_traits,
+  here::here(folder, "try_anna.Rds")
+)
+
+saveRDS(
+  tar_read(gift_trait_meta) |>
+    rename(trait_ID = Lvl3),
+  here::here(folder, "gift_trait_meta.Rds")
+)
