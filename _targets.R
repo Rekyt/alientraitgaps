@@ -417,7 +417,9 @@ list(
   ),
   tar_target(
     trait_network_file,
-    write_network_file(trait_network, here::here("inst", "trait_network.graphml")),
+    write_network_file(
+      trait_network, here::here("inst", "trait_network.graphml")
+    ),
     format = "file"
   ),
   tarchetypes::tar_map(
