@@ -99,16 +99,6 @@ get_glonaf_region_correspondence = function(glonaf_alien_species) {
     return(species_regions)
 }
 
-get_glonaf_species_number = function(glonaf_con) {
-  sp = glonaf_con %>%
-    tbl("species_numbers") %>%
-    select(OBJIDsic, starts_with("num_")) %>%
-    collect()
-
-  discon(glonaf_con)
-
-  return(sp)
-}
 
 #' Create a unified regions sf object
 #'
@@ -181,6 +171,7 @@ select_glonaf_mainland_large_islands = function(
       by = "OBJIDsic"
     )
 }
+
 
 extract_species_regions_table = function(
     glonaf_con, match_glonaf_tnrs, glonaf_list

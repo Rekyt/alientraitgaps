@@ -96,10 +96,6 @@ list(
                  "regions_2023_17_10.shp")
     )
   ),
-  tar_target(
-    glonaf_species_number,
-    get_glonaf_species_number(connect_glonaf_db())
-  ),
 
 
   # Load GIFT data -------------------------------------------------------------
@@ -514,14 +510,6 @@ list(
       network_consolidated_trait_names, glonaf_bien_traits,
       glonaf_try_traits_available, aus_traits, gift_glonaf_traits
     )
-  ),
-  tar_target(
-    trait_database_sp_list,
-    list_species_by_trait_per_database(combined_traits_origin)
-  ),
-  tar_target(
-    trait_database_euler_diagrams,
-    intersect_species_list_by_trait_across_database(trait_database_sp_list)
   ),
 
   # Trait Combinations ---------------------------------------------------------
