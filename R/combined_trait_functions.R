@@ -871,6 +871,11 @@ simplify_growth_form = function(combined_growth_form) {
 count_number_of_traits_per_region = function(
     glonaf_species_regions, combined_traits
 ) {
+
+  match_type = names(combined_traits)
+
+  combined_traits = combined_traits[[1]]
+
   glonaf_species_regions %>%
     full_join(
       combined_traits %>%
@@ -881,7 +886,8 @@ count_number_of_traits_per_region = function(
     group_by(OBJIDsic) %>%
     summarise(
       across(n_traits, .fns = list(median = median, mean = mean, sd = sd))
-    )
+    ) |>
+    mutate(match_type = match_type)
 }
 
 list_species_by_trait_per_database = function(combined_traits_origin) {

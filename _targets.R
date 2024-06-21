@@ -570,19 +570,28 @@ list(
   ),
   tar_target(
     glonaf_species_regions,
-    distinct(select(glonaf_species_regions_status, -status_name))
+    distinct(
+      select(glonaf_species_regions_status, -status_name, -taxon_orig_id)
+    )
+  ),
+  tar_target(
+    trait_combinations_types,
+    list(full = trait_combinations_full, close = trait_combinations_close,
+         exact = trait_combinations_exact)
   ),
   tar_target(
     regions_trait_prop,
     count_species_proportion_trait_by_region(
-      glonaf_species_regions, contain_trait_combination
-    )
+      glonaf_species_regions, trait_combinations_types
+    ),
+    pattern = map(trait_combinations_types)
   ),
   tar_target(
     glonaf_status_trait_cat,
     get_trait_combinations_and_cat_per_invasion_status(
-      glonaf_species_regions_status, contain_trait_combination
-    )
+      glonaf_species_regions_status, trait_combinations_types
+    ),
+    pattern = map(trait_combinations_types)
   ),
   tar_target(
     glonaf_species_area,
@@ -601,12 +610,21 @@ list(
   tar_target(
     european_species_traits,
     get_european_glonaf_species(
-      glonaf_europe, glonaf_species_regions, contain_trait_combination
-    )
+      glonaf_europe, glonaf_species_regions, trait_combinations_types
+    ),
+    pattern = map(trait_combinations_types)
+  ),
+  tar_target(
+    combined_trait_types,
+    list(full  = combined_traits_full, close = combined_traits_close,
+         exact = combined_traits_exact)
   ),
   tar_target(
     trait_n_regions,
-    count_number_of_traits_per_region(glonaf_species_regions, combined_traits)
+    count_number_of_traits_per_region(
+      glonaf_species_regions, combined_trait_types
+    ),
+    pattern = map(combined_trait_types)
   ),
 
   # Get environmental & socioeconomic variables --------------------------------
@@ -757,18 +775,21 @@ list(
     plot_map_proportion_trait_by_region(
       regions_trait_prop, glonaf_small_islands,
       glonaf_mainland_large_islands_simplified
-    )
+    ),
+    pattern = map(regions_trait_prop)
   ),
   tar_target(
     fig_map_alien_richness,
     plot_map_alien_richness_region(
       regions_trait_prop, glonaf_small_islands,
       glonaf_mainland_large_islands_simplified
-    )
+    ),
+    pattern = map(regions_trait_prop)
   ),
   tar_target(
     fig_status_prop_comb,
-    plot_trait_comb_proportion_per_invasion_status(glonaf_status_trait_cat)
+    plot_trait_comb_proportion_per_invasion_status(glonaf_status_trait_cat),
+    pattern = map(glonaf_status_trait_cat)
   ),
   tar_target(
     fig_widest_range_trait_comb_prop,
@@ -780,7 +801,8 @@ list(
     fig_map_europe_trait_prop,
     plot_map_europe_proportion_trait(
       regions_trait_prop, glonaf_small_islands, glonaf_mainland_large_islands
-    )
+    ),
+    pattern = map(regions_trait_prop)
   ),
   tar_target(
     fig_network_trait_name,

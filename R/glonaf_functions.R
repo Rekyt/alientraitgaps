@@ -210,7 +210,7 @@ extract_species_regions_table = function(
     collect() |>
     inner_join(
       glonaf_alien_species |>
-        distinct(taxon_orig_id, taxa_accepted),
+        distinct(taxon_orig_id, species = taxa_accepted),
       by = "taxon_orig_id"
     )
 
@@ -223,12 +223,14 @@ count_species_proportion_trait_by_region = function(
     glonaf_species_regions, contain_trait_combination
 ) {
 
-  glonaf_species_regions %>%
+  match_type = names(contain_trait_combination)
+
+  contain_trait_combination = contain_trait_combination[[1]]
+
+  glonaf_species_regions |>
     full_join(
       contain_trait_combination %>%
-        ungroup() %>%
-        filter(species != "") %>%
-        select(species, has_at_least_one_trait :has_bergmann) %>%
+        select(species, has_at_least_one_trait:has_bergmann) %>%
         mutate(is_present = TRUE),
       by = "species"
     ) %>%
@@ -244,7 +246,8 @@ count_species_proportion_trait_by_region = function(
     ) %>%
     rename(
       prop_with_any_trait = has_at_least_one_trait_prop
-    )
+    ) |>
+    mutate(match_type = match_type)
 
 }
 
@@ -255,6 +258,11 @@ count_species_proportion_trait_by_region = function(
 get_trait_combinations_and_cat_per_invasion_status = function(
     glonaf_species_regions_status, contain_trait_combination
 ) {
+
+  match_type = names(contain_trait_combination)
+
+  contain_trait_combination = contain_trait_combination[[1]]
+
   glonaf_species_regions_status %>%
     mutate(
       status_name = ifelse(
@@ -269,7 +277,10 @@ get_trait_combinations_and_cat_per_invasion_status = function(
       contain_trait_combination %>%
         mutate(n_traits = length(traits)) %>%
         select(-traits, -in_glonaf),
-      by = "species")
+      by = "species"
+    ) |>
+    mutate(match_type = match_type)
+
 }
 
 count_number_of_regions_and_area = function(
@@ -340,6 +351,11 @@ get_european_regions_of_glonaf = function(glonaf_mainland_large_islands) {
 get_european_glonaf_species = function(
     glonaf_europe, glonaf_species_regions, contain_trait_combination
 ) {
+
+  match_type = names(contain_trait_combination)
+
+  contain_trait_combination = contain_trait_combination[[1]]
+
   glonaf_species_regions %>%
     semi_join(glonaf_europe, by = "OBJIDsic") %>%
     distinct(OBJIDsic, species) %>%
@@ -358,6 +374,7 @@ get_european_glonaf_species = function(
     ungroup() %>%
     arrange(desc(n_regions)) %>%
     mutate(
-      occurrence_rank = row_number()
+      occurrence_rank = row_number(),
+      match_type = match_type
     )
 }

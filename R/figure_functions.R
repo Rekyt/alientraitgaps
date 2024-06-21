@@ -885,7 +885,7 @@ plot_map_europe_proportion_trait = function(
 
   # Pivot trait proportions data
   pivot_trait = regions_trait_prop %>%
-    select(-n_species) %>%
+    select(-n_species, -match_type) %>%
     tidyr::pivot_longer(
       !OBJIDsic, names_to = "prop_name", values_to = "prop_value"
     ) %>%
