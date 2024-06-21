@@ -174,14 +174,8 @@ select_glonaf_mainland_large_islands = function(
 
 
 extract_species_regions_table = function(
-    glonaf_con, match_glonaf_tnrs, glonaf_list
+    glonaf_con, glonaf_alien_species
 ) {
-
-  # Reconstruct GloNAF df
-  glonaf_names_df = data.frame(
-    id           = paste0("glonaf-", seq_along(glonaf_list)),
-    species_name = glonaf_list
-  )
 
   # Extract all regions for all species referenced in GloNAF
   species_regions = tbl(glonaf_con, "flora_orig_2_0") %>%
@@ -213,53 +207,16 @@ extract_species_regions_table = function(
       by = "region_id"
     ) %>%
     distinct(taxon_orig_id, status_name, OBJIDsic) %>%
-    # Get species names and ids
-    inner_join(tbl(glonaf_con, "taxon_wcvp"), by = c(taxon_orig_id = "id")) %>%
-    # Corrected names after matching TPL
-    distinct(species_id, taxon_orig_id, status_name, OBJIDsic) %>%
-    inner_join(tbl(glonaf_con, "species_list_2_0"), by = c(species_id = "id")) %>%
-    select(-species_id) %>%
-    # Add Name status from TPL
-    inner_join(tbl(glonaf_con, "name_status"), by = c(name_status_id = "id")) %>%
-    select(-name_status_id) %>%
-    # Get only binomial name
-    filter(infra_rank_id == 4) %>%
-    # Add full genus name
+    collect() |>
     inner_join(
-      glonaf_con %>%
-        tbl("genus") %>%
-        select(genus_id = id, genus = name), by = "genus_id"
-    ) %>%
-    select(-genus_id) %>%
-    # Add author name
-    inner_join(
-      glonaf_con  %>%
-        tbl("author") %>%
-        select(author_id = id, author_name = name),
-      by = "author_id"
-    ) %>%
-    select(-author_id) %>%
-    collect()
+      glonaf_alien_species |>
+        distinct(taxon_orig_id, taxa_accepted),
+      by = "taxon_orig_id"
+    )
 
   discon(glonaf_con)
-  # Merge this information based on
-  species_regions %>%
-    distinct(OBJIDsic, status_name, genus, epithet, author_name) %>%
-    mutate(
-      full_name = paste(genus, epithet, author_name)
-    ) %>%
-    inner_join(
-      match_glonaf_tnrs %>%
-        inner_join(
-          glonaf_names_df,
-          by = c(ID = "id")
-        ) %>%
-        distinct(species_name, species = Accepted_species),
-      by = c(full_name = "species_name")
-    ) %>%
-    distinct(species, status_name, OBJIDsic) %>%
-    select(OBJIDsic, status_name, species) %>%
-    filter(species != "")
+
+  species_regions
 }
 
 count_species_proportion_trait_by_region = function(

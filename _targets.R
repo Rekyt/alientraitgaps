@@ -565,7 +565,7 @@ list(
   tar_target(
     glonaf_species_regions_status,
     extract_species_regions_table(
-      connect_glonaf_db(), match_glonaf_tnrs, glonaf_list
+      connect_glonaf_db(), glonaf_alien_species
     )
   ),
   tar_target(
