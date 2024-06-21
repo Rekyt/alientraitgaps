@@ -1,13 +1,21 @@
-# Script to perform extracts for sGubik
+# Script to perform data extractions for sGubik
 #
-# # Packages ---------------------------------------------------------------------
+# Packages ---------------------------------------------------------------------
 library("dplyr")
 library("targets")
 
-# Load trait data --------------------------------------------------------------
-# Diaz combinations
+# Load data --------------------------------------------------------------------
+
+tictoc::tic()
 
 tar_load(trait_names_exact)
+
+sgubik_species = readr::read_csv(
+  "inst/data_extracts/sgubik_extract/sgubik_sp_list.csv"
+)
+
+
+# Compute all possible Diaz trait combinations ---------------------------------
 
 exact_combs = get_exact_combs()
 
@@ -19,7 +27,8 @@ diaz_traits = as.vector(exact_combs$diaz) |>
 potential_traits = trait_names_exact |>
   filter(consolidated_name %in% diaz_traits)
 
-# Extract trait data -----------------------------------------------------------
+
+# Extract GSPFF trait data -----------------------------------------------------
 
 # AusTraits
 austraits_traits = tar_read(austraits)$traits |>
@@ -80,6 +89,8 @@ try_simple = try_traits |>
     by = "TraitID"
   )
 
+# Merge all databases so that species are retained if they have the GSPFF
+# covered by the merge of all databases
 total_traits = list(
   austraits = austraits_simple |>
     distinct(species = taxon_name, consolidated_name),
@@ -106,6 +117,12 @@ total_diaz = total_traits |>
 with_diaz = total_diaz |>
   filter(has_diaz)
 
+
+# sGUBIK species list ----------------------------------------------------------
+
+non_native = sgubik_species |>
+  filter(!is.na(status_glonaf))
+
 # Filter species with full GSPFF -----------------------------------------------
 
 austraits_gspff = austraits_traits |>
@@ -114,31 +131,44 @@ austraits_gspff = austraits_traits |>
 bien_gspff = bien_traits |>
   filter(scrubbed_species_binomial %in% with_diaz$species)
 
+
 gift_gspff = gift_traits |>
   filter(work_species %in% with_diaz$species)
 
 try_gspff = try_traits |>
   filter(AccSpeciesName %in% with_diaz$species)
 
+
+# Get full trait data for non-native species -----------------------------------
+
+austraits_non_native = tar_read(austraits)$traits |>
+  filter(taxon_name %in% non_native$accepted_taxon_name)
+
+bien_non_native = tar_read(bien_traits) |>
+  filter(scrubbed_species_binomial %in% non_native$accepted_taxon_name)
+
+gift_non_native = tar_read(gift_raw_traits) |>
+  filter(work_species %in% non_native$accepted_taxon_name)
+
+try_non_native = tar_read(full_try_df) |>
+  filter(AccSpeciesName %in% non_native$accepted_taxon_name)
+
+
 # Save all these data ----------------------------------------------------------
 
 folder = here::here("inst", "data_extracts", "sgubik_extract")
 
-saveRDS(
-  austraits_gspff,
-  here::here(folder, "austraits_gspff.Rds")
-)
-saveRDS(
-  bien_gspff,
-  here::here(folder, "bien_gspff.Rds")
-)
-saveRDS(
-  gift_gspff,
-  here::here(folder, "gift_gspff.Rds")
-)
-saveRDS(
-  try_gspff,
-  here::here(folder, "try_gspff.Rds")
-)
+list(
+  austraits_gspff = austraits_gspff,
+  bien_gspff      = bien_gspff,
+  gift_gspff      = gift_gspff,
+  try_gspff       = try_gspff,
+  austraits_non_native = austraits_non_native,
+  bien_non_native      = bien_non_native,
+  gift_non_native      = gift_non_native,
+  try_non_native       = try_non_native
+) |>
+  purrr::iwalk(\(x, y) saveRDS(x, here::here(folder, paste0(y, ".Rds"))))
+
 
 tictoc::toc()
