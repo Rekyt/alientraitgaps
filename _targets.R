@@ -776,7 +776,8 @@ list(
       regions_trait_prop, glonaf_small_islands,
       glonaf_mainland_large_islands_simplified
     ),
-    pattern = map(regions_trait_prop)
+    pattern = map(regions_trait_prop),
+    iteration = "list"
   ),
   tar_target(
     fig_map_alien_richness,
@@ -784,25 +785,30 @@ list(
       regions_trait_prop, glonaf_small_islands,
       glonaf_mainland_large_islands_simplified
     ),
-    pattern = map(regions_trait_prop)
+    pattern = map(regions_trait_prop),
+    iteration = "list"
   ),
   tar_target(
     fig_status_prop_comb,
     plot_trait_comb_proportion_per_invasion_status(glonaf_status_trait_cat),
-    pattern = map(glonaf_status_trait_cat)
+    pattern = map(glonaf_status_trait_cat),
+    iteration = "list"
   ),
   tar_target(
     fig_widest_range_trait_comb_prop,
     plot_trait_combination_per_range_size(
-      glonaf_species_area, contain_trait_combination
-    )
+      glonaf_species_area, trait_combinations_types[[1]]
+    ),
+    pattern = map(trait_combinations_types),
+    iteration = "list"
   ),
   tar_target(
     fig_map_europe_trait_prop,
     plot_map_europe_proportion_trait(
       regions_trait_prop, glonaf_small_islands, glonaf_mainland_large_islands
     ),
-    pattern = map(regions_trait_prop)
+    pattern = map(regions_trait_prop),
+    iteration = "list"
   ),
   tar_target(
     fig_network_trait_name,
@@ -845,11 +851,13 @@ list(
   ),
   tar_target(
     pfig3_maps_trait_prop_and_richness,
-    assemble_fig3(fig_map_alien_richness, fig_map_prop_trait_regions)
+    assemble_fig3(fig_map_alien_richness[[1]], fig_map_prop_trait_regions[[1]])
   ),
   tar_target(
     pfig4_trait_comb_prop_status_regions,
-    assemble_fig4(fig_status_prop_comb, fig_widest_range_trait_comb_prop)
+    assemble_fig4(
+      fig_status_prop_comb[[1]], fig_widest_range_trait_comb_prop[[1]]
+    )
   ),
   tar_target(
     ptab2_trait_knowledge_model_summary,

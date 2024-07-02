@@ -315,12 +315,12 @@ plot_trait_combination_per_range_size = function(
       limits = c(0, 1)
     ) +
     scale_shape_discrete(
-      "Top 100 Widespread? (# of regions)",
+      "Widespread species?",
       guide = guide_legend(reverse = TRUE),
       labels = c(`TRUE` = "Yes", `FALSE` = "No")
     ) +
     scale_color_manual(
-      "Top 100 Widespread? (# of regions)",
+      "Widespread species?",
       guide = guide_legend(reverse = TRUE),
       labels = c(`TRUE` = "Yes", `FALSE` = "No"),
       values = c(`TRUE` = "#018571", `FALSE` = "#a6611a")
@@ -885,7 +885,7 @@ plot_map_europe_proportion_trait = function(
 
   # Pivot trait proportions data
   pivot_trait = regions_trait_prop %>%
-    select(-n_species, -match_type) %>%
+    select(-is_present_prop, -n_species, -match_type) %>%
     tidyr::pivot_longer(
       !OBJIDsic, names_to = "prop_name", values_to = "prop_value"
     ) %>%
