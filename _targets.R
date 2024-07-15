@@ -472,7 +472,15 @@ list(
     network_consolidated_trait_names,
     consolidate_trait_names_from_network(trait_network, "full")
   ),
+  tar_target(
+    standard_growth_form,
+    standardize_growth_form(
+      trait_names_full, austraits, bien_traits, gift_raw_traits,
+      gift_trait_meta, full_try_df, try_harmonized_species
+    )
+  ),
 
+  ### LEGACY CODE WILL BE REMOVED AT ONE POINT
   ## Actual tables with trait names
   # Actual table with species names and trait names
   tar_target(
@@ -534,9 +542,10 @@ list(
   tar_target(
     trait_knowledge_df,
     assemble_trait_knowledge_df(
-      combined_traits, simplified_growth_form, species_final_socioecovars,
-      match_glonaf_tnrs
-    )
+      trait_combinations_types, standard_growth_form, species_final_socioecovars,
+      glonaf_harmonized
+    ),
+    pattern = map(trait_combinations_types)
   ),
   tar_target(
     trait_knowledge_model,

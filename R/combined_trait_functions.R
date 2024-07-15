@@ -751,6 +751,151 @@ count_specific_trait_combinations = function(
 }
 
 
+# Function to standardize growth form
+standardize_growth_form = function(
+    trait_names_full, austraits, bien_traits, gift_raw_traits, gift_trait_meta,
+    full_try_df, try_harmonized_species
+) {
+
+  growth_form_traits = trait_names_full |>
+    filter(consolidated_name == "Plant growth form")
+
+  austraits_growth = austraits$traits |>
+    filter(trait_name %in% unique(growth_form_traits$austraits_trait_name)) |>
+    distinct(taxon_name, trait_name, value)
+
+  bien_growth = bien_traits |>
+    filter(
+      !is.na(scrubbed_species_binomial),
+      trait_name %in% unique(growth_form_traits$bien_trait_name)
+    ) |>
+    distinct(scrubbed_species_binomial, trait_name, trait_value)
+
+  gift_growth = gift_raw_traits |>
+    semi_join(
+      gift_trait_meta |>
+        filter(Trait2 %in% unique(growth_form_traits$gift_trait_name)),
+      by = c(trait_ID = "Lvl3")
+    )
+
+  try_growth = full_try_df |>
+    filter(TraitID %in% unique(growth_form_traits$try_trait_id))
+
+  # Filter actually interesting trait
+  austraits_growth_simple = austraits_growth |>
+    filter(trait_name == "plant_growth_form") |>
+    mutate(
+      simplified_value = case_when(
+        grepl("tree", value, fixed = TRUE)  ~ "tree",
+        grepl("shrub", value, fixed = TRUE) ~ "shrub",
+        grepl("herb", value, fixed = TRUE)  ~ "herb",
+        TRUE                                ~ "other"
+      )
+    )
+
+  bien_growth_simple = bien_growth |>
+    filter(trait_name == "whole plant growth form")
+
+  gift_growth_simple = gift_growth |>
+    filter(trait_ID == "1.2.1") |>
+    distinct(work_species, trait_value)
+
+  try_growth_simple = try_growth |>
+    select(
+      AccSpeciesID, AccSpeciesName, TraitID, TraitName, Dataset, OriglName,
+      OrigValueStr, StdValue
+    ) |>
+    inner_join(
+      try_harmonized_species |>
+        select(
+          AccSpeciesID = TRY_AccSpeciesID, AccSpeciesName = TRY_AccSpeciesName,
+          MatchedName
+        ),
+      by = join_by(AccSpeciesID, AccSpeciesName)
+    )
+
+  austraits_list = austraits_growth_simple |>
+    distinct(taxon_name, simplified_value) |>
+    group_by(taxon_name) |>
+    summarise(growth_form = list(unique(simplified_value)))
+
+  bien_list = bien_growth_simple |>
+    distinct(
+      taxon_name       = scrubbed_species_binomial,
+      simplified_value = trait_value
+    ) |>
+    mutate(
+      simplified_value = case_when(
+        grepl("tree", simplified_value, fixed = TRUE)  |
+          grepl("Tree", simplified_value, fixed = TRUE)  ~ "tree",
+        grepl("shrub", simplified_value, fixed = TRUE) |
+          grepl("Shrub", simplified_value, fixed = TRUE) ~ "shrub",
+        grepl("herb", simplified_value, fixed = TRUE)  |
+          grepl("Herb", simplified_value, fixed = TRUE) ~ "herb",
+        TRUE                                  ~ "other"
+      )
+    )|>
+    group_by(taxon_name) |>
+    summarise(growth_form = list(unique(simplified_value)))
+
+  gift_list = gift_growth_simple |>
+    distinct(
+      taxon_name      = work_species,
+      simplified_value =  trait_value
+    ) |>
+    mutate(
+      simplified_value = case_when(
+        grepl("tree", simplified_value, fixed = TRUE)  |
+          grepl("Tree", simplified_value, fixed = TRUE)  ~ "tree",
+        grepl("shrub", simplified_value, fixed = TRUE) |
+          grepl("Shrub", simplified_value, fixed = TRUE) ~ "shrub",
+        grepl("herb", simplified_value, fixed = TRUE)  |
+          grepl("Herb", simplified_value, fixed = TRUE) ~ "herb",
+        TRUE                                  ~ "other"
+      )
+    ) |>
+    group_by(taxon_name) |>
+    summarise(growth_form = list(unique(simplified_value)))
+
+  try_list = try_growth_simple |>
+    filter(TraitID == 42) |>
+    distinct(
+      taxon_name       = MatchedName,
+      simplified_value = OrigValueStr
+    ) |>
+    mutate(
+      simplified_value = case_when(
+        grepl("tree", simplified_value, fixed = TRUE)  |
+          grepl("Tree", simplified_value, fixed = TRUE)  ~ "tree",
+        grepl("shrub", simplified_value, fixed = TRUE) |
+          grepl("Shrub", simplified_value, fixed = TRUE) ~ "shrub",
+        grepl("herb", simplified_value, fixed = TRUE)  |
+          grepl("Herb", simplified_value, fixed = TRUE) ~ "herb",
+        TRUE                                  ~ "other"
+      )
+    ) |>
+    group_by(taxon_name) |>
+    summarise(growth_form = list(unique(simplified_value)))
+
+
+  total_growth_form = list(austraits = austraits_list,
+                           bien      = bien_list,
+                           gift      = gift_list,
+                           try       = try_list) |>
+    bind_rows() |>
+    group_by(taxon_name) |>
+    summarise(growth_form = list(unique(unlist(growth_form)))) |>
+    rowwise() |>
+    mutate(simplified_growth_form = case_when(
+      "tree" %in% growth_form  ~ "tree",
+      "shrub" %in% growth_form ~ "shrub",
+      "herb" %in% growth_form  ~ "herb",
+      TRUE                     ~ "other"
+    )) |>
+    ungroup()
+
+}
+
 # Function to create a unified growth form dataset to use downstream
 extract_growth_form = function(
     combined_traits, glonaf_bien_traits, gift_all_raw_traits, gift_names_traits,

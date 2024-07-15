@@ -31,11 +31,11 @@ get_continental_origin = function() {
 
 assemble_trait_knowledge_df = function(
     combined_traits, simplified_growth_form, species_socioecovars,
-    match_glonaf_tnrs
+    glonaf_harmonized
 ) {
 
-  all_unified_species = match_glonaf_tnrs %>%
-    distinct(species = Accepted_species)
+  all_unified_species = glonaf_harmonized %>%
+    distinct(species = taxa_binomial)
 
   number_measured_traits = combined_traits %>%
     group_by(species) %>%
