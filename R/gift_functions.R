@@ -67,30 +67,12 @@ retrieve_all_gift_checklists = function(gift_api, gift_version) {
 }
 
 match_taxonomy_checklists_raw = function(
-    gift_all_raw_traits, gift_raw_species, gift_raw_list, match_raw_gift_tnrs
+    gift_all_raw_traits
 ) {
 
-  # Original raw names
-  original_names = gift_all_raw_traits %>%
+  gift_all_raw_traits %>%
     distinct(orig_ID, name_ID, work_ID, genus_ID, work_species)
 
-  # Correspondence between original names and used string to match them
-  submitted_names = gift_raw_species %>%
-    distinct(orig_ID, full_name) %>%
-    inner_join(
-      gift_raw_list %>%
-        tibble::enframe("other_id", "full_name") %>%
-        mutate(ID = paste0("gift-raw-", row_number())) %>%
-        select(ID, full_name),
-      by = "full_name"
-    )
-
-  # Make full correspondence between original names and rematched ones
-  match_raw_gift_tnrs %>%
-    full_join(submitted_names, by = "ID") %>%
-    select(orig_ID, Accepted_species) %>%
-    # Add 'work_ID' for prematched names to retrieve in checklists
-    full_join(original_names, by = "orig_ID")
 }
 
 match_checklist = function(gift_matched_taxonomy, gift_checklists) {
@@ -106,14 +88,13 @@ match_checklist = function(gift_matched_taxonomy, gift_checklists) {
     )
 }
 
-simplify_gift_distribution = function(gift_matched_checklists) {
+simplify_gift_distribution = function(gift_checklists) {
 
   # Simplify species status per polygon
   # The code smells but comes from GIFT::GIFT_species_distribution()
   # Couldn't simplify it with case_when() or order functions
-  gift_matched_checklists %>%
-    filter(Accepted_species != "") %>%
-    group_by(entity_ID, Accepted_species) %>%
+  gift_checklists$checklists %>%
+    group_by(entity_ID, work_species) %>%
     dplyr::mutate(
       conflict_native       = ifelse(length(unique(native)) > 1, 1, 0),
       conflict_naturalized  = ifelse(length(unique(naturalized)) > 1, 1, 0),
@@ -135,7 +116,7 @@ simplify_gift_distribution = function(gift_matched_checklists) {
     ungroup() %>%
     select(-ref_ID, -list_ID) %>%
     distinct() %>%
-    select(entity_ID, Accepted_species, everything()) %>%
+    select(entity_ID, work_species, everything()) %>%
     mutate(status = case_when(
       native == 1 & naturalized == 0     ~ "native",
       native == 1 & is.na(naturalized)   ~ "native",

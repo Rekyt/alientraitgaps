@@ -141,9 +141,7 @@ list(
   ),
   tar_target(
     gift_matched_taxonomy,
-    match_taxonomy_checklists_raw(
-      gift_raw_traits, gift_raw_species, gift_raw_list
-    )
+    match_taxonomy_checklists_raw(gift_raw_traits, gift_raw_species)
   ),
   tar_target(
     gift_matched_checklists,
@@ -359,7 +357,7 @@ list(
   ),
   tar_target(
     gift_unified_distribution,
-    simplify_gift_distribution(gift_matched_checklists)
+    simplify_gift_distribution(gift_checklists)
   ),
 
   # TRY traits -----------------------------------------------------------------
