@@ -69,15 +69,15 @@ model_alien_trait_knowledge = function(trait_knowledge_df) {
       !is.na(gdp_mean_non_native), !is.na(mean_access_cities_2015_mean)
     ) %>%
     select(
-      species, n_traits, simp_form, n_total, n_total_non_native, n_biomes,
-      mean_hii_v2geo_mean, mean_hii_v2geo_sd, gdp_mean_native,
+      species, n_traits, simplified_growth_form , n_total, n_total_non_native,
+      n_biomes, mean_hii_v2geo_mean, mean_hii_v2geo_sd, gdp_mean_native,
       gdp_mean_non_native, mean_access_cities_2015_mean
     ) %>%
     mutate(
       across(n_total:mean_access_cities_2015_mean, ~ as.numeric(scale(.x)))
     ) %>%
     rename(
-      growth_form                   = simp_form,
+      growth_form                   = simplified_growth_form,
       total_range_size              = n_total,
       non_native_range_size         = n_total_non_native,
       avg_human_influence_index     = mean_hii_v2geo_mean,

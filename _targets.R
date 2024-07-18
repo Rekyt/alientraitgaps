@@ -548,7 +548,9 @@ list(
   ),
   tar_target(
     trait_knowledge_model,
-    model_alien_trait_knowledge(trait_knowledge_df)
+    model_alien_trait_knowledge(trait_knowledge_df),
+    pattern = map(trait_knowledge_df),
+    iteration = "list"
   ),
 
   # World Regions --------------------------------------------------------------
