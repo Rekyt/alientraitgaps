@@ -185,9 +185,9 @@ count_socioecovars_cover = function(
 
   # Count proportion of range covered
   gift_unified_distribution %>%
-    select(entity_ID, Accepted_species, status) %>%
+    select(entity_ID, work_species, status) %>%
     left_join(gift_trans, by = "entity_ID") %>%
-    group_by(Accepted_species) %>%
+    group_by(work_species) %>%
     summarise(
       # Count number of regions/area of total range
       n_total = n(),
@@ -219,9 +219,9 @@ compute_gift_species_socioecovars = function(
 ) {
 
   gift_unified_distribution %>%
-    select(entity_ID, Accepted_species, status) %>%
+    select(entity_ID, work_species, status) %>%
     right_join(gift_socioecovars, by = "entity_ID") %>%
-    group_by(Accepted_species) %>%
+    group_by(work_species) %>%
     summarise(
       across(
         mean_hf_v2geo:mean_access_cities_2015,
@@ -257,12 +257,12 @@ combine_and_filter_socioecovars = function(
     inner_join(
       species_gift_count_socioecovars %>%
         filter(prop_n_described >= 0.8) %>%
-        distinct(species = Accepted_species),
+        distinct(species = work_species),
     by = "species"
     ) %>%
     left_join(
       species_gift_socioecovars,
-      by = c(species = "Accepted_species")
+      by = c(species = "work_species")
     )
 
 }

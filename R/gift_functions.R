@@ -94,6 +94,10 @@ simplify_gift_distribution = function(gift_checklists) {
   # The code smells but comes from GIFT::GIFT_species_distribution()
   # Couldn't simplify it with case_when() or order functions
   gift_checklists$checklists %>%
+    select(
+      entity_ID, work_species, ref_ID, list_ID, native, naturalized,
+      endemic_list
+    ) |>
     group_by(entity_ID, work_species) %>%
     dplyr::mutate(
       conflict_native       = ifelse(length(unique(native)) > 1, 1, 0),

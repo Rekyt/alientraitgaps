@@ -540,10 +540,11 @@ list(
   tar_target(
     trait_knowledge_df,
     assemble_trait_knowledge_df(
-      trait_combinations_types, standard_growth_form, species_final_socioecovars,
-      glonaf_harmonized
+      trait_combinations_types, standard_growth_form,
+      species_final_socioecovars, glonaf_harmonized
     ),
-    pattern = map(trait_combinations_types)
+    pattern = map(trait_combinations_types),
+    iteration = "list"
   ),
   tar_target(
     trait_knowledge_model,

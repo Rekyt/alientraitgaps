@@ -34,24 +34,27 @@ assemble_trait_knowledge_df = function(
     glonaf_harmonized
 ) {
 
+  simplified_growth_form = simplified_growth_form |>
+    distinct(species = taxon_name, simplified_growth_form)
+
   all_unified_species = glonaf_harmonized %>%
     distinct(species = taxa_binomial)
 
-  number_measured_traits = combined_traits %>%
-    group_by(species) %>%
-    summarise(n_traits = n())
+  number_measured_traits = combined_traits[[1]] %>%
+    mutate(n_traits = purrr::map_int(traits, length)) |>
+    select(species, n_traits)
 
   Reduce(
     function(x, y) inner_join(x, y, by = "species"),
     list(number_measured_traits, simplified_growth_form, species_socioecovars,
          all_unified_species)
   ) %>%
-    select(species, simp_form, everything()) %>%
+    select(species, simplified_growth_form, everything()) %>%
+    full_join(all_unified_species, by = "species") |>
     # Replace problematic NAs by 0s
     mutate(
       across(c(n_traits, n_total:n_unknown), .fns = ~tidyr::replace_na(.x, 0))
     ) %>%
-    filter(species != "") %>%
     mutate(
       n_total_non_native = n_total - n_native
     )
