@@ -882,7 +882,7 @@ list(
     )
   ),
   tar_target(
-    ptab2_trait_knowledge_model_summary,
+    ptab1_trait_knowledge_model_summary,
     create_trait_knowledge_table(trait_knowledge_model),
     pattern = map(trait_knowledge_model),
     iteration = "list"

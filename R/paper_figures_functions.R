@@ -37,8 +37,10 @@ create_trait_knowledge_table = function(trait_knowledge_model) {
 
   first_table %>%
     select(-df_error, -c(Std_Coefficient:Fit)) %>%
-    filter(!(Parameter %in% c("AIC", "AICc", "BIC", "Sigma", "R2_Nagelkerke")),
-           !is.na(Parameter)) %>%
+    filter(
+      !(Parameter %in% c("AIC", "AICc", "BIC", "Sigma", "R2_Nagelkerke")),
+      !is.na(Parameter)
+    ) %>%
     mutate(
       Coeff_95CI = paste0(
         ifelse(Coefficient > 0, " ", ""),
@@ -54,8 +56,6 @@ create_trait_knowledge_table = function(trait_knowledge_model) {
       ),
       z = round(z, 1),
       Parameter = case_when(
-        Parameter == "(Intercept)" & is.na(z) ~ "Intercept (dispersion)",
-        Parameter == "(Intercept)"            ~ "Intercept",
         TRUE ~ tools::toTitleCase(Parameter)
       )
     ) %>%
@@ -63,11 +63,13 @@ create_trait_knowledge_table = function(trait_knowledge_model) {
     select(Parameter, Coeff_95CI, z, p_val) %>%
     mutate(
       Parameter = Parameter %>%
+        gsub("Growth Form", "", ., fixed = TRUE) %>%
         gsub("Gdp", "GDP", ., fixed = TRUE) %>%
         gsub("Avg", "Average", ., fixed = TRUE) %>%
         gsub("Sd", "Standard Deviation of", ., fixed = TRUE) %>%
         gsub("^n", "Number of", .) %>%
-        gsub("Non Native", "Non-native", ., fixed = TRUE)
+        gsub("Non Native", "Non-native", ., fixed = TRUE) %>%
+        tools::toTitleCase()
     ) %>%
     rename(`Coefficient (95% CI)` = Coeff_95CI)
 
