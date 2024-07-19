@@ -871,20 +871,28 @@ list(
   ),
   tar_target(
     ptab2_trait_knowledge_model_summary,
-    create_trait_knowledge_table(trait_knowledge_model)
+    create_trait_knowledge_table(trait_knowledge_model),
+    pattern = map(trait_knowledge_model),
+    iteration = "list"
   ),
   tar_target(
     supp_fig1_model_partial_residuals,
-    plot_partial_residuals(trait_knowledge_model)
+    plot_partial_residuals(trait_knowledge_model[[1]]),
+    pattern = map(trait_knowledge_model),
+    iteration = "list"
   ),
   tar_target(
     supp_fig2_proportion_species_trait,
-    plot_proportion_species_with_trait(combined_traits, match_glonaf_tnrs)
+    plot_proportion_species_with_trait(
+      trait_combinations_types, glonaf_harmonized
+    ),
+    pattern = map(trait_combinations_types),
+    iteration = "list"
   ),
   tar_target(
     supp_fig3_treemap_number_trait,
     plot_treemaps_with_number_of_traits(
-      combined_traits_taxonomy, contain_trait_combination
+      glonaf_family, trait_combinations_full
     )
   ),
   tar_target(

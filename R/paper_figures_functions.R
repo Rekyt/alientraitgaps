@@ -36,8 +36,8 @@ create_trait_knowledge_table = function(trait_knowledge_model) {
   first_table = as.data.frame(report::report_table(trait_knowledge_model))
 
   first_table %>%
-    select(-df_error, -c(Component:Fit)) %>%
-    filter(!(Parameter %in% c("AIC", "AICc", "BIC", "Sigma")),
+    select(-df_error, -c(Std_Coefficient:Fit)) %>%
+    filter(!(Parameter %in% c("AIC", "AICc", "BIC", "Sigma", "R2_Nagelkerke")),
            !is.na(Parameter)) %>%
     mutate(
       Coeff_95CI = paste0(
@@ -104,24 +104,23 @@ plot_partial_residuals = function(trait_knowledge_model) {
 }
 
 plot_proportion_species_with_trait = function(
-    combined_traits, match_glonaf_tnrs
+    combined_traits, glonaf_harmonized
 ) {
 
-  trait_number = combined_traits %>%
-    group_by(species) %>%
-    summarise(n_traits = n()) %>%
+  trait_number = combined_traits[[1]] %>%
+    mutate(n_traits = purrr::map_int(traits, length)) %>%
     group_by(n_traits) %>%
     summarise(n_species = n()) %>%
     arrange(desc(n_traits)) %>%
     mutate(cumulative_species = cumsum(n_species))
 
-  n_total = sum(unique(match_glonaf_tnrs[["Accepted_species"]]) != "")
+  n_total = sum(unique(glonaf_harmonized[["taxa_binomial"]]) != "")
 
-  rm(combined_traits, match_glonaf_tnrs)
+  rm(combined_traits, glonaf_harmonized)
 
   trait_number %>%
     ggplot(aes(n_traits, cumulative_species)) +
-    geom_line(color = "darkblue") +
+    geom_line(color = "darkblue", linewidth = 1) +
     scale_x_log10("Number of traits") +
     scale_y_continuous(
       "Cumulative number of species having at least X trait(s)",
@@ -137,12 +136,12 @@ plot_proportion_species_with_trait = function(
 
 
 plot_treemaps_with_number_of_traits = function(
-  combined_traits_taxonomy, contain_trait_combination
+  glonaf_family, trait_combinations_full
 ) {
 
-  tax_comb = combined_traits_taxonomy %>%
-    distinct(species, genus, family) %>%
-    inner_join(contain_trait_combination, by = "species") %>%
+  tax_comb = glonaf_family %>%
+    distinct(species = taxa_accepted, family = family_wcvp) %>%
+    inner_join(trait_combinations_full, by = "species") %>%
     mutate(n_traits = purrr::map_int(traits, length)) %>%
     mutate(across(where(is.character), ~iconv(.x, "latin1", to = "UTF-8"))) %>%
     select(species, family, n_traits) %>%
@@ -156,7 +155,7 @@ plot_treemaps_with_number_of_traits = function(
     count(family, trait_category, name = "n_species")
 
   # Clean environment
-  rm(combined_traits_taxonomy, contain_trait_combination)
+  rm(glonaf_family, trait_combinations_full)
 
   # Only by trait category
   general_treemap = tax_comb %>%
