@@ -452,8 +452,8 @@ list(
       count_trait_combinations(simplified_traits, match_type, glonaf_harmonized)
     ),
     tar_target(
-      fig_euler_diagrams_top_20_traits_database,
-      plot_data_origin_intersect_top_20_traits(database_euler_diagrams),
+      fig_euler_diagrams_top_25_traits_database,
+      plot_data_origin_intersect_top_n_traits(database_euler_diagrams, 25),
     ),
     tar_target(
       fig_bars_absolute_database_importance_traits,
@@ -601,7 +601,8 @@ list(
     get_trait_combinations_and_cat_per_invasion_status(
       glonaf_species_regions_status, trait_combinations_types
     ),
-    pattern = map(trait_combinations_types)
+    pattern = map(trait_combinations_types),
+    iteration = "list"
   ),
   tar_target(
     glonaf_species_area,
@@ -862,7 +863,9 @@ list(
   # Assembling Figs. & Models for Paper ----------------------------------------
   tar_target(
     pfig1_trait_heatmap_and_freq,
-    assemble_fig1(fig_combined_trait_heatmap, fig_species_per_trait_combined)
+    assemble_fig1(
+      fig_combined_trait_heatmap_inset, fig_species_per_trait_combined
+    )
   ),
   tar_target(
     pfig2_treemap_trait_combination,
@@ -885,13 +888,17 @@ list(
     iteration = "list"
   ),
   tar_target(
-    supp_fig1_model_partial_residuals,
+    supp_fig1_euler_trait_databases,
+    fig_euler_diagrams_top_25_traits_database_full
+  ),
+  tar_target(
+    supp_fig2_model_partial_residuals,
     plot_partial_residuals(trait_knowledge_model),
     pattern = map(trait_knowledge_model),
     iteration = "list"
   ),
   tar_target(
-    supp_fig2_proportion_species_trait,
+    supp_fig3_proportion_species_trait,
     plot_proportion_species_with_trait(
       trait_combinations_types, glonaf_harmonized
     ),
@@ -899,13 +906,13 @@ list(
     iteration = "list"
   ),
   tar_target(
-    supp_fig3_treemap_number_trait,
+    supp_fig4_treemap_number_trait,
     plot_treemaps_with_number_of_traits(
       glonaf_family, trait_combinations_full
     )
   ),
   tar_target(
-    supp_fig4_maps_median_sd_n_traits,
+    supp_fig5_maps_median_sd_n_traits,
     assemble_maps_number_of_traits(
       fig_map_median_n_traits_region, fig_map_sd_n_traits_region
     )

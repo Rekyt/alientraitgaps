@@ -1118,16 +1118,21 @@ plot_histogram_number_trait_regions = function(trait_n_regions) {
     theme(aspect.ratio = 1)
 }
 
-plot_data_origin_intersect_top_20_traits = function(
-    trait_database_euler_diagrams
+plot_data_origin_intersect_top_n_traits = function(
+    trait_database_euler_diagrams, n_traits = 20
 ) {
 
   # Remove some non-functional traits
   trait_database_euler_diagrams = trait_database_euler_diagrams %>%
-    filter(!(consolidated_name %in% c("Elevational_range_min", "Habitat_1")))
+    filter(
+      !(consolidated_name %in%
+          c("Elevational_range_min", "Habitat_1",
+            "Species occurrence range: native vs invasive")
+        )
+    )
 
   # Needed data
-  n_traits = seq(1, 20, by = 1)
+  n_traits = seq(1, n_traits, by = 1)
 
   # Fill scale (corresponds to Set1)
   db_fills = c(
