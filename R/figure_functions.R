@@ -338,7 +338,7 @@ plot_number_of_traits_per_number_of_regions = function(
 ) {
   # Preprocess data
   n_traits_n_regions = contain_trait_combination %>%
-    mutate(n_traits = length(traits)) %>%
+    mutate(n_traits = purrr::map_int(traits, length)) %>%
     select(species, n_traits) %>%
     ungroup() %>%
     inner_join(glonaf_species_area, by = "species")
@@ -1099,6 +1099,7 @@ plot_network_trait = function(trait_name_network) {
 # Other Figures ----------------------------------------------------------------
 plot_histogram_number_trait_regions = function(trait_n_regions) {
   trait_n_regions %>%
+    select(-match_type) |>
     tidyr::pivot_longer(-OBJIDsic) %>%
     ggplot(aes(value)) +
     geom_histogram(color = "white") +

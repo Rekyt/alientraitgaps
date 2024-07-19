@@ -634,7 +634,8 @@ list(
     count_number_of_traits_per_region(
       glonaf_species_regions, combined_trait_types
     ),
-    pattern = map(combined_trait_types)
+    pattern = map(combined_trait_types),
+    iteration = "list"
   ),
 
   # Get environmental & socioeconomic variables --------------------------------
@@ -826,27 +827,35 @@ list(
   ),
   tar_target(
     fig_trait_histogram_regions,
-    plot_histogram_number_trait_regions(trait_n_regions)
+    plot_histogram_number_trait_regions(trait_n_regions),
+    pattern = map(trait_n_regions),
+    iteration = "list"
   ),
   tar_target(
     fig_map_median_n_traits_region,
     plot_map_median_n_traits_region(
       trait_n_regions, glonaf_small_islands,
       glonaf_mainland_large_islands_simplified
-    )
+    ),
+    pattern = map(trait_n_regions),
+    iteration = "list"
   ),
   tar_target(
     fig_map_sd_n_traits_region,
     plot_map_sd_n_traits_region(
       trait_n_regions, glonaf_small_islands,
       glonaf_mainland_large_islands_simplified
-    )
+    ),
+    pattern = map(trait_n_regions),
+    iteration = "list"
   ),
   tar_target(
     fig_n_traits_n_regions,
     plot_number_of_traits_per_number_of_regions(
-      contain_trait_combination, glonaf_species_area
-    )
+      trait_combinations_types[[1]], glonaf_species_area
+    ),
+    pattern = map(trait_combinations_types),
+    iteration = "list"
   ),
 
 
@@ -877,7 +886,7 @@ list(
   ),
   tar_target(
     supp_fig1_model_partial_residuals,
-    plot_partial_residuals(trait_knowledge_model[[1]]),
+    plot_partial_residuals(trait_knowledge_model),
     pattern = map(trait_knowledge_model),
     iteration = "list"
   ),
@@ -987,8 +996,4 @@ list(
     ),
     format = "file"
   )
-  # Figure 5
-  # Supp. Fig.
-  # Supp. Fig.
-  # Supp. Fig.
 )
