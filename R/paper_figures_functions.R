@@ -31,59 +31,45 @@ assemble_fig3 = function(fig_map_alien_richness, fig_map_prop_trait_regions) {
     patchwork::plot_annotation(tag_levels = "A")
 }
 
-create_trait_knowledge_table = function(trait_knowledge_model) {
-
-  first_table = as.data.frame(report::report_table(trait_knowledge_model))
-
-  first_table %>%
-    select(-df_error, -c(Std_Coefficient:Fit)) %>%
-    filter(
-      !(Parameter %in% c("AIC", "AICc", "BIC", "Sigma", "R2_Nagelkerke")),
-      !is.na(Parameter)
-    ) %>%
-    mutate(
-      Coeff_95CI = paste0(
-        ifelse(Coefficient > 0, " ", ""),
-        round(Coefficient, 2), " [",
-        ifelse(Coefficient > 0, " ", ""), round(CI_low, 2), " – ",
-        ifelse(Coefficient > 0, " ", ""), round(CI_high, 2),
-        "]"
-      ),
-      p_val = case_when(
-        is.na(p)  ~ NA_character_,
-        p <= 1e-3 ~ "p < 0.001",
-        TRUE      ~ as.character(round(p, 3))
-      ),
-      z = round(z, 1),
-      Parameter = case_when(
-        TRUE ~ tools::toTitleCase(Parameter)
-      )
-    ) %>%
-    select(-Coefficient, -starts_with("CI"), -p) %>%
-    select(Parameter, Coeff_95CI, z, p_val) %>%
-    mutate(
-      Parameter = Parameter %>%
-        gsub("Growth Form", "", ., fixed = TRUE) %>%
-        gsub("Gdp", "GDP", ., fixed = TRUE) %>%
-        gsub("Avg", "Average", ., fixed = TRUE) %>%
-        gsub("Sd", "Standard Deviation of", ., fixed = TRUE) %>%
-        gsub("^n", "Number of", .) %>%
-        gsub("Non Native", "Non-native", ., fixed = TRUE) %>%
-        tools::toTitleCase()
-    ) %>%
-    rename(`Coefficient (95% CI)` = Coeff_95CI)
-
-}
-
-
 assemble_fig4 = function(
-  fig_status_prop_comb, fig_widest_range_trait_comb_prop
+    fig_status_prop_comb, fig_widest_range_trait_comb_prop
 ) {
   patchwork::wrap_plots(
     fig_status_prop_comb, fig_widest_range_trait_comb_prop,
     tag_level = "new", nrow = 1
   ) +
     patchwork::plot_annotation(tag_levels = "A")
+}
+
+
+create_fig5 = function(trait_knowledge_model) {
+
+  sjPlot::plot_model(
+    trait_knowledge_model,
+    sort.est = TRUE,
+    show.values = TRUE,
+    show.p = FALSE,
+    value.offset = 0.4,
+    title = "",
+    axis.labels = c(
+      growth_formtree               = "Growth Form: Tree",
+      growth_formshrub              = "Growth Form: Shrub",
+      growth_formherb               = "Growth Form: Herb",
+      growth_formother              = "Growth Form: Other",
+      total_range_size              = "Total Range Size",
+      avg_human_influence_index     = "Avg. Human Influence Index",
+      n_biomes                      = "Number of Biomes",
+      sd_human_influence_index      = "Std. Dev.\nHuman Influence Index",
+      avg_accessibility             = "Accessibility",
+      avg_gdp_over_non_native_range = "Avg. GDP\n(non-native range)",
+      non_native_range_size         = "Non-native Range Size",
+      avg_gdp_over_native_range     = "Avg. GDP\n(native range)"
+    ),
+    wrap.labels = 40,
+    axis.title = ""
+  ) +
+    theme_bw()
+
 }
 
 
