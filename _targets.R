@@ -914,7 +914,7 @@ list(
   tar_target(
     supp_fig5_maps_median_sd_n_traits,
     assemble_maps_number_of_traits(
-      fig_map_median_n_traits_region, fig_map_sd_n_traits_region
+      fig_map_median_n_traits_region[[1]], fig_map_sd_n_traits_region[[1]]
     )
   ),
 

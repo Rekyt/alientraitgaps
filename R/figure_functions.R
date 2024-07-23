@@ -781,11 +781,11 @@ plot_map_proportion_trait_by_region = function(
       )
     ) +
     scale_fill_viridis_b(
-      name = "Prop. of known alien species",
+      name = "Prop. of known non-native species",
       labels = scales::percent_format(), n.breaks = 6, show.limits = TRUE
     ) +
     scale_color_viridis_b(
-      name = "Prop. of known alien species",
+      name = "Prop. of known non-native species",
       labels = scales::percent_format(), n.breaks = 6, show.limits = TRUE
     ) +
     guides(fill = guide_colorsteps(title.vjust = 0.8),
@@ -848,14 +848,14 @@ plot_map_alien_richness_region = function(
       size = 1.2, shape = 21, stroke = 0.5
     ) +
     scale_fill_fermenter(
-      name = "Alien Species Richness", trans = "log10", n.breaks = 5,
+      name = "Non-native Species Richness", trans = "log10", n.breaks = 5,
       palette = "YlOrRd", direction = 1,
       show.limits = TRUE,
       # Force limit to merge axes
       limits = richness_range
     ) +
     scale_color_fermenter(
-      name = "Alien Species Richness", trans = "log10", n.breaks = 5,
+      name = "Non-native Species Richness", trans = "log10", n.breaks = 5,
       palette = "YlOrRd", direction = 1,
       show.limits = TRUE,
       # Force limit to merge axes
@@ -1010,15 +1010,10 @@ plot_map_median_n_traits_region = function(
       breaks = c(10, 30, 50, 100, 300),
       limits = c(10, 300), show.limits = TRUE
     ) +
-    guides(
-      fill  = guide_bins(title.vjust = 0.8, axis = FALSE, axis.linewidth = 0),
-      color = guide_bins(title.vjust = 0.8, axis = FALSE, axis.linewidth = 0)
-    ) +
     ylim(-5747986, NA) +  # Remove whatever is below 60°S
     theme_void() +
     theme(
       legend.position  = "top",
-      legend.key       = element_rect(colour = NA),
       legend.key.width = unit(2, "lines"),
       plot.margin      = margin(b = 3/11)
     )
@@ -1064,15 +1059,10 @@ plot_map_sd_n_traits_region = function(
     scale_color_viridis_b(
       "Standard Deviation of Number of Traits", trans = "log10"
     ) +
-    guides(
-      fill  = guide_bins(title.vjust = 0.8, axis = FALSE, axis.linewidth = 0),
-      color = guide_bins(title.vjust = 0.8, axis = FALSE, axis.linewidth = 0)
-    ) +
     ylim(-5747986, NA) +  # Remove whatever is below 60°S
     theme_void() +
     theme(
       legend.position  = "top",
-      legend.key       = element_rect(colour = NA),
       legend.key.width = unit(2, "lines"),
       plot.margin      = margin(b = 3/11)
     )
