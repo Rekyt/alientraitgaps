@@ -30,8 +30,8 @@ get_glonaf_alien_species_count = function(glonaf_con) {
 get_glonaf_species_list = function(glonaf_con) {
 
   species_list = tbl(glonaf_con, "flora_orig_2_0") %>%
-    # Get taxa that are referenced as naturalized, alien, or invasive
-    filter(status_id %in% c(2, 4, 5, 7, 11, 12, 14:16)) %>%
+    # Get taxa that are referenced as naturalized or invasive
+    filter(status_id %in% c(2, 5)) %>%
     # Keep only lists that are not outdated
     semi_join(
       tbl(glonaf_con, "list") %>%
