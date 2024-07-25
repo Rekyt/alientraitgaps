@@ -13,7 +13,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-# `alientraitgaps` – "Gaps in global non-native plant trait data and how to move forward"
+# :notebook: `alientraitgaps` – "Gaps in global non-native plant trait data and how to move forward"
 
 <!-- badges: start -->
 <!-- badges: end -->
