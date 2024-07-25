@@ -36,15 +36,6 @@ list(
     austraits_species,
     austraits[["taxa"]]
   ),
-  tar_target(
-    austraits_list,
-    unique(
-      paste(
-        austraits_species[["taxon_name"]],
-        austraits_species[["scientificNameAuthorship"]]
-      )
-    )
-  ),
 
 
   # Load APD (Australian Plant Traits Dictionary) ------------------------------
@@ -183,9 +174,6 @@ list(
   ),
   # Get the name list
   tar_target(
-    try_list, extract_try_list(try_species)
-  ),
-  tar_target(
     raw_try_harmonized_species,
     here::here(
       "inst", "exdata", "try",
@@ -246,20 +234,6 @@ list(
     subset_glonaf_species(try_harmonized, glonaf_harmonized, "MatchedName")
   ),
 
-  # Legacy code TO BE DELETED
-  tar_target(
-    match_try_tnrs, get_tnrs_values(try_list, "try")
-  ),
-  tar_target(
-    match_glonaf_tnrs, get_tnrs_values(glonaf_list, "glonaf")
-  ),
-  tar_target(
-    match_austraits_tnrs, get_tnrs_values(austraits_list, "austraits"),
-  ),
-  tar_target(
-    match_raw_gift_tnrs, get_tnrs_values(gift_raw_list, "gift-raw")
-  ),
-
 
   # AusTraits traits -----------------------------------------------------------
   # Simplify AusTraits traits
@@ -271,22 +245,6 @@ list(
   tar_target(
     harmonized_austraits_glonaf,
     harmonize_austraits_glonaf(match_austraits_tnrs, match_glonaf_tnrs)
-  ),
-
-  # Get and count trait data
-  tar_target(
-    aus_traits,
-    get_austraits_traits_for_glonaf_species(
-      austraits, harmonized_austraits_glonaf
-    )
-  ),
-  tar_target(
-    aus_species_per_trait,
-    count_austraits_species_per_trait(aus_traits),
-  ),
-  tar_target(
-    aus_trait_per_species,
-    count_austraits_trait_per_species(aus_traits)
   ),
 
 
@@ -333,28 +291,6 @@ list(
     gift_traits_simple,
     simplify_gift_traits(gift_raw_traits)
   ),
-  # Match species names
-  tar_target(
-    harmonized_gift_glonaf,
-    harmonize_gift_glonaf(match_raw_gift_tnrs, match_glonaf_tnrs)
-  ),
-
-  # GIFT traits for GloNAF species
-  tar_target(
-    gift_glonaf_traits,
-    get_gift_traits_for_glonaf_species(
-      gift_raw_traits, gift_matched_taxonomy, harmonized_gift_glonaf,
-      gift_trait_meta
-    )
-  ),
-  tar_target(
-    gift_species_per_trait,
-    count_gift_species_per_trait(gift_glonaf_traits),
-  ),
-  tar_target(
-    gift_trait_per_species,
-    count_gift_trait_per_species(gift_glonaf_traits)
-  ),
   tar_target(
     gift_unified_distribution,
     simplify_gift_distribution(gift_checklists)
@@ -365,21 +301,6 @@ list(
   tar_target(
     try_traits_simple,
     simplify_try_traits(full_try_df)
-  ),
-
-  # Harmonize TRY and GloNAF
-  tar_target(
-    harmonized_try_glonaf,
-    harmonize_try_glonaf_species(match_try_tnrs, match_glonaf_tnrs)
-  ),
-  # Get back AccSpeciesID after matching
-  tar_target(
-    harmonized_try_ids,
-    get_try_ids_from_harmonized_species(harmonized_try_glonaf, try_species)
-  ),
-  tar_target(
-    glonaf_try_traits_available,
-    list_all_traits_glonaf(harmonized_try_glonaf, try_species, full_try_df)
   ),
 
 
@@ -475,55 +396,6 @@ list(
     standardize_growth_form(
       trait_names_full, austraits, bien_traits, gift_raw_traits,
       gift_trait_meta, full_try_df, try_harmonized_species
-    )
-  ),
-
-  ### LEGACY CODE WILL BE REMOVED AT ONE POINT
-  ## Actual tables with trait names
-  # Actual table with species names and trait names
-  tar_target(
-    combined_traits,
-    combine_bien_try_aus_gift_traits(
-      network_consolidated_trait_names, austraits, bien_traits,
-      gift_raw_traits,
-      glonaf_try_traits_available, aus_traits, gift_glonaf_traits
-    )
-  ),
-  # Growth form table per species
-  tar_target(
-    combined_growth_form,
-    extract_growth_form(
-      combined_traits, glonaf_bien_traits, gift_raw_traits,
-      gift_matched_taxonomy, harmonized_gift_glonaf, match_glonaf_tnrs,
-      glonaf_list
-    )
-  ),
-  tar_target(
-    simplified_growth_form,
-    simplify_growth_form(combined_growth_form)
-  ),
-
-  # Get higher taxonomy for combined traits
-  tar_target(
-    combined_traits_taxonomy,
-    get_glonaf_higher_taxonomy_combined_traits(match_glonaf_tnrs)
-  ),
-
-  # Count number of traits per database
-  tar_target(
-    combined_traits_origin,
-    count_traits_per_database(
-      network_consolidated_trait_names, glonaf_bien_traits,
-      glonaf_try_traits_available, aus_traits, gift_glonaf_traits
-    )
-  ),
-
-  # Trait Combinations ---------------------------------------------------------
-  tar_target(bergmann_comb_df, get_bergmann_combs()),
-  tar_target(
-    contain_trait_combination,
-    count_specific_trait_combinations(
-      combined_traits, match_glonaf_tnrs, bergmann_comb_df
     )
   ),
 
