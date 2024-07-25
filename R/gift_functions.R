@@ -31,26 +31,7 @@ extract_raw_gift_species = function(gift_all_raw_traits, gift_checklists) {
 
 }
 
-extract_gift_species_names = function(gift_names) {
-  gift_names %>%
-    select(genus, species_epithet, subtaxon, author) %>%
-    mutate(full_name = paste(
-      genus, species_epithet,
-      ifelse(!is.na(author), author, ""),
-      ifelse(!is.na(subtaxon), subtaxon, "")
-    )) %>%
-    pull(full_name) %>%
-    unique()
-}
 
-extract_gift_names_with_traits = function(gift_traits_final, gift_names) {
-  gift_names %>%
-    semi_join(
-      gift_traits_final %>%
-        distinct(work_ID),
-      by = "work_ID"
-    )
-}
 
 retrieve_all_gift_checklists = function(gift_api, gift_version) {
   GIFT::GIFT_checklists(
@@ -140,59 +121,4 @@ simplify_gift_traits = function(gift_raw_traits) {
 
 }
 
-harmonize_gift_glonaf = function(match_gift_tnrs, match_glonaf_tnrs) {
-  match_gift_tnrs %>%
-    distinct(
-      gift_id = ID,
-      name_init_gift        = Name_submitted,
-      species_accepted_gift = Accepted_species
-    ) %>%
-    inner_join(
-      match_glonaf_tnrs %>%
-        distinct(
-          glonaf_id = ID,
-          name_init_glonaf        = Name_submitted,
-          species_accepted_glonaf = Accepted_species
-        ),
-      by = c(species_accepted_gift = "species_accepted_glonaf")
-    ) %>%
-    filter(species_accepted_gift != "")
-}
 
-get_gift_traits_for_glonaf_species = function(
-    gift_all_raw_traits, gift_matched_taxonomy, harmonized_gift_glonaf,
-    gift_current_trait_meta
-) {
-
-
-  # Get raw trait data
-  gift_all_raw_traits %>%
-    distinct(orig_ID, trait_ID) %>%
-    # Add matching name
-    inner_join(
-      gift_matched_taxonomy,
-      by = "orig_ID"
-    ) %>%
-    # Filter GloNAF species
-    inner_join(
-      harmonized_gift_glonaf %>%
-        distinct(species_accepted_gift),
-      by = c(Accepted_species = "species_accepted_gift")
-    ) %>%
-    inner_join(
-      gift_current_trait_meta %>%
-        distinct(trait_ID = Lvl3, Trait2),
-      by = "trait_ID"
-    ) %>%
-    distinct(species_accepted_gift = Accepted_species, Trait2)
-}
-
-count_gift_species_per_trait = function(gift_glonaf_traits) {
-  gift_glonaf_traits %>%
-    dplyr::count(Trait2, sort = TRUE, name = "n_sp")
-}
-
-count_gift_trait_per_species = function(gift_glonaf_traits) {
-  gift_glonaf_traits %>%
-    dplyr::count(species_accepted_gift, sort = TRUE, name = "n_traits")
-}

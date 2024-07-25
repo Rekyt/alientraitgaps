@@ -141,12 +141,6 @@ list(
 
 
   # Load TRY data --------------------------------------------------------------
-  # Load actual files
-  tar_target(
-    raw_try_species,
-    here::here("inst", "exdata", "try", "TryAccSpecies.txt"),
-    format = "file"
-  ),
   # Full TRY extract
   tar_target(
     raw_full_try,
@@ -166,11 +160,6 @@ list(
   tar_target(
     try_traits,
     readr::read_delim(raw_try_traits, skip = 3, col_select = -6)
-  ),
-  # Load species file
-  tar_target(
-    try_species,
-    data.table::fread(raw_try_species, encoding = "UTF-8")
   ),
   # Get the name list
   tar_target(
@@ -241,11 +230,6 @@ list(
     austraits_traits_simple,
     simplify_austraits_traits(austraits)
   ),
-  # Match GloNAF to AusTraits
-  tar_target(
-    harmonized_austraits_glonaf,
-    harmonize_austraits_glonaf(match_austraits_tnrs, match_glonaf_tnrs)
-  ),
 
 
   # BIEN traits ----------------------------------------------------------------
@@ -270,19 +254,6 @@ list(
     get_bien_taxonomy(bien_traits)
   ),
 
-  # Query BIEN traits for GloNAF species
-  tar_target(
-    glonaf_bien_traits_count,
-    count_bien_traits_per_species(harmonized_try_glonaf)
-  ),
-  tar_target(
-    glonaf_bien_traits,
-    get_bien_traits(harmonized_try_glonaf)
-  ),
-  tar_target(
-    glonaf_bien_species_per_trait,
-    count_bien_species_per_trait(glonaf_bien_traits_count)
-  ),
 
 
   # GIFT traits ----------------------------------------------------------------

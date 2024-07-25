@@ -58,17 +58,6 @@ get_glonaf_species_list = function(glonaf_con) {
 }
 
 
-get_glonaf_higher_taxonomy_combined_traits = function(match_glonaf_tnrs) {
-
-  match_glonaf_tnrs %>%
-    distinct(species = Accepted_species, family = Accepted_family) %>%
-    filter(species != "") %>%
-    mutate(genus = stringr::word(species, 1)) %>%
-    select(species, genus, family)
-
-}
-
-
 get_glonaf_region_correspondence = function(glonaf_alien_species) {
 
   glonaf_con = connect_glonaf_db()
