@@ -78,9 +78,6 @@ list(
     glonaf_alien_species, get_glonaf_species_list(connect_glonaf_db())
   ),
   tar_target(
-    glonaf_regions_list, get_glonaf_region_correspondence(glonaf_alien_species)
-  ),
-  tar_target(
     glonaf_regions,
     sf::read_sf(
       here::here("inst", "exdata", "glonaf", "regions_2023-10-17",
@@ -129,14 +126,6 @@ list(
   tar_target(
     gift_raw_list,
     gift_raw_species[["full_name"]]
-  ),
-  tar_target(
-    gift_matched_taxonomy,
-    match_taxonomy_checklists_raw(gift_raw_traits, gift_raw_species)
-  ),
-  tar_target(
-    gift_matched_checklists,
-    match_checklist(gift_matched_taxonomy, gift_checklists)
   ),
 
 
@@ -359,10 +348,6 @@ list(
     )
   ),
   tar_target(
-    network_consolidated_trait_names,
-    consolidate_trait_names_from_network(trait_network, "full")
-  ),
-  tar_target(
     standard_growth_form,
     standardize_growth_form(
       trait_names_full, austraits, bien_traits, gift_raw_traits,
@@ -372,14 +357,6 @@ list(
 
 
   # Trait Knowledge Model ------------------------------------------------------
-  tar_target(
-    alien_range_size,
-    get_alien_range_size(glonaf_species_regions_status)
-  ),
-  tar_target(
-    invasive_range_size,
-    get_invasive_range_size(glonaf_species_regions_status)
-  ),
   tar_target(
     trait_knowledge_df,
     assemble_trait_knowledge_df(
@@ -452,21 +429,6 @@ list(
     count_number_of_regions_and_area(
       glonaf_species_regions, unified_glonaf_regions
     )
-  ),
-  tar_target(
-    glonaf_most_distributed_species,
-    count_most_distributed_species_and_bootstrap(glonaf_species_area, 100, 100)
-  ),
-  tar_target(
-    glonaf_europe,
-    get_european_regions_of_glonaf(glonaf_mainland_large_islands)
-  ),
-  tar_target(
-    european_species_traits,
-    get_european_glonaf_species(
-      glonaf_europe, glonaf_species_regions, trait_combinations_types
-    ),
-    pattern = map(trait_combinations_types)
   ),
   tar_target(
     combined_trait_types,
@@ -655,14 +617,6 @@ list(
       glonaf_species_area, trait_combinations_types[[1]]
     ),
     pattern = map(trait_combinations_types),
-    iteration = "list"
-  ),
-  tar_target(
-    fig_map_europe_trait_prop,
-    plot_map_europe_proportion_trait(
-      regions_trait_prop, glonaf_small_islands, glonaf_mainland_large_islands
-    ),
-    pattern = map(regions_trait_prop),
     iteration = "list"
   ),
   tar_target(

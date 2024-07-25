@@ -1,16 +1,3 @@
-get_alien_range_size = function(glonaf_species_regions_status) {
-  glonaf_species_regions_status %>%
-    distinct(species, OBJIDsic) %>%
-    count(species, name = "n_alien_regions")
-}
-
-get_invasive_range_size = function(glonaf_species_regions_status) {
-  glonaf_species_regions_status %>%
-    filter(status_name == "invasive") %>%
-    distinct(species, OBJIDsic) %>%
-    count(species, name = "n_invasive_regions")
-}
-
 get_continental_origin = function() {
 
   glonaf_con = connect_glonaf_db()

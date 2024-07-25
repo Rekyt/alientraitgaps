@@ -47,27 +47,6 @@ retrieve_all_gift_checklists = function(gift_api, gift_version) {
   )
 }
 
-match_taxonomy_checklists_raw = function(
-    gift_all_raw_traits
-) {
-
-  gift_all_raw_traits %>%
-    distinct(orig_ID, name_ID, work_ID, genus_ID, work_species)
-
-}
-
-match_checklist = function(gift_matched_taxonomy, gift_checklists) {
-  gift_checklists[[2]] %>%
-    full_join(
-      gift_matched_taxonomy %>%
-        distinct(work_ID, genus_ID, work_species, Accepted_species),
-      by = c("work_ID", "genus_ID", "work_species")
-    ) %>%
-    distinct(
-      ref_ID, list_ID, entity_ID, Accepted_species, native, naturalized,
-      endemic_list
-    )
-}
 
 simplify_gift_distribution = function(gift_checklists) {
 

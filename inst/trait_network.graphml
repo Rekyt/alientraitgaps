@@ -17154,9 +17154,6 @@
     <edge source="n554" target="n1774">
       <data key="e_match_type">close</data>
     </edge>
-    <edge source="n554" target="n1774">
-      <data key="e_match_type">close</data>
-    </edge>
     <edge source="n555" target="n2019">
       <data key="e_match_type">close</data>
     </edge>
