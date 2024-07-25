@@ -13,45 +13,47 @@ knitr::opts_chunk$set(
 )
 ```
 
-# `alientraitgaps` - Quantifying Global Trait Gaps in Alien Plants
+# `alientraitgaps` – "Gaps in global non-native plant trait data and how to move forward"
 
 <!-- badges: start -->
 <!-- badges: end -->
 
-## Goal
+## Summary
 
-This repository contains a full workflow to assess to what extent alien plants
-have gaps in their traits. At global scale we know very little about alien
-plants. Especially trait-based ecology can help us understand,
-among other things, the invasion successes of alien plants. To use this approach
-we first need to know which traits are available for alien plants.
+This repository holds the compendium for the manuscript entitled "Gaps in global non-native plant trait data and how to move forward".
+The goal of the manuscript and the code in this compendium is to leverage global plant trait data to depict how much we know about the traits of naturalized plants around the world. This is a prerequisite to perform any large-scale analyses about naturalized plants.
+For this, we leverage data from four global plant trait databases: [AusTraits](https://austraits.org/), [BIEN](https://bien.nceas.ucsb.edu/bien/), [GIFT](https://gift.uni-goettingen.de/home), and [TRY](https://www.try-db.org/). We also use the [GloNAF](https://glonaf.org) database to get lists of naturalized species globally.
 
-The goal of this project is to look into functional trait databases and quantify
-the number and type of traits available for alien plants globally.
-This is done comparing different global scale trait databases (TRY and BIEN).
+## Citation
 
-From this extensive analysis of data gaps, a list of priority species for which
-trait data is needed, is going to be generated to see where to focus the trait
-gathering efforts.
+If you want to reference this workflow you can cite it through the following citation:
+
+> Grenié M., Violle C, Munoz F., (2019). Compendium of R code and data for 'Gaps in global non-native plant trait data and how to move forward'. Online at https://doi.org/xxx/xxx [**Zenodo DOI to come**]
+
+Please also cite the manuscript:
+
+> Grenié M., ..., Winter M.. *Gaps in global non-native plant trait data and how to move forward*. Submitted to *Global Ecology and Biogeography*.
 
 
 ## Installation
 
-The repository contain the full workflow to reproduce our analyses, including
-our figures.
+The repository contains the full workflow to reproduce our analyses and figures.
+You can download it through GitHub with the following link: https://github.com/Rekyt/alientraitgaps/archive/main.zip
 
-You can install it from GitHub using:
-
-``` r
-# install.packages("devtools")
-devtools::install_github("Rekyt/alientraitgaps")
-```
-
+From there, unzip it, and read the section below.
 
 ## How to run
 
 The workflow leverages the `targets` package to get reproducible analyses.
-To run the workflow, copy the repository then run `targets::tar_make()`.
-**/!\\ WARNING: this can take a while to run depending on your computer /!\\**.
-You also need to have access to the GloNAF database and put the id and password
-as environment variable `GLONAF_USER` and `GLONAF_PASSWORD` respectively.
+To run it run the following command `targets::tar_make()`.
+The command will tell which packages are needed to run the workflow. You can install these packages through `install.packages()`.
+
+The workflow needs a reliable internet connection to run.
+On a standard laptop with internet, it takes about **8 hours** to complete without parallel execution.
+
+
+## Needed environment variables
+
+As the GloNAF data are not yet fully open, you need to have access to the GloNAF database and put the id and password as environment variables `GLONAF_USER` and `GLONAF_PASSWORD` respectively as provided by the GloNAF.
+Similarly, these analyses rely on using the private access of the GIFT database to gather all observations from GIFT. To reproduce it, you need to store the private GIFT API URL as the `GIFT_RESTRICTED_API`. If you don't have access to the private API, you can use the public one which gives very similar results.
+
