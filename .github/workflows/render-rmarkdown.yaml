@@ -20,7 +20,7 @@ jobs:
           fetch-depth: 0
 
       - name: Install udunits
-        run: sudo apt-get install libudunits2-dev gdal geos proj
+        run: sudo apt-get install libudunits2-dev gdal-bin geos-bin proj-bin
 
       - uses: r-lib/actions/setup-pandoc@v2
 
