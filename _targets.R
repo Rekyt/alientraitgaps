@@ -20,8 +20,7 @@ source("R/try_functions.R")
 # Initial options --------------------------------------------------------------
 
 tar_option_set(
-  packages = c("data.table", "disk.frame", "dplyr", "ggplot2", "here", "TNRS",
-               "TR8", "treemapify", "sf")
+  packages = c("data.table", "dplyr", "ggplot2", "here", "treemapify", "sf")
 )
 
 # Target factory ---------------------------------------------------------------
