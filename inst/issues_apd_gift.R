@@ -8,8 +8,12 @@ tar_load(gift_trait_meta)
 
 gift_trait_meta = GIFT::GIFT_traits_meta()
 
-tibble::as_tibble(read.csv("APD_traits_input.csv")) |>
-  select(identifier:label, starts_with("GIFT")) |>
+apd_minor_fixes = read.csv("inst/exdata/austraits/APD_traits_input_minor_fixes.csv") |>
+  tibble::as_tibble() |>
+  select(
+    trait_id = identifier, trait, label, contains("BIEN"), contains("GIFT"),
+    contains("TRY")
+  )
 
 
 apd_gift_detailed = apd_subset |>
