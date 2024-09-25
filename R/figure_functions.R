@@ -785,11 +785,11 @@ plot_map_proportion_trait_by_region = function(
       )
     ) +
     scale_fill_viridis_b(
-      name = "Prop. of known non-native species",
+      name = "Prop. of known alien species",
       labels = scales::percent_format(), n.breaks = 6, show.limits = TRUE
     ) +
     scale_color_viridis_b(
-      name = "Prop. of known non-native species",
+      name = "Prop. of known alien species",
       labels = scales::percent_format(), n.breaks = 6, show.limits = TRUE
     ) +
     guides(fill = guide_colorsteps(title.vjust = 0.8),
@@ -852,14 +852,14 @@ plot_map_alien_richness_region = function(
       size = 1.2, shape = 21, stroke = 0.5
     ) +
     scale_fill_fermenter(
-      name = "Non-native Species Richness", trans = "log10", n.breaks = 5,
+      name = "Alien Species Richness", trans = "log10", n.breaks = 5,
       palette = "YlOrRd", direction = 1,
       show.limits = TRUE,
       # Force limit to merge axes
       limits = richness_range
     ) +
     scale_color_fermenter(
-      name = "Non-native Species Richness", trans = "log10", n.breaks = 5,
+      name = "Alien Species Richness", trans = "log10", n.breaks = 5,
       palette = "YlOrRd", direction = 1,
       show.limits = TRUE,
       # Force limit to merge axes
