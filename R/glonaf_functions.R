@@ -138,7 +138,7 @@ extract_species_regions_table = function(
   # Extract all regions for all species referenced in GloNAF
   species_regions = tbl(glonaf_con, "flora_orig_2_0") %>%
     # Get taxa that are referenced as naturalized, alien, or invasive
-    filter(status_id %in% c(2, 4, 5, 7)) %>%
+    filter(status_id %in% c(2, 5)) %>%
     distinct(taxon_orig_id, list_id, status_id) %>%
     # Add status name
     inner_join(
