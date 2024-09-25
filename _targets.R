@@ -784,7 +784,7 @@ list(
         "inst", "figures","figure4_trait_comb_prop_status_regions.pdf"
       ),
       pfig4_trait_comb_prop_status_regions, height = 3.7, width = 6.2,
-      units = "in", scale = 1.8
+      units = "in", scale = 1.2
     ),
     format = "file"
   ),
@@ -795,7 +795,7 @@ list(
         "inst", "figures","figure4_trait_comb_prop_status_regions.png"
       ),
       pfig4_trait_comb_prop_status_regions, height = 3.7, width = 6.2,
-      units = "in", scale = 1.8, dpi = 300
+      units = "in", scale = 1.2, dpi = 300
     ),
     format = "file"
   )

@@ -34,14 +34,14 @@ plot_number_species_per_trait_combined = function(
       vjust = -2.2, size = rel(4.2)
     ) +
     geom_vline(
-      xintercept = total_sp/2, linetype = 2, color = "darkblue", linewidth = 2/3
+      xintercept = total_sp/2, linetype = 2, color = "darkblue", linewidth = 1
     ) +
     # 100% vertical line
     geom_vline(
-      xintercept = total_sp, linetype = 2, color = "darkred", linewidth = 2/3
+      xintercept = total_sp, linetype = 2, color = "firebrick", linewidth = 1
     ) +
     geom_text(
-      label = "100%", color = "darkred", x = total_sp, y = 25, hjust = 0.5,
+      label = "100%", color = "firebrick", x = total_sp, y = 25, hjust = 0.5,
       vjust = -2.2, size = rel(4.2)
     ) +
     # Actual geoms
@@ -241,7 +241,9 @@ plot_trait_comb_proportion_per_invasion_status = function(
     coord_flip() +
     theme_bw() +
     theme(
-      legend.position = "top", panel.grid.minor = element_blank(),
+      legend.position = "top",
+      legend.title.position = "top",
+      panel.grid.minor = element_blank(),
       panel.grid.major.y = element_blank()
     )
 }
@@ -328,7 +330,9 @@ plot_trait_combination_per_range_size = function(
     coord_flip() +
     theme_bw() +
     theme(
-      legend.position = "top", panel.grid.minor = element_blank(),
+      legend.position = "top",
+      legend.title.position = "top",
+      panel.grid.minor = element_blank(),
       panel.grid.major.y = element_blank()
     )
 }
