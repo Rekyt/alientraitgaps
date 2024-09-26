@@ -596,9 +596,9 @@
     },
     "bayestestR": {
       "Package": "bayestestR",
-      "Version": "0.13.2",
+      "Version": "0.14.0",
       "Source": "Repository",
-      "Repository": "CRAN",
+      "Repository": "RSPM",
       "Requirements": [
         "R",
         "datawizard",
@@ -608,7 +608,7 @@
         "stats",
         "utils"
       ],
-      "Hash": "4a6a2eebe2db1dfb1c792c4ed91e73dc"
+      "Hash": "71e7da5d38487173de67a1f0d763ceef"
     },
     "benchmarkme": {
       "Package": "benchmarkme",
@@ -1000,16 +1000,16 @@
     },
     "datawizard": {
       "Package": "datawizard",
-      "Version": "0.10.0",
+      "Version": "0.12.3",
       "Source": "Repository",
-      "Repository": "CRAN",
+      "Repository": "RSPM",
       "Requirements": [
         "R",
         "insight",
         "stats",
         "utils"
       ],
-      "Hash": "62d6ec10346d3302a1299e1c54641d83"
+      "Hash": "611537168bbb78b57720de109ec1ad19"
     },
     "desc": {
       "Package": "desc",
@@ -1147,9 +1147,9 @@
     },
     "effectsize": {
       "Package": "effectsize",
-      "Version": "0.8.8",
+      "Version": "0.8.9",
       "Source": "Repository",
-      "Repository": "CRAN",
+      "Repository": "RSPM",
       "Requirements": [
         "R",
         "bayestestR",
@@ -1160,7 +1160,7 @@
         "stats",
         "utils"
       ],
-      "Hash": "6709e156cf7869d95d8fd6e365337d2c"
+      "Hash": "7aceb5e07b6d48171c6b56714cc305ea"
     },
     "eulerr": {
       "Package": "eulerr",
@@ -1915,16 +1915,16 @@
     },
     "insight": {
       "Package": "insight",
-      "Version": "0.19.11",
+      "Version": "0.20.4",
       "Source": "Repository",
-      "Repository": "CRAN",
+      "Repository": "RSPM",
       "Requirements": [
         "R",
         "methods",
         "stats",
         "utils"
       ],
-      "Hash": "53172afebe4b773ed2c405332aa465d7"
+      "Hash": "8457d6e682a49f2c87b698a830527b09"
     },
     "ipred": {
       "Package": "ipred",
@@ -2463,9 +2463,9 @@
     },
     "parameters": {
       "Package": "parameters",
-      "Version": "0.21.7",
+      "Version": "0.22.2",
       "Source": "Repository",
-      "Repository": "CRAN",
+      "Repository": "RSPM",
       "Requirements": [
         "R",
         "bayestestR",
@@ -2476,7 +2476,7 @@
         "stats",
         "utils"
       ],
-      "Hash": "9f8ce76f256b193e1536c827c7adc125"
+      "Hash": "ee0115da94a9cf7c451615415ce65c03"
     },
     "patchwork": {
       "Package": "patchwork",
@@ -2498,9 +2498,9 @@
     },
     "performance": {
       "Package": "performance",
-      "Version": "0.11.0",
+      "Version": "0.12.3",
       "Source": "Repository",
-      "Repository": "CRAN",
+      "Repository": "RSPM",
       "Requirements": [
         "R",
         "bayestestR",
@@ -2509,7 +2509,7 @@
         "stats",
         "utils"
       ],
-      "Hash": "eb8ecde248cd610ae3097f5d00718cbd"
+      "Hash": "92be9503bc3394c464688fb6b03002e3"
     },
     "phangorn": {
       "Package": "phangorn",
