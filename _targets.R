@@ -371,6 +371,21 @@ list(
     pattern = map(trait_knowledge_df),
     iteration = "list"
   ),
+  tar_target(
+    trait_knowledge_df_prop,
+    assemble_trait_knowledge_df(
+      trait_combinations_types[1], standard_growth_form,
+      species_final_socioecovars_prop, glonaf_harmonized
+    ),
+    pattern = map(species_final_socioecovars_prop),
+    iteration = "list"
+  ),
+  tar_target(
+    trait_knowledge_model_prop,
+    model_alien_trait_knowledge(trait_knowledge_df_prop),
+    pattern = map(trait_knowledge_df_prop),
+    iteration = "list"
+  ),
 
   # World Regions --------------------------------------------------------------
   tar_target(
@@ -521,6 +536,16 @@ list(
       species_socioecovars, species_gift_count_socioecovars,
       species_gift_socioecovars
     )
+  ),
+  tar_target(target_proportion, c(0.7, 0.8, 0.9)),
+  tar_target(
+    species_final_socioecovars_prop,
+    combine_and_filter_socioecovars(
+      species_socioecovars, species_gift_count_socioecovars,
+      species_gift_socioecovars, target_proportion
+    ),
+    pattern = map(target_proportion),
+    iteration = "list"
   ),
 
   # Make figures ---------------------------------------------------------------

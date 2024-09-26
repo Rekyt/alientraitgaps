@@ -249,14 +249,14 @@ compute_gift_species_socioecovars = function(
 
 combine_and_filter_socioecovars = function(
     species_socioecovars, species_gift_count_socioecovars,
-    species_gift_socioecovars
+    species_gift_socioecovars, target_prop = 0.8
 ) {
 
   species_socioecovars %>%
     distinct(species) %>%
     inner_join(
       species_gift_count_socioecovars %>%
-        filter(prop_n_described >= 0.8) %>%
+        filter(prop_n_described >= target_prop) %>%
         distinct(species = work_species),
     by = "species"
     ) %>%
