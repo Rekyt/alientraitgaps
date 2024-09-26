@@ -798,5 +798,27 @@ list(
       units = "in", scale = 1.2, dpi = 300
     ),
     format = "file"
+  ),
+  tar_target(
+    pfig5_trait_knowledge_model_plot_pdf,
+    ggsave(
+      here::here(
+        "inst", "figures","figure5_trait_knowledge_model.pdf"
+      ),
+      pfig4_trait_comb_prop_status_regions, height = 5.31, width = 6.5,
+      units = "in",
+    ),
+    format = "file"
+  ),
+  tar_target(
+    pfig5_trait_knowledge_model_plot_png,
+    ggsave(
+      here::here(
+        "inst", "figures","figure5_trait_knowledge_model.png"
+      ),
+      pfig4_trait_comb_prop_status_regions, height = 5.31, width = 6.5,
+      units = "in", dpi = 300
+    ),
+    format = "file"
   )
 )
