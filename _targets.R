@@ -738,6 +738,12 @@ list(
       fig_map_median_n_traits_region[[1]], fig_map_sd_n_traits_region[[1]]
     )
   ),
+  tar_target(
+    supp_fig6_trait_model_alt,
+    create_fig5(trait_knowledge_model_prop),
+    pattern = map(trait_knowledge_model_prop),
+    iteration = "list"
+  ),
 
 
   # Save Plots for paper -------------------------------------------------------
