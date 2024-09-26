@@ -78,7 +78,7 @@ model_alien_trait_knowledge = function(trait_knowledge_df) {
     n_traits ~ growth_form + total_range_size + non_native_range_size +
       n_biomes + avg_human_influence_index + sd_human_influence_index +
       avg_gdp_over_native_range + avg_gdp_over_non_native_range +
-      avg_accessibility + 0,
+      avg_accessibility,
     contrasts = list(growth_form = contr.sum),
     data      = trait_knowledge_df
   )
