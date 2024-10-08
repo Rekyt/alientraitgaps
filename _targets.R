@@ -840,7 +840,7 @@ list(
       here::here(
         "inst", "figures","figure5_trait_knowledge_model.pdf"
       ),
-      pfig4_trait_comb_prop_status_regions, height = 5.31, width = 6.5,
+      pfig5_trait_knowledge_model_plot[[1]], height = 5.31, width = 6.5,
       units = "in",
     ),
     format = "file"
@@ -851,7 +851,7 @@ list(
       here::here(
         "inst", "figures","figure5_trait_knowledge_model.png"
       ),
-      pfig4_trait_comb_prop_status_regions, height = 5.31, width = 6.5,
+      pfig5_trait_knowledge_model_plot[[1]], height = 5.31, width = 6.5,
       units = "in", dpi = 300
     ),
     format = "file"
