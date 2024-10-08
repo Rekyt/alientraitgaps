@@ -1039,10 +1039,10 @@ plot_data_origin_intersect_top_n_traits = function(
 
   # Fill scale (corresponds to Set1)
   db_fills = c(
-    "#e41a1c",  # (AusTraits) Red
-    "#377eb8",  # (BIEN)      Blue
-    "#4daf4a",  # (GIFT)      Green
-    "#984ea3"   # (TRY)       Purple
+    "#E69F00",  # (AusTraits) Orange
+    "#56B4E9",  # (BIEN)      Blue
+    "#009E73",  # (GIFT)      Green
+    "#F0E442"   # (TRY)       Yellow
   )
 
   # Create a horizontal common legend for the whole plot
@@ -1051,10 +1051,12 @@ plot_data_origin_intersect_top_n_traits = function(
     nrow = 1, ncol = 4,
     pch = 21,
     gp = grid::gpar(
-      fill = c("#e41a1c",  # (AusTraits) Red
-               "#377eb8",  # (BIEN)      Blue
-               "#4daf4a",  # (GIFT)      Green
-               "#984ea3"), # (TRY)       Purple
+      fill = c(
+        "#E69F00",  # (AusTraits) Orange
+        "#56B4E9",  # (BIEN)      Blue
+        "#009E73",  # (GIFT)      Green
+        "#F0E442"   # (TRY)       Yellow
+      ),
       col = "#333333",
       fontsize = 8
     ),
@@ -1176,10 +1178,10 @@ plot_relative_database_importance_traits = function(
       scale_y_discrete(labels = label_wrap_gen(40)) +
       scale_fill_manual(
         values = c(
-          AusTraits            = "#e41a1c",  # (AusTraits) Red
-          BIEN                 = "#377eb8",  # (BIEN)      Blue
-          GIFT                 = "#4daf4a",  # (GIFT)      Green
-          TRY                  = "#984ea3",  # (TRY)       Purple
+          AusTraits            = "#E69F00",  # (AusTraits) Orange
+          BIEN                 = "#56B4E9",  # (BIEN)      Blue
+          GIFT                 = "#009E73",  # (GIFT)      Green
+          TRY                  = "#F0E442",  # (TRY)       Yellow
           "2-DBs intersection" = "#AAAAAA",
           "3-DBs intersection" = "#777777",
           "4-DBs intersection" = "#444444"
