@@ -740,9 +740,7 @@ list(
   ),
   tar_target(
     supp_fig6_trait_model_alt,
-    create_fig5(trait_knowledge_model_prop),
-    pattern = map(trait_knowledge_model_prop),
-    iteration = "list"
+    plot_all_models(trait_knowledge_model_prop),
   ),
 
 

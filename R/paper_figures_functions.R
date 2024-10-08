@@ -232,3 +232,34 @@ assemble_maps_number_of_traits = function(
   ) +
     patchwork::plot_annotation(tag_levels = "A")
 }
+
+plot_all_models = function(all_models) {
+
+  sjPlot::plot_models(
+    all_models,
+    title = "",
+    axis.labels = c(
+      growth_formtree               = "Growth Form: Tree",
+      growth_formshrub              = "Growth Form: Shrub",
+      growth_formherb               = "Growth Form: Herb",
+      growth_formother              = "Growth Form: Other",
+      total_range_size              = "Total Range Size",
+      avg_human_influence_index     = "Avg. Human Influence Index",
+      n_biomes                      = "Number of Biomes",
+      sd_human_influence_index      = "Std. Dev.\nHuman Influence Index",
+      avg_accessibility             = "Accessibility",
+      avg_gdp_over_non_native_range = "Avg. GDP\n(non-native range)",
+      non_native_range_size         = "Non-native Range Size",
+      avg_gdp_over_native_range     = "Avg. GDP\n(native range)"
+    ),
+    wrap.labels = 40,
+    axis.title = "",
+    m.labels = c("70% var. coverage", "80% var. coverage", "90% var. coverage"),
+    legend.title = "Models",
+    show.p = FALSE,
+    value.size = 2
+  ) +
+    theme_bw() +
+    theme(legend.position = "top")
+
+}
