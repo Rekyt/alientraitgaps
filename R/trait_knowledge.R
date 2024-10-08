@@ -78,6 +78,44 @@ model_alien_trait_knowledge = function(trait_knowledge_df) {
     n_traits ~ growth_form + total_range_size + non_native_range_size +
       n_biomes + avg_human_influence_index + sd_human_influence_index +
       avg_gdp_over_native_range + avg_gdp_over_non_native_range +
+      avg_accessibility + 0,
+    contrasts = list(growth_form = contr.sum),
+    data      = trait_knowledge_df
+  )
+
+}
+
+
+model_alien_trait_knowledge_with_intercept = function(trait_knowledge_df) {
+
+  trait_knowledge_df = trait_knowledge_df %>%
+    filter(
+      !is.na(mean_hii_v2geo_mean), !is.na(gdp_mean_native),
+      !is.na(gdp_mean_non_native), !is.na(mean_access_cities_2015_mean)
+    ) %>%
+    select(
+      species, n_traits, simplified_growth_form , n_total, n_total_non_native,
+      n_biomes, mean_hii_v2geo_mean, mean_hii_v2geo_sd, gdp_mean_native,
+      gdp_mean_non_native, mean_access_cities_2015_mean
+    ) %>%
+    mutate(
+      across(n_total:mean_access_cities_2015_mean, ~ as.numeric(scale(.x)))
+    ) %>%
+    rename(
+      growth_form                   = simplified_growth_form,
+      total_range_size              = n_total,
+      non_native_range_size         = n_total_non_native,
+      avg_human_influence_index     = mean_hii_v2geo_mean,
+      sd_human_influence_index      = mean_hii_v2geo_sd,
+      avg_gdp_over_native_range     = gdp_mean_native,
+      avg_gdp_over_non_native_range = gdp_mean_non_native,
+      avg_accessibility             = mean_access_cities_2015_mean
+    )
+
+  MASS::glm.nb(
+    n_traits ~ growth_form + total_range_size + non_native_range_size +
+      n_biomes + avg_human_influence_index + sd_human_influence_index +
+      avg_gdp_over_native_range + avg_gdp_over_non_native_range +
       avg_accessibility,
     contrasts = list(growth_form = \(x) contr.treatment(x, base = 2)),
     data      = trait_knowledge_df

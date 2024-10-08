@@ -52,10 +52,6 @@ create_fig5 = function(trait_knowledge_model) {
     value.offset = 0.4,
     title = "",
     axis.labels = c(
-      growth_formtree               = "Growth Form: Tree",
-      growth_formshrub              = "Growth Form: Shrub",
-      growth_formherb               = "Growth Form: Herb",
-      growth_formother              = "Growth Form: Other",
       total_range_size              = "Total Range Size",
       avg_human_influence_index     = "Avg. Human Influence Index",
       n_biomes                      = "Number of Biomes",
@@ -66,7 +62,9 @@ create_fig5 = function(trait_knowledge_model) {
       avg_gdp_over_native_range     = "Avg. GDP\n(native range)"
     ),
     wrap.labels = 40,
-    axis.title = ""
+    axis.title = "",
+    rm.terms = c("growth_formtree", "growth_formshrub", "growth_formherb",
+                 "growth_formother")
   ) +
     theme_bw()
 
@@ -257,7 +255,9 @@ plot_all_models = function(all_models) {
     m.labels = c("70% var. coverage", "80% var. coverage", "90% var. coverage"),
     legend.title = "Models",
     show.p = FALSE,
-    value.size = 2
+    value.size = 2,
+    rm.terms = c("growth_formtree", "growth_formshrub", "growth_formherb",
+                 "growth_formother")
   ) +
     theme_bw() +
     theme(legend.position = "top")

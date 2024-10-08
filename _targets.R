@@ -372,6 +372,12 @@ list(
     iteration = "list"
   ),
   tar_target(
+    trait_knowledge_model_for_r2,
+    model_alien_trait_knowledge_with_intercept(trait_knowledge_df),
+    pattern = map(trait_knowledge_df),
+    iteration = "list"
+  ),
+  tar_target(
     trait_knowledge_df_prop,
     assemble_trait_knowledge_df(
       trait_combinations_types[1], standard_growth_form,
