@@ -715,6 +715,16 @@ list(
     iteration = "list"
   ),
   tar_target(
+    supp_table1_file,
+    readr::write_csv(
+      trait_names_full,
+      here::here(
+        "inst", "exdata", "correspondence_tables",
+        "supp_table1_trait_names_full.csv"
+      )
+    )
+  ),
+  tar_target(
     supp_fig1_euler_trait_databases,
     fig_euler_diagrams_top_25_traits_database_full
   ),
