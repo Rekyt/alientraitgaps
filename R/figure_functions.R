@@ -1042,7 +1042,7 @@ plot_data_origin_intersect_top_n_traits = function(
     "#E69F00",  # (AusTraits) Orange
     "#56B4E9",  # (BIEN)      Blue
     "#009E73",  # (GIFT)      Green
-    "#F0E442"   # (TRY)       Yellow
+    "#CC79A7"   # (TRY)       Pink
   )
 
   # Create a horizontal common legend for the whole plot
@@ -1055,7 +1055,7 @@ plot_data_origin_intersect_top_n_traits = function(
         "#E69F00",  # (AusTraits) Orange
         "#56B4E9",  # (BIEN)      Blue
         "#009E73",  # (GIFT)      Green
-        "#F0E442"   # (TRY)       Yellow
+        "#CC79A7"   # (TRY)       Yellow
       ),
       col = "#333333",
       fontsize = 8
