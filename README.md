@@ -31,9 +31,8 @@ following citation:
 
 > Grenié M., Bruelheide H., Dawson W., Essl F., van Kleunen M., KÜhn I.,
 > Kref H., Pyšek P., Weigelt P., and Winter M.. Workflow for *Gaps in
-> global non-native plant trait data and how to move forward*.
-> Submitted. Online at <https://doi.org/xxx/xxx> \[**Zenodo DOI to
-> come**\]
+> global non-native plant trait data and how to move forward*. Online at
+> <https://doi.org/10.5281/zenodo.13940200>
 
 Please also cite the manuscript:
 
