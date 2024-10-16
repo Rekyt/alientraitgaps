@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# `alientraitgaps` – “Gaps in global non-native plant trait data and how to move forward”
+# :notebook: `alientraitgaps` – “Gaps in global non-native plant trait data and how to move forward”
 
 <!-- badges: start -->
 <!-- badges: end -->
@@ -9,12 +9,14 @@
 ## Summary
 
 This repository holds the compendium for the manuscript entitled “Gaps
-in global non-native plant trait data and how to move forward”. The goal
-of the manuscript and the code in this compendium is to leverage global
-plant trait data to depict how much we know about the traits of
-naturalized plants around the world. This is a prerequisite to perform
-any large-scale analyses about naturalized plants. For this, we leverage
-data from four global plant trait databases:
+in global non-native plant trait data and how to move forward”.
+
+The goal of the manuscript and the code in this compendium is to
+leverage global plant trait data to depict how much we know about the
+traits of naturalized plants around the world. This is a prerequisite to
+perform any large-scale analyses about naturalized plants.
+
+For this, we leverage data from four global plant trait databases:
 [AusTraits](https://austraits.org/),
 [BIEN](https://bien.nceas.ucsb.edu/bien/),
 [GIFT](https://gift.uni-goettingen.de/home), and
@@ -27,16 +29,18 @@ species globally.
 If you want to reference this workflow you can cite it through the
 following citation:
 
-> Grenié M., Violle C, Munoz F., (2019). Compendium of R code and data
-> for ‘Gaps in global non-native plant trait data and how to move
-> forward’. Online at <https://doi.org/xxx/xxx> \[**Zenodo DOI to
+> Grenié M., Bruelheide H., Dawson W., Essl F., van Kleunen M., KÜhn I.,
+> Kref H., Pyšek P., Weigelt P., and Winter M.. Workflow for *Gaps in
+> global non-native plant trait data and how to move forward*.
+> Submitted. Online at <https://doi.org/xxx/xxx> \[**Zenodo DOI to
 > come**\]
 
 Please also cite the manuscript:
 
-> Grenié M., …, Winter M.. *Gaps in global non-native plant trait data
-> and how to move forward*. Submitted to *Global Ecology and
-> Biogeography*.
+> Grenié M., Bruelheide H., Dawson W., Essl F., van Kleunen M., KÜhn I.,
+> Kref H., Pyšek P., Weigelt P., and Winter M.. *Gaps in global
+> non-native plant trait data and how to move forward*. Submitted.
+> \[**EcoEvoRxiv DOI to come**\]
 
 ## Installation
 
@@ -50,8 +54,8 @@ From there, unzip it, and read the section below.
 
 The workflow leverages the `targets` package to get reproducible
 analyses. To run it run the following command `targets::tar_make()`. The
-command will tell which packages are needed to run the workflow. You can
-install these packages through `install.packages()`.
+workflow comes with an `renv` lockfile detailing all its dependencies.
+Use `renv::restore()` to get all packages.
 
 The workflow needs a reliable internet connection to run. On a standard
 laptop with internet, it takes about **8 hours** to complete without
