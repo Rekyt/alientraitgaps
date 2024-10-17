@@ -34,12 +34,12 @@ following citation:
 > global non-native plant trait data and how to fill them*. Online at
 > <https://doi.org/10.5281/zenodo.13940200>
 
-Please also cite the manuscript:
+Please also cite the preprint:
 
 > Grenié M., Bruelheide H., Dawson W., Essl F., van Kleunen M., Kühn I.,
 > Kref H., Pyšek P., Weigelt P., and Winter M.. *Gaps in global
-> non-native plant trait data and how to fill them*. Submitted.
-> \[**EcoEvoRxiv DOI to come**\]
+> non-native plant trait data and how to fill them*. EcoEvoRxiv
+> preprint: <https://doi.org/10.32942/X2FH0T>
 
 ## Installation
 
