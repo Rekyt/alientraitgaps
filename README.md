@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# :notebook: `alientraitgaps` – “Gaps in global non-native plant trait data and how to move forward”
+# :notebook: `alientraitgaps` – “Gaps in global non-native plant trait data and how to fill them”
 
 <!-- badges: start -->
 <!-- badges: end -->
@@ -29,16 +29,16 @@ species globally.
 If you want to reference this workflow you can cite it through the
 following citation:
 
-> Grenié M., Bruelheide H., Dawson W., Essl F., van Kleunen M., KÜhn I.,
+> Grenié M., Bruelheide H., Dawson W., Essl F., van Kleunen M., Kühn I.,
 > Kref H., Pyšek P., Weigelt P., and Winter M.. Workflow for *Gaps in
-> global non-native plant trait data and how to move forward*. Online at
+> global non-native plant trait data and how to fill them*. Online at
 > <https://doi.org/10.5281/zenodo.13940200>
 
 Please also cite the manuscript:
 
-> Grenié M., Bruelheide H., Dawson W., Essl F., van Kleunen M., KÜhn I.,
+> Grenié M., Bruelheide H., Dawson W., Essl F., van Kleunen M., Kühn I.,
 > Kref H., Pyšek P., Weigelt P., and Winter M.. *Gaps in global
-> non-native plant trait data and how to move forward*. Submitted.
+> non-native plant trait data and how to fill them*. Submitted.
 > \[**EcoEvoRxiv DOI to come**\]
 
 ## Installation
@@ -70,3 +70,12 @@ the GIFT database to gather all observations from GIFT. To reproduce it,
 you need to store the private GIFT API URL as the `GIFT_RESTRICTED_API`.
 If you don’t have access to the private API, you can use the public one
 which gives very similar results.
+
+## Acknowledgements
+
+We’d like to use our space here to acknowledge all contributors of trait
+observations to these databases, the people who wrote the flora
+aggregated by GIFT, as well as all the people who contributed
+aggregating and building these databases. Our work wouldn’t be possible
+without the huge long-term collective effort of the functional trait
+community where each actor in the chain helped building a trait commons.
