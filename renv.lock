@@ -1,6 +1,6 @@
 {
   "R": {
-    "Version": "4.3.1",
+    "Version": "4.4.2",
     "Repositories": [
       {
         "Name": "BioCsoft",
@@ -536,19 +536,18 @@
     },
     "austraits": {
       "Package": "austraits",
-      "Version": "2.2.3",
+      "Version": "3.0.2",
       "Source": "GitHub",
       "RemoteType": "github",
       "RemoteHost": "api.github.com",
-      "RemoteRepo": "austraits",
       "RemoteUsername": "traitecoevo",
-      "RemotePkgRef": "traitecoevo/austraits",
-      "RemoteRef": "HEAD",
-      "RemoteSha": "e83b53905b879fca7e826015deb67fb123741808",
+      "RemoteRepo": "austraits",
+      "RemoteRef": "master",
+      "RemoteSha": "81f1418fc8ce83916bca1bdc323c98af770b782a",
       "Requirements": [
         "R",
         "RefManageR",
-        "assertthat",
+        "cli",
         "dplyr",
         "janitor",
         "jsonlite",
@@ -558,11 +557,12 @@
         "rlang",
         "stats",
         "stringr",
+        "tibble",
         "tidyr",
         "tidyselect",
         "utils"
       ],
-      "Hash": "d79858fc17957d53678cf797a2a2f62c"
+      "Hash": "a0da9ed81cf638c833163bb9467869d4"
     },
     "backports": {
       "Package": "backports",
@@ -1609,8 +1609,8 @@
       "Package": "glitter",
       "Version": "0.2.999",
       "Source": "GitHub",
-      "Remotes": "r-lib/testthat",
       "RemoteType": "github",
+      "Remotes": "r-lib/testthat",
       "RemoteHost": "api.github.com",
       "RemoteRepo": "glitter",
       "RemoteUsername": "lvaudor",
@@ -2925,8 +2925,8 @@
       "Package": "rWCVP",
       "Version": "1.2.6",
       "Source": "GitHub",
-      "Remotes": "github::matildabrown/rWCVPdata",
       "RemoteType": "github",
+      "Remotes": "github::matildabrown/rWCVPdata",
       "RemoteHost": "api.github.com",
       "RemoteRepo": "rWCVP",
       "RemoteUsername": "matildabrown",
@@ -2951,7 +2951,7 @@
         "tibble",
         "tidyr"
       ],
-      "Hash": "476a1249a7f5d2221f99460dc32b6deb"
+      "Hash": "179b47c1aa4a851f1f10b1dfe319131e"
     },
     "rWCVPdata": {
       "Package": "rWCVPdata",
