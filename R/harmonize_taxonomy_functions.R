@@ -1,3 +1,40 @@
+match_tnrs = function(species_df) {
+
+  TNRS::TNRS(
+    species_df,
+    sources = c("wcvp", "wfo"),
+    classification  ="wfo"
+  )
+
+}
+
+create_tnrs_df = function(species_df, id_prefix, ...) {
+
+  all_columns = rlang::enquos(...)
+
+  species_df |>
+    mutate(id = paste0(id_prefix, "_", row_number()),
+           species_name = paste(!!!all_columns)) |>
+    select(id, species_name)
+
+}
+
+get_gift_raw_species_df = function(gift_traits) {
+
+  gift_traits |>
+    distinct(orig_ID, genus, species_epithet, subtaxon, author) |>
+    mutate(
+      id = orig_ID,
+      # Remove introduced double spaces when pasting all parts of species name
+      species_name = gsub(
+        "  ", " ", paste(genus, species_epithet, subtaxon, author),
+        fixed = TRUE
+      )
+    ) |>
+    select(id, species_name)
+
+}
+
 get_austraits_taxonomy = function(austraits_species) {
 
   austraits_species |>

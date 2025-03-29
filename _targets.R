@@ -165,22 +165,67 @@ list(
 
 
   # Harmonizing Taxonomies -----------------------------------------------------
-  # Summarise taxonomies for each database
+  ## Summarise taxonomies for each database
+  # AusTraits
+  tar_target(
+    austraits_species_df,
+    create_tnrs_df(austraits_species, "austraits", taxon_name)
+  ),
+  tar_target(
+    austraits_tnrs,
+    match_tnrs(austraits_species_df)
+  ),
   tar_target(
     austraits_harmonized,
     get_austraits_taxonomy(austraits_species)
   ),
+  # BIEN
   tar_target(
     bien_harmonized,
     get_bien_taxonomy(bien_species)
+  ),
+  # GIFT
+  tar_target(
+    gift_raw_species_df,
+    get_gift_raw_species_df(gift_raw_traits)
+  ),
+  tar_target(
+    gift_species_df,
+    create_tnrs_df(gift_species, "gift", work_species, work_author)
+  ),
+  tar_target(
+    gift_tnrs,
+    match_tnrs(gift_species_df)
+  ),
+  tar_target(
+    gift_raw_tnrs,
+    match_tnrs(gift_raw_species_df)
   ),
   tar_target(
     gift_harmonized,
     get_gift_taxonomy(gift_species)
   ),
+  # TRY
+  tar_target(
+    try_species_df,
+    create_tnrs_df(try_harmonized_species, "try", TRY_SpeciesName)
+  ),
+  tar_target(
+    try_tnrs,
+    match_tnrs(try_species_df)
+  ),
   tar_target(
     try_harmonized,
     get_try_taxonomy(try_harmonized_species)
+  ),
+  # GloNAF
+  tar_target(
+    glonaf_species_df,
+    create_tnrs_df(glonaf_alien_species, "glonaf", taxon_orig)
+  ),
+  tar_target(
+    glonaf_tnrs,
+    match_tnrs(glonaf_species_df)
   ),
   tar_target(
     glonaf_harmonized,
@@ -758,6 +803,10 @@ list(
     supp_fig6_trait_model_alt,
     plot_all_models(trait_knowledge_model_prop),
   ),
+
+
+  # Online supplementary material
+  tarchetypes::tar_render(online_supp, "manuscript/online_supplementary_material.Rmd"),
 
 
   # Save Plots for paper -------------------------------------------------------
