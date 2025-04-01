@@ -232,7 +232,9 @@ name_connected_components = function(trait_network) {
 }
 
 
-consolidate_trait_names_from_network = function(trait_network, match_type = c("full", "close", "exact")) {
+consolidate_trait_names_from_network = function(
+    trait_network, match_type = c("full", "close", "exact")
+) {
 
   if (match_type == "close") {
 
@@ -281,23 +283,19 @@ unnest_names = function(trait_names_df) {
 
 
 combine_traits_all_databases = function(
-    trait_names, austraits_traits_simple, bien_traits_simple,
-    gift_traits_simple, try_traits_simple, gift_trait_meta, austraits_glonaf,
-    bien_glonaf, gift_glonaf, try_glonaf
+    trait_names, austraits_traits_harmo, bien_traits_simple, gift_traits_harmo,
+    try_traits_harmo, glonaf_tnrs
 ) {
 
   ## AusTraits
   austraits_consolidated = trait_names |>
     # Add species names to trait table
     inner_join(
-      austraits_traits_simple, by = c(austraits_trait_name = "trait_name"),
+      austraits_traits_harmo, by = c(austraits_trait_name = "trait_name"),
       relationship = "many-to-many"
     ) |>
-    distinct(component, consolidated_name, component_size, taxon_name) |>
-    # Keep only matched GloNAF species
-    inner_join(austraits_glonaf, by = "taxon_name") |>
     distinct(
-      component, consolidated_name, component_size, matched_name = binomial
+      component, consolidated_name, component_size, species = Accepted_species
     )
 
   ## BIEN
@@ -308,55 +306,48 @@ combine_traits_all_databases = function(
       relationship = "many-to-many"
     ) |>
     distinct(
-      component, consolidated_name, component_size, scrubbed_species_binomial
-    ) |>
-    semi_join(bien_glonaf, by = "scrubbed_species_binomial") |>
-    distinct(
       component, consolidated_name, component_size,
-      matched_name = scrubbed_species_binomial
+      species = scrubbed_species_binomial
     )
 
   ## GIFT
-  gift_consolidated = gift_traits_simple |>
+  gift_consolidated = gift_traits_harmo |>
     inner_join(
-      gift_trait_meta |>
-        select(trait_ID = Lvl3, trait_name = Trait2),
-      by = "trait_ID"
-    ) |>
-    inner_join(
-      trait_names, by = c(trait_name = "gift_trait_name"),
+      trait_names, by = "gift_trait_name",
       relationship = "many-to-many"
     ) |>
-    distinct(component, consolidated_name, component_size, work_species) |>
-    # Keep only matched GloNAF species
-    semi_join(gift_glonaf, by = "work_species") |>
-    rename(matched_name = work_species)
+    distinct(
+      component, consolidated_name, component_size, species = Accepted_species
+    )
 
   ## TRY
   try_consolidated = trait_names |>
     mutate(try_trait_id = as.integer(try_trait_id)) |>
     inner_join(
-      try_traits_simple, by = c(try_trait_id = "TraitID"),
+      try_traits_harmo, by = c(try_trait_id = "TraitID"),
       relationship = "many-to-many"
     ) |>
-    distinct(component, consolidated_name, component_size, AccSpeciesID) |>
-    # Keep only matched GloNAF species
-    inner_join(try_glonaf, by = "AccSpeciesID") |>
     distinct(
-      component, consolidated_name, component_size, matched_name = MatchedName
+      component, consolidated_name, component_size, species = Accepted_species
     )
 
+  glonaf_tnrs = glonaf_tnrs |>
+    distinct(species = Accepted_species) |>
+    filter(species != "") |>
+    mutate(in_glonaf = TRUE)
 
   full_consolidated = list(
     AusTraits = austraits_consolidated,
-    BIEN = bien_consolidated,
-    GIFT = gift_consolidated,
-    TRY = try_consolidated
+    BIEN      = bien_consolidated,
+    GIFT      = gift_consolidated,
+    TRY       = try_consolidated
   ) |>
     bind_rows(.id = "database") |>
-    rename(species = matched_name)
+    left_join(glonaf_tnrs, by = "species") |>
+    mutate(in_glonaf = ifelse(is.na(in_glonaf), FALSE, TRUE))
 
 }
+
 
 count_trait_combinations = function(
     simplified_traits, match_type, glonaf_harmonized

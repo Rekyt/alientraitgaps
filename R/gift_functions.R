@@ -101,3 +101,22 @@ simplify_gift_traits = function(gift_raw_traits) {
 }
 
 
+match_gift_traits_taxonomy = function(
+    gift_raw_traits, gift_raw_tnrs, gift_trait_meta
+) {
+
+  gift_raw_traits |>
+    distinct(orig_ID = as.character(orig_ID), trait_ID) |>
+    inner_join(
+      gift_raw_tnrs |>
+        distinct(orig_ID = ID, Accepted_species),
+      by = "orig_ID"
+    ) |>
+    distinct(Accepted_species, trait_ID) |>
+    inner_join(
+      gift_trait_meta |>
+        distinct(trait_ID = Lvl3, gift_trait_name = Trait2),
+      by = c("trait_ID")
+    )
+
+}

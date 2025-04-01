@@ -263,6 +263,10 @@ list(
     austraits_traits_simple,
     simplify_austraits_traits(austraits)
   ),
+  tar_target(
+    austraits_traits_harmo,
+    merge_austraits_with_taxo(austraits_traits_simple, austraits_tnrs)
+  ),
 
 
   # BIEN traits ----------------------------------------------------------------
@@ -299,12 +303,21 @@ list(
     gift_unified_distribution,
     simplify_gift_distribution(gift_checklists)
   ),
+  tar_target(
+    gift_traits_harmo,
+    match_gift_traits_taxonomy(gift_raw_traits, gift_raw_tnrs, gift_trait_meta)
+  ),
+
 
   # TRY traits -----------------------------------------------------------------
   # Simplify
   tar_target(
     try_traits_simple,
     simplify_try_traits(full_try_df)
+  ),
+  tar_target(
+    try_traits_harmo,
+    match_try_traits_taxonomy(full_try_df, try_tnrs)
   ),
 
 
@@ -352,14 +365,20 @@ list(
       unnest_names(trait_names_nested)
     ),
 
+
     # Combine Trait Data ---------------------------------------------------------
+
+    tar_target(
+      combined_traits_all,
+      combine_traits_all_databases(
+        trait_names, austraits_traits_harmo, bien_traits_simple,
+        gift_traits_harmo, try_traits_harmo, glonaf_tnrs
+      )
+    ),
+    # Subset for GloNAF species
     tar_target(
       combined_traits,
-      combine_traits_all_databases(
-        trait_names, austraits_traits_simple, bien_traits_simple,
-        gift_traits_simple, try_traits_simple, gift_trait_meta,
-        austraits_glonaf, bien_glonaf, gift_glonaf, try_glonaf
-      )
+      dplyr::select(dplyr::filter(combined_traits_all, in_glonaf), -in_glonaf)
     ),
     tar_target(
       simplified_traits, distinct(combined_traits, consolidated_name, species)
