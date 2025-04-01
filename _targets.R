@@ -290,6 +290,10 @@ list(
     bien_species,
     get_bien_taxonomy(bien_traits)
   ),
+  tar_target(
+    bien_citations,
+    BIEN::BIEN_metadata_citation(trait.dataframe = bien_traits)
+  ),
 
 
 
