@@ -83,6 +83,14 @@ list(
                  "regions_2023_17_10.shp")
     )
   ),
+  tar_target(
+    glonaf_species_fam,
+    get_glonaf_family_genus_species(glonaf_tnrs)
+  ),
+  tar_target(
+    glonaf_tree,
+    build_glonaf_phylo_tree(glonaf_species_fam)
+  )
 
 
   # Load GIFT data -------------------------------------------------------------
@@ -292,7 +300,7 @@ list(
   ),
   tar_target(
     bien_citations,
-    BIEN::BIEN_metadata_citation(trait.dataframe = bien_traits)
+    BIEN::BIEN_metadata_citation(trait.dataframe = head(bien_traits, 2e3))
   ),
 
 

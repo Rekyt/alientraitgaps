@@ -254,3 +254,25 @@ count_number_of_regions_and_area = function(
     group_by(species) %>%
     summarise(n_regions = n(), total_area = sum(GeodAREA))
 }
+
+get_glonaf_family_genus_species = function(glonaf_tnrs) {
+
+  glonaf_tnrs |>
+    distinct(species = Accepted_species, family = Accepted_family) |>
+    filter(species != "") |>
+    mutate(
+      genus   = stringr::str_extract(species, "\\w+"),
+      species = stringr::str_replace(species, stringr::fixed(" "), "_")
+    ) |>
+    select(family, genus, species)
+
+}
+
+build_glonaf_phylo_tree = function(glonaf_species_fam) {
+
+  rtrees::get_tree(
+    glonaf_species_fam, taxon = "plant", scenario = "at_basal_node"
+  )
+
+}
+
