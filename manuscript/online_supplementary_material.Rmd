@@ -1,5 +1,5 @@
 ---
-title: "Online Interactive Figures"
+title: "Global trait gaps for non-native plants: online supplement"
 author: "Matthias Grenié"
 bibliography: refs.bib
 date: "`r Sys.Date()`"
