@@ -1,6 +1,7 @@
 ---
 title: "Online Interactive Figures"
 author: "Matthias Grenié"
+bibliography: refs.bib
 date: "`r Sys.Date()`"
 output: html_document
 ---
@@ -21,7 +22,13 @@ It also displays the trait description network that links all the trait concepts
 
 This is an extended version of figure 2, presenting the trait combination availability across the different plant families. This figure is a treemap, where each area represents the proportion of non-native species with the given trait combination. The taxonomical families are ordered by the number of non-native species in our dataset. This extended figure uses `plotly` and help you explore the dataset and export a snapshot of the plot.
 
-```{r plotly-fig2, fig.cap = "Extended figure 2", echo=FALSE}
+The referenced trait combinations are as follow:
+
+- LHS trait combination: leaf mass per area, plant height, seed mass. It compares the general life history strategy of species at global scale without being context-dependent [@Westoby_Leafheightseed_1998].
+- Aboveground traits: these are the six traits used in the Global Spectrum of Plant Life Form and Function [@Diaz_Global_2016]. They capture the main axes of variation in aboveground plant strategies worldwide.
+- Root traits: these are the four traits defined by [@Bergmann_Fungal_2020]. They position species along the root economics spectrum and contrasts species along two axes: a “conservation” gradient corresponding to the fast-slow continuum and a “collaboration” gradient corresponding to reliance on mycorrhizal fungi to extract nutrients.
+
+```{r plotly-fig2, fig.cap = "Treemap of trait combination availabilities across taxonomic families. The size of rectangles is proportional to the number of non-native species referenced in our dataset. The different colors represent the different available trait combinations: light gray = no trait are available for these species; darker gray = at least one trait is available in our dataset; orange = the four root traits are availabe; light purple = the three LHS traits are available; light brown = both LHS and root traits are available; dark purple = the six aboveground spectrum traits are available; dark brown = both aboveground spectrum and root traits are available.", echo=FALSE}
 trait_category_color_scale = tibble::tribble(
    ~trait_category,           ~color,    ~category_name,                       
    "FALSE.FALSE.FALSE.FALSE", "#f0f0f0", "No trait",                            # No trait
