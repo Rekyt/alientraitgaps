@@ -1,0 +1,96 @@
+---
+title: "Online Interactive Figures"
+author: "Matthias Grenié"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+This document is an online supplement to the following manuscript:
+
+> Grenié M., Bruelheide H., Dawson W., Essl F., van Kleunen M., Kühn I., Kref H., Pyšek P., Weigelt P., and Winter M.. *Gaps in global non-native plant trait data and how to fill them*. EcoEvoRxiv preprint: https://doi.org/10.32942/X2FH0T
+
+It aims to provide some interactive figures to make easier exploration of the data produced in the paper.
+It also displays the trait description network that links all the trait concepts across databases and let users download the table behind the trait description.
+
+
+# Extended Figure 2 : Trait availability across taxonomy
+
+This is an extended version of figure 2, presenting the trait combination availability across the different plant families. This figure is a treemap, where each area represents the proportion of non-native species with the given trait combination. The taxonomical families are ordered by the number of non-native species in our dataset. This extended figure uses `plotly` and help you explore the dataset and export a snapshot of the plot.
+
+```{r plotly-fig2, fig.cap = "Extended figure 2", echo=FALSE}
+trait_category_color_scale = tibble::tribble(
+   ~trait_category,           ~color,    ~category_name,                       
+   "FALSE.FALSE.FALSE.FALSE", "#f0f0f0", "No trait",                            # No trait
+   "TRUE.FALSE.FALSE.FALSE" , "#d3d3d3", "At least one trait",                 # >=1 trait
+   "TRUE.FALSE.FALSE.TRUE"  , "#d25601", "Root traits",                         # Root traits
+   "TRUE.TRUE.FALSE.FALSE"  , "#9283ac", "LHS",                                 # LHS
+   "TRUE.TRUE.FALSE.TRUE"   , "#923601", "LHS\n& Root traits",                  # LHS + Root
+   "TRUE.TRUE.TRUE.FALSE"   , "#563787", "Aboveground\nspectrum",               # Aboveground
+   "TRUE.TRUE.TRUE.TRUE"    , "#551601", "Aboveground spectrum\n& Root traits" # Aboveground + Root
+)
+
+taxonomy_trait_availability = readRDS("trait_combination.Rds") |>
+  dplyr::mutate(final_cat = paste(family, trait_category, sep = " - ")) |>
+  dplyr::inner_join(trait_category_color_scale, by = "trait_category")
+
+family_total = taxonomy_trait_availability |>
+  dplyr::group_by(family) |>
+  dplyr::summarise(n_total = sum(n_species))
+
+fig_treemap = plotly::plot_ly(
+  type = "treemap",
+  ids     = c("Non-native plants", family_total$family, as.character(taxonomy_trait_availability$final_cat)),
+  labels  = c("Non-native plants", family_total$family, as.character(taxonomy_trait_availability$category_name)),
+  parents = c("", rep("Non-native plants", nrow(family_total)), taxonomy_trait_availability$family),
+  values  = c(sum(family_total$n_total), family_total$n_total, taxonomy_trait_availability$n_species),
+  textinfo="label+value+percent parent",
+  insidetextfont = list(size = 14),
+  outsidetextfont = list(size = 16),
+  branchvalues = "total",
+  pathbar = list(visible = TRUE, textfont = list(size = 18, family = "sans-serif")),
+  hovertemplate = '%{label}<br>Number of species: %{value}<br>Proportion: %{percentParent:.0%}',
+  marker = list(colors = c(rep("#FFF", nrow(family_total) + 1), taxonomy_trait_availability$color))
+)
+
+fig_treemap
+```
+
+
+# Trait concept network
+
+We here present the trait concept network we used to combine the trait datasets.
+This is the table presented as Table S1. Basically this is a combination of the
+trait concepts from AusTraits, BIEN, GIFT, and TRY. The trait are matched based
+on the Austraits Plant traits Dictionary (APD) and manual matching. Then all the
+traits concepts that in the same connected component of the network are
+considered identical. Here we aren't showing the network graphically because of
+performance issues for moderately large networks (~3000 nodes and ~2000 edges).
+We're interested showing the collated table version which contains the following
+columns:
+
+- `component`, number of the connected component the trait name network ordered by size.
+- `consolidated_name`, automatically assigned name of the component for understanding.
+- `component_size`, size of the connected component in number of nodes (= trait names)
+- `austraits_trait_name`, trait name provided as in AusTraits.
+- `bien_trait_name`, trait name provided as in BIEN
+- `gift_trait_name`, trait name provided as in GIFT corresponding to the “Trait2” level.
+- `try_trait_id`, trait id as provided in TRY TraitID column
+
+The buttons allow you to directly download the entire table.
+
+```{r table-trait-names, echo=FALSE}
+
+supp_table1 = read.csv("supp_table1_trait_names_full.csv")
+
+DT::datatable(
+  supp_table1, extensions = 'Buttons', options = list(
+    dom = 'Bfrtip',
+    buttons = c('copy', 'csv', 'excel', 'pdf', 'print')
+  )
+)
+```
+
