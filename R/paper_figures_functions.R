@@ -44,29 +44,35 @@ assemble_fig4 = function(
 
 create_fig5 = function(trait_knowledge_model) {
 
-  sjPlot::plot_model(
+  # Get model parameters
+  mp = parameters::model_parameters(
     trait_knowledge_model,
-    sort.est = TRUE,
-    show.values = TRUE,
-    show.p = FALSE,
-    value.offset = 0.4,
-    title = "",
-    axis.labels = c(
-      total_range_size              = "Total Range Size",
-      avg_human_influence_index     = "Avg. Human Influence Index",
-      n_biomes                      = "Number of Biomes",
-      sd_human_influence_index      = "Std. Dev.\nHuman Influence Index",
-      avg_accessibility             = "Accessibility",
-      avg_gdp_over_non_native_range = "Avg. GDP\n(non-native range)",
-      non_native_range_size         = "Non-native Range Size",
-      avg_gdp_over_native_range     = "Avg. GDP\n(native range)"
-    ),
-    wrap.labels = 40,
-    axis.title = "",
-    rm.terms = c("growth_formtree", "growth_formshrub", "growth_formherb",
-                 "growth_formother")
+    drop = "growth_form"
+  )
+
+  # Tidy up name of parameters
+  mp = mp |>
+    mutate(Parameter = case_match(
+      Parameter,
+      "total_range_size"              ~ "Total Range Size",
+      "avg_human_influence_index"     ~ "Avg. Human Influence Index",
+      "n_biomes"                      ~ "Number of Biomes",
+      "sd_human_influence_index"      ~ "Std. Dev.\nHuman Influence Index",
+      "avg_accessibility"             ~ "Accessibility",
+      "avg_gdp_over_non_native_range" ~ "Avg. GDP\n(non-native range)",
+      "non_native_range_size"         ~ "Non-native Range Size",
+      "avg_gdp_over_native_range"     ~ "Avg. GDP\n(native range)"
+    ))
+
+  # Remove object laying around to avoid having huge ggplot2 objects
+  rm(trait_knowledge_model)
+
+  plot(
+    mp, show_labels = TRUE, size_point = 0.6, size_text = 3.5,
+    sort = "descending"
   ) +
-    theme_bw()
+    ggplot2::theme_bw() +
+    ggplot2::guides(color = "none")
 
 }
 
