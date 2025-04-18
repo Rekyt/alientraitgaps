@@ -90,7 +90,10 @@ list(
   tar_target(
     glonaf_tree,
     build_glonaf_phylo_tree(glonaf_species_fam)
-  )
+  ),
+  tar_target(
+    glonaf_pev, PVR::PVRdecomp(glonaf_tree)
+  ),
 
 
   # Load GIFT data -------------------------------------------------------------
