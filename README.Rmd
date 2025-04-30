@@ -13,9 +13,10 @@ knitr::opts_chunk$set(
 )
 ```
 
-# :notebook: `alientraitgaps` – "Gaps in global non-native plant trait data and how to fill them"
+# :notebook: Code compendium for "Gaps in global non-native plant trait data and how to fill them"
 
 <!-- badges: start -->
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.13940200.svg)](https://doi.org/10.5281/zenodo.13940200)
 <!-- badges: end -->
 
 ## Summary
@@ -37,6 +38,44 @@ Please also cite the preprint:
 > Grenié M., Bruelheide H., Dawson W., Essl F., van Kleunen M., Kühn I., Kref H., Pyšek P., Weigelt P., and Winter M.. *Gaps in global non-native plant trait data and how to fill them*. EcoEvoRxiv preprint: https://doi.org/10.32942/X2FH0T
 
 
+
+## Workflow structure
+
+The workflow leverages the [`targets`](https://docs.ropensci.org/targets/) package to make reproducible analyses. The main workflow file `_targets.R` sits at the root of the repository. It defines all the the objects that are generated and that can later be accessed through `targets::tar_read()` with their names. This file refers to many different functions, abstracting away the complexity of the pipeline, that are split throughout different `.R` files in the `R/` folder.
+
+Because the workflow is quite complex, here a summary visualization:
+
+```{r targets-glimpse}
+glimpse = targets::tar_glimpse(targets_only = FALSE)
+
+
+htmlwidgets::saveWidget(glimpse, "inst/glimpse.html")
+
+htmltools::tags$iframe(
+  src  = file.path("inst/glimpse.html"),
+  width = "100%",
+  height = "600",
+  scrolling = "no",
+  seamless = "seamless",
+  frameBorder = "0"
+)
+```
+
+Here's a summary of the workflow:
+
+1. Load all trait files
+    1. Load AusTraits from `austraits` package
+    2. Access BIEN and GIFT databases from their R packages
+    3. Load TRY database from an extract of all open information
+    4. Load the Austraits Plant Dictionary (APD) from the flat file from their repository
+    5. Load all the correspondence tables between databases from dedicated files
+2. Access the GloNAF database
+3. Harmonize the taxonomy of all databases, except BIEN, through the Taxonomic Name Resolution Service (TNRS) through the dedicated `TNRS` R package
+4. Make a trait concept network and simplify all trait databases through this network
+5. Collate all databases
+6. Count the number of available traits per species and model it
+7. Visualize these numbers and analyses
+
 ## Installation
 
 The repository contains the full workflow to reproduce our analyses and figures.
@@ -44,20 +83,52 @@ You can download it through GitHub with the following link: https://github.com/R
 
 From there, unzip it, and read the section below.
 
-## How to run
+## How to run the workflow
 
-The workflow leverages the `targets` package to get reproducible analyses.
 To run it run the following command `targets::tar_make()`.
 The workflow comes with an `renv` lockfile detailing all its dependencies. Use `renv::restore()` to get all packages.
 
 The workflow needs a reliable internet connection to run.
 On a standard laptop with internet, it takes about **8 hours** to complete without parallel execution.
 
-
 ## Needed environment variables
 
-As the GloNAF data are not yet fully open, you need to have access to the GloNAF database and put the id and password as environment variables `GLONAF_USER` and `GLONAF_PASSWORD` respectively as provided by the GloNAF.
-Similarly, these analyses rely on using the private access of the GIFT database to gather all observations from GIFT. To reproduce it, you need to store the private GIFT API URL as the `GIFT_RESTRICTED_API`. If you don't have access to the private API, you can use the public one which gives very similar results.
+As the GloNAF data are not yet fully open, you need to have access to the GloNAF database and put the id and password as environment variables `GLONAF_USER` and `GLONAF_PASSWORD` respectively as provided by the GloNAF. But you can access the same data through the hosted version of GloNAF v2 on Zenodo: https://doi.org/10.5281/zenodo.14696776.
+
+Similarly, these analyses rely on using the private access of the GIFT database to gather all observations from GIFT. To reproduce it, you need to store the private GIFT API URL as the `GIFT_RESTRICTED_API`. If you don't have access to the private API, you can use the public one, which gives very similar results.
+
+
+## Long-term data availability
+
+Because this workflow relies on several online services (BIEN, GIFT, and TNRS), re-running the workflow could actually give slightly different answers as well as may be impossible if the the online services go offline, or if the version of the code used here becomes incompatible with newer versions of the services. To ensure long-term availability of the data anda analyses provided here, the generated `_targets/` folder containing all objects generated throughout the workflow is archived [on Zenodo](https://doi.org/10.5281/zenodo.13940200). To load it, download the `_targets` folder from Zenodo then copy it at the root of the `alientraitgaps` repository and you can access all of the targets through `targets::tar_read()`.
+
+If you reuse some of the data files provided here for scientific reproducibility, be sure to check and respect all of the licenses of all of the original data sources.
+
+
+## Detailed structure of the repository
+
+Here's a breakdown of the structure of the repository:
+
+```
+.                                  # Root of the repository
+├── docs                           # GitHub pages folder to host online supplements
+├── inst                           # Folder containing all data and other files
+│   ├── exdata                     # Folder containing all external data
+│   │   ├── apd                    # Data from AusTraits Plant Dictionary
+│   │   ├── austraits              # Data from AusTraits
+│   │   ├── correspondence_tables  # Correspondence tables between databases
+│   │   ├── glonaf                 # Data from GloNAF
+│   │   ├── gpw                    # Data on population count
+│   │   ├── grip                   # Data on road density
+│   │   └── try                    # Data from TRY
+│   ├── figures                    # Folder with all the figures of the manuscript
+│   └── presentations              # Folder containing some presentations of this work
+├── manuscript                     # Manuscript files
+├── R                              # All the functions needed to run the pipeline
+├── renv                           # Files for the renv package
+└── _targets                       # Storage for the targets package
+```
+
 
 ## Acknowledgements
 
