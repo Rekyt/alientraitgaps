@@ -408,7 +408,7 @@ list(
     ),
     tar_target(
       trait_combinations,
-      count_trait_combinations(simplified_traits, match_type, glonaf_harmonized)
+      count_trait_combinations(combined_traits_all, match_type)
     ),
     tar_target(
       fig_euler_diagrams_top_25_traits_database,

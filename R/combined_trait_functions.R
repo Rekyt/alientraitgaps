@@ -350,24 +350,20 @@ combine_traits_all_databases = function(
 
 
 count_trait_combinations = function(
-    simplified_traits, match_type, glonaf_harmonized
+    combined_traits_all, match_type
 ) {
 
   combs = case_when(match_type == "full" ~ get_full_combs(),
                     match_type == "close" ~ get_close_combs(),
                     match_type == "exact" ~ get_exact_combs())
 
-  simplified_traits  |>
-    full_join(
-      glonaf_harmonized |>
-        distinct(species = taxa_binomial),
-      by = "species"
-    ) |>
+  combined_traits_all  |>
+    filter(species != "") |>
+    distinct(consolidated_name, species, in_glonaf) |>
     group_by(species) |>
-    summarise(traits = list(consolidated_name)) |>
+    summarise(traits = list(consolidated_name), in_glonaf = unique(in_glonaf)) |>
     rowwise() |>
     mutate(
-      in_glonaf              = TRUE,
       has_at_least_one_trait = length(traits) > 0 & all(!is.na(traits)),
       # Consider that each combinations can have multiple ways of writing it
       # first 'any()' means any combination variant
