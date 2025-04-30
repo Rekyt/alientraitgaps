@@ -43,7 +43,7 @@ list(
     {
       loc <- here::here("inst", "exdata", "apd", "apd_flat_traits.csv")
       download.file(
-        "https://github.com/traitecoevo/APD/raw/master/data/APD_traits_input.csv",
+        "https://github.com/traitecoevo/APD/blob/c7c860f73104091697426466943b3298d9b69fde/data/APD_traits_input.csv",
         loc
       )
       loc

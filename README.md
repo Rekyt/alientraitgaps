@@ -63,7 +63,6 @@ glimpse = targets::tar_glimpse(targets_only = FALSE)
 
 ``` r
 
-
 htmlwidgets::saveWidget(glimpse, "inst/glimpse.html")
 
 htmltools::tags$iframe(
@@ -130,7 +129,32 @@ to store the private GIFT API URL as the `GIFT_RESTRICTED_API`. If you
 don’t have access to the private API, you can use the public one, which
 gives very similar results.
 
+## Trait concept network
+
+One of the output of this work is the trait concept network to merge the
+four used plant trait databases (AusTraits, BIEN, GIFT, and TRY), it is
+available through the file named `supp_table1_trait_names_full.csv` at
+the following relative path
+`inst/exdata/correspondence_tables/supp_table1_trait_names_full.csv`.
+You can [download it
+directly](https://github.com/Rekyt/alientraitgaps/raw/refs/heads/main/inst/exdata/correspondence_tables/supp_table1_trait_names_full.csv)
+or used the [archived version](https://doi.org/10.5281/zenodo.13940200),
+or check its [online
+version](https://rekyt.github.io/alientraitgaps/#trait-concept-network).
+
 ## Long-term data availability
+
+For the sake of simplicity we now record the actual version of all the
+data sources used here:
+
+- AusTraits v6.0.0
+- BIEN v4.2.1
+- GIFT v3.1
+- TRY v6.0
+- GloNAF version 2.0
+- AusTraits Plant Dictionary v2.0.0
+- TNRS: app.version 5.3.1, database version 4.4.1, build date =
+  2024-01-17, code version = 5.1, api version = 5.3.2
 
 Because this workflow relies on several online services (BIEN, GIFT, and
 TNRS), re-running the workflow could actually give slightly different
