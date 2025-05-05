@@ -837,6 +837,12 @@ list(
     supp_fig6_trait_model_alt,
     plot_all_models(trait_knowledge_model_prop),
   ),
+  tar_target(
+    supp_fig7_venn_shared_species,
+    plot_venn_diagram_shared_species(
+      austraits_tnrs, bien_traits_simple, gift_raw_tnrs, try_tnrs, glonaf_tnrs
+    )
+  ),
 
 
   # Online supplementary material

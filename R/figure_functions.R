@@ -1202,3 +1202,42 @@ plot_relative_database_importance_traits = function(
 
 
 }
+
+
+plot_venn_diagram_shared_species = function(
+    austraits_tnrs, bien_traits_simple, gift_raw_tnrs, try_tnrs, glonaf_tnrs
+) {
+
+  # Gather all species from all databases
+  all_species = list(
+    AusTraits = austraits_tnrs,
+    BIEN      = bien_traits_simple |>
+      distinct(Accepted_species = scrubbed_species_binomial),
+    GIFT      = gift_raw_tnrs,
+    TRY       = try_tnrs,
+    GloNAF    = glonaf_tnrs
+  ) |>
+    lapply(
+      \(x) x |>
+        distinct(Accepted_species) |>
+        filter(Accepted_species != "") |>
+        pull(Accepted_species)
+    )
+
+  plot(
+    eulerr::venn(all_species),
+    main = "Shared Species Across Databases",
+    quantities = list(type = "counts", fontsize = 8),
+    edges = list(lwd = 0.5, lex = 1, col = "#333333"),
+    fills = list(
+      fill = c(
+        "#E69F00",  # (AusTraits) Orange
+        "#56B4E9",  # (BIEN)      Blue
+        "#009E73",  # (GIFT)      Green
+        "#CC79A7",  # (TRY)       Pink
+        "#C22901"   # (GloNAF)    Red
+      )
+    )
+  )
+
+}
