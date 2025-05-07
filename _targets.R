@@ -471,6 +471,11 @@ list(
     pattern = map(trait_knowledge_df_prop),
     iteration = "list"
   ),
+  tar_target(
+    trait_knowledge_signal,
+    estimate_phylogenetic_signal(trait_knowledge_df, trait_knowledge_model, glonaf_tree),
+    pattern = map(trait_knowledge_df, trait_knowledge_model)
+  ),
 
   # World Regions --------------------------------------------------------------
   tar_target(

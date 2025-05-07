@@ -122,3 +122,48 @@ model_alien_trait_knowledge_with_intercept = function(trait_knowledge_df) {
   )
 
 }
+
+estimate_phylogenetic_signal = function(
+    trait_knowledge_df, trait_knowledge_model, glonaf_tree
+) {
+
+  # Get same df as in model
+  original_df = trait_knowledge_df %>%
+    filter(
+      !is.na(mean_hii_v2geo_mean), !is.na(gdp_mean_native),
+      !is.na(gdp_mean_non_native), !is.na(mean_access_cities_2015_mean)
+    ) %>%
+    select(
+      species, n_traits, simplified_growth_form , n_total, n_total_non_native,
+      n_biomes, mean_hii_v2geo_mean, mean_hii_v2geo_sd, gdp_mean_native,
+      gdp_mean_non_native, mean_access_cities_2015_mean
+    ) %>%
+    mutate(
+      across(n_total:mean_access_cities_2015_mean, ~ as.numeric(scale(.x)))
+    ) %>%
+    rename(
+      growth_form                   = simplified_growth_form,
+      total_range_size              = n_total,
+      non_native_range_size         = n_total_non_native,
+      avg_human_influence_index     = mean_hii_v2geo_mean,
+      sd_human_influence_index      = mean_hii_v2geo_sd,
+      avg_gdp_over_native_range     = gdp_mean_native,
+      avg_gdp_over_non_native_range = gdp_mean_non_native,
+      avg_accessibility             = mean_access_cities_2015_mean
+    )
+
+  # Make smaller df with residuals
+  actual_df = original_df |>
+    select(species) |>
+    mutate(
+      species = gsub(" ", "_", species, fixed = TRUE),
+      trait_knowledge_resid = resid(trait_knowledge_model)
+    )
+
+  # Estimate phylogenetic signal
+  trait_knowledge_signal = phytools::phylosig(
+    glonaf_tree, tibble::deframe(actual_df),
+    method = "lambda", test = TRUE
+  )
+
+}
