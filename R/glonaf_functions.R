@@ -231,13 +231,17 @@ get_trait_combinations_and_cat_per_invasion_status = function(
     tidyr::complete(species, status_name, fill = list(n = 0)) %>%
     arrange(species, status_name) %>%
     tidyr::pivot_wider(names_from = status_name, values_from = n) %>%
-    inner_join(
+    right_join(
       contain_trait_combination %>%
         mutate(n_traits = length(traits)) %>%
         select(-traits, -in_glonaf),
       by = "species"
     ) |>
-    mutate(match_type = match_type)
+    mutate(
+      match_type  = match_type,
+      invasive    = ifelse(is.na(invasive), 0, invasive),
+      naturalized = ifelse(is.na(naturalized), 0, naturalized)
+    )
 
 }
 

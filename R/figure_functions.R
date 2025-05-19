@@ -160,7 +160,13 @@ plot_trait_comb_proportion_per_invasion_status = function(
 
   # Pre-process data
   trait_comb_prop_status = glonaf_status_trait_cat %>%
-    mutate(is_invasive_or_never = invasive > 0) %>%
+    mutate(
+      is_invasive_or_never = case_when(
+        invasive == 0 & naturalized == 0 ~ "native",
+        invasive > 0                     ~ "invasive",
+        naturalized  > 0                 ~ "naturalized"
+      )
+    ) %>%
     group_by(is_invasive_or_never) %>%
     summarise(
       across(
@@ -177,8 +183,9 @@ plot_trait_comb_proportion_per_invasion_status = function(
     select(is_invasive_or_never, n) %>%
     mutate(
       better_status = case_when(
-        is_invasive_or_never == TRUE  ~ "Ref. invasive ≥ 1",
-        is_invasive_or_never == FALSE ~ "Never invasive"
+        is_invasive_or_never == "native"      ~ "Native",
+        is_invasive_or_never == "invasive"    ~ "Ref. invasive ≥ 1",
+        is_invasive_or_never == "naturalized" ~ "Naturalized never invasive"
       ),
       labels = paste0(better_status, "\n(n = ", format(n, big.mark = ","), ")")
     ) %>%
@@ -192,7 +199,7 @@ plot_trait_comb_proportion_per_invasion_status = function(
     ) %>%
     mutate(
       is_invasive_or_never = factor(
-        is_invasive_or_never, levels = c(FALSE, TRUE)
+        is_invasive_or_never, levels = c("native", "naturalized", "invasive")
       ),
       comb_name = factor(
         comb_name,
@@ -235,7 +242,7 @@ plot_trait_comb_proportion_per_invasion_status = function(
       labels = status_labels
     ) +
     scale_color_manual("Species Status", values = c(
-      `TRUE` = "#E69F00", `FALSE` = "#56B4E9"
+      native = "#009E73", invasive = "#E69F00", naturalized = "#56B4E9"
     ), guide = guide_legend(reverse = TRUE), labels = status_labels
     ) +
     coord_flip() +
