@@ -160,10 +160,12 @@ estimate_phylogenetic_signal = function(
       trait_knowledge_resid = resid(trait_knowledge_model)
     )
 
+  new_tree = as(glonaf_tree, "phylo4d")
+  phylobase::tipData(new_tree)$trait_resid = tibble::deframe(actual_df)[phylobase::tipLabels(new_tree)]
+
   # Estimate phylogenetic signal
-  trait_knowledge_signal = phytools::phylosig(
-    glonaf_tree, tibble::deframe(actual_df),
-    method = "lambda", test = TRUE
+  trait_knowledge_signal = phylosignal::phyloSignal(
+    new_tree, methods = "Lambda", reps = 100
   )
 
 }
