@@ -770,7 +770,11 @@ plot_map_proportion_trait_by_region = function(
   # Actual plot
   mainland_pivot %>%
     ggplot(aes(fill = prop_value)) +
-    geom_sf(data = world_sf, fill = "gray85", color = "gray65", size = 1/100) +
+    geom_sf(
+      data = world_sf |>
+              filter(continent != "Antarctica"),
+      fill = "gray85", color = "gray65", size = 1/100
+    ) +
     # Non-small islands and mainlands
     geom_sf(color = NA, size = 1/100) +
     # Small islands
@@ -801,7 +805,6 @@ plot_map_proportion_trait_by_region = function(
     ) +
     guides(fill = guide_colorsteps(title.vjust = 0.8),
            color = guide_colorsteps(title.vjust = 0.8)) +
-    ylim(-5747986, NA) +  # Remove whatever is below 60°S
     theme_void() +
     theme(
       legend.position = "bottom",
@@ -848,7 +851,11 @@ plot_map_alien_richness_region = function(
   # Actual plot
   mainland_richness %>%
     ggplot(aes(fill = n_species)) +
-    geom_sf(data = world_sf, fill = "gray85", size = 1/100) +
+    geom_sf(
+      data = world_sf |>
+        filter(continent != "Antarctica"),
+      fill = "gray85", color = "gray65", size = 1/100
+    ) +
     # Non-small islands and mainlands
     geom_sf() +
     # Small islands
@@ -872,7 +879,6 @@ plot_map_alien_richness_region = function(
       # Force limit to merge axes
       limits = richness_range
     ) +
-    ylim(-5747986, NA) +  # Remove whatever is below 60°S
     theme_void() +
     guides(fill = guide_colorsteps(title.vjust = 0.8),
            color = guide_colorsteps(title.vjust = 0.8)) +
@@ -909,7 +915,11 @@ plot_map_median_n_traits_region = function(
   # Actual Plot
   mainland_n_traits %>%
     ggplot(aes(fill = n_traits_median)) +
-    geom_sf(data = world_sf, fill = "gray85", color = "gray65", size = 1/100) +
+    geom_sf(
+      data = world_sf |>
+        filter(continent != "Antarctica"),
+      fill = "gray85", color = "gray65", size = 1/100
+    ) +
     # Non-small islands and mainlands
     geom_sf(color = NA, size = 1/100) +
     # Small islands
@@ -930,7 +940,6 @@ plot_map_median_n_traits_region = function(
       breaks = c(10, 30, 50, 100, 300),
       limits = c(10, 300), show.limits = TRUE
     ) +
-    ylim(-5747986, NA) +  # Remove whatever is below 60°S
     theme_void() +
     theme(
       legend.position  = "top",
@@ -963,7 +972,11 @@ plot_map_sd_n_traits_region = function(
   # Actual Plot
   mainland_n_traits %>%
     ggplot(aes(fill = n_traits_sd)) +
-    geom_sf(data = world_sf, fill = "gray85", color = "gray65", size = 1/100) +
+    geom_sf(
+      data = world_sf |>
+        filter(continent != "Antarctica"),
+      fill = "gray85", color = "gray65", size = 1/100
+    ) +
     # Non-small islands and mainlands
     geom_sf(color = NA, size = 1/100) +
     # Small islands
@@ -979,7 +992,6 @@ plot_map_sd_n_traits_region = function(
     scale_color_viridis_b(
       "Standard Deviation of Number of Traits", trans = "log10"
     ) +
-    ylim(-5747986, NA) +  # Remove whatever is below 60°S
     theme_void() +
     theme(
       legend.position  = "top",
