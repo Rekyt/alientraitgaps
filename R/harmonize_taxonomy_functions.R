@@ -25,10 +25,11 @@ get_gift_raw_species_df = function(gift_traits) {
     distinct(orig_ID, genus, species_epithet, subtaxon, author) |>
     mutate(
       id = orig_ID,
+      # Replace NA with empty strings for easier later concatenation
+      across(genus:author, \(x) stringr::str_replace_na(x, "")),
       # Remove introduced double spaces when pasting all parts of species name
       species_name = gsub(
-        "  ", " ", paste(genus, species_epithet, subtaxon, author),
-        fixed = TRUE
+        "  ", " ", paste(genus, species_epithet, subtaxon, author)
       )
     ) |>
     select(id, species_name)
