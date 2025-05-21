@@ -819,7 +819,11 @@ list(
     iteration = "list"
   ),
   tar_target(
-    supp_fig3_proportion_species_trait,
+    supp_fig3_trait_model_alt,
+    plot_all_models(trait_knowledge_model_prop),
+  ),
+  tar_target(
+    supp_fig4_proportion_species_trait,
     plot_proportion_species_with_trait(
       trait_combinations_types, glonaf_harmonized
     ),
@@ -827,20 +831,16 @@ list(
     iteration = "list"
   ),
   tar_target(
-    supp_fig4_treemap_number_trait,
+    supp_fig5_treemap_number_trait,
     plot_treemaps_with_number_of_traits(
       glonaf_family, trait_combinations_full
     )
   ),
   tar_target(
-    supp_fig5_maps_median_sd_n_traits,
+    supp_fig6_maps_median_sd_n_traits,
     assemble_maps_number_of_traits(
       fig_map_median_n_traits_region[[1]], fig_map_sd_n_traits_region[[1]]
     )
-  ),
-  tar_target(
-    supp_fig6_trait_model_alt,
-    plot_all_models(trait_knowledge_model_prop),
   ),
   tar_target(
     supp_fig7_venn_shared_species,

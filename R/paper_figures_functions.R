@@ -100,6 +100,7 @@ plot_proportion_species_with_trait = function(
 ) {
 
   trait_number = combined_traits[[1]] %>%
+    filter(in_glonaf) |>
     mutate(n_traits = purrr::map_int(traits, length)) %>%
     group_by(n_traits) %>%
     summarise(n_species = n()) %>%
