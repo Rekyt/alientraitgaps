@@ -8,6 +8,7 @@ source("R/apd_functions.R")
 source("R/austraits_functions.R")
 source("R/bien_functions.R")
 source("R/combined_trait_functions.R")
+source("R/data_references.R")
 source("R/env_socioeco_vars.R")
 source("R/figure_functions.R")
 source("R/glonaf_functions.R")
@@ -471,11 +472,11 @@ list(
     pattern = map(trait_knowledge_df_prop),
     iteration = "list"
   ),
-  tar_target(
-    trait_knowledge_signal,
-    estimate_phylogenetic_signal(trait_knowledge_df, trait_knowledge_model, glonaf_tree),
-    pattern = map(trait_knowledge_df, trait_knowledge_model)
-  ),
+  # tar_target(
+  #   trait_knowledge_signal,
+  #   estimate_phylogenetic_signal(trait_knowledge_df, trait_knowledge_model, glonaf_tree),
+  #   pattern = map(trait_knowledge_df, trait_knowledge_model)
+  # ),
 
   # World Regions --------------------------------------------------------------
   tar_target(
@@ -637,6 +638,24 @@ list(
     pattern = map(target_proportion),
     iteration = "list"
   ),
+
+
+  # Get data references --------------------------------------------------------------------------------
+  tar_target(
+    austraits_refs,
+    gather_austraits_references(austraits, austraits_tnrs, combined_traits_full)
+  ),
+  tar_target(
+    bien_refs,
+    gather_bien_references(bien_traits, combined_traits_full)
+  ),
+  # tar_target(
+  #   gift_refs,
+  #   gather_gift_references()
+  # ),
+  # tar_target(
+  #   try_refs
+  # ),
 
   # Make figures ---------------------------------------------------------------
   tar_target(
