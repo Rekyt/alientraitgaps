@@ -3,7 +3,7 @@ match_tnrs = function(species_df) {
   TNRS::TNRS(
     species_df,
     sources = c("wcvp", "wfo"),
-    classification  ="wfo"
+    classification = "wfo"
   )
 
 }
@@ -32,7 +32,7 @@ get_gift_raw_species_df = function(gift_traits) {
         "  ", " ", paste(genus, species_epithet, subtaxon, author)
       )
     ) |>
-    select(id, species_name)
+    distinct(id, species_name)
 
 }
 
