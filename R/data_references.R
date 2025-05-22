@@ -92,3 +92,38 @@ gather_gift_references = function(
     pull(ref_long)
 
 }
+
+gather_try_references = function(
+    combined_traits_full, try_tnrs, try_species_df, try_harmonized_species,
+    full_try_df
+) {
+
+  try_sub_traits = combined_traits_full |>
+    filter(database == "TRY") |>
+    distinct(species) |>
+    inner_join(
+      try_tnrs |>
+        distinct(id = ID, species = Accepted_species) |>
+        filter(species != ""),
+      by = "species"
+    ) |>
+    distinct(id) |>
+    inner_join(
+      try_species_df,
+      by = "id"
+    ) |>
+    rename(TRY_SpeciesName = species_name) |>
+    inner_join(
+      try_harmonized_species |>
+        select(TRY_SpeciesName, TRY_AccSpeciesID),
+      by = "TRY_SpeciesName"
+    )
+
+  try_cites = full_try_df |>
+    semi_join(
+      try_sub_traits, by = join_by(AccSpeciesID == TRY_AccSpeciesID)
+    ) |>
+    distinct(Reference) |>
+    pull(Reference)
+
+}

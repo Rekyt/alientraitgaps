@@ -657,9 +657,13 @@ list(
       gift_raw_tnrs, gift_raw_species_df, gift_raw_traits, combined_traits_full
     )
   ),
-  # tar_target(
-  #   try_refs
-  # ),
+  tar_target(
+    try_refs,
+    gather_try_references(
+      combined_traits_full, try_tnrs, try_species_df, try_harmonized_species,
+      full_try_df
+    )
+  ),
 
   # Make figures ---------------------------------------------------------------
   tar_target(
