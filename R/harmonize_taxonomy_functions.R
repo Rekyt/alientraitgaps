@@ -32,7 +32,8 @@ get_gift_raw_species_df = function(gift_traits) {
         "  ", " ", paste(genus, species_epithet, subtaxon, author)
       )
     ) |>
-    distinct(id, species_name)
+    distinct(id, species_name) |>
+    mutate(new_id = paste0("gift-", row_number()))
 
 }
 
