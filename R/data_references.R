@@ -1,7 +1,7 @@
 # Script to gather data references from the trait databases
 
 gather_austraits_references = function(
-    austraits, austraits_tnrs, combined_traits_full
+    austraits, austraits_tnrs, austraits_species_df, combined_traits_full
 ) {
 
   aus_species = combined_traits_full |>
@@ -59,16 +59,36 @@ gather_bien_references = function(bien_traits, combined_traits_full) {
 
 }
 
-gather_gift_references = function() {
+gather_gift_references = function(
+    gift_raw_tnrs, gift_raw_species_df, gift_raw_traits, combined_traits_full
+) {
 
   gift_sub_traits = combined_traits_full |>
     filter(database == "GIFT") |>
     distinct(species) |>
     inner_join(
       gift_raw_tnrs |>
-        distinct(id = ID, species = Accepted_species) |>
+        distinct(new_id = ID, species = Accepted_species) |>
         filter(species != ""),
       by = "species"
+    ) |>
+    inner_join(
+      gift_raw_species_df, by = "new_id"
     )
+
+  gift_raw_traits |>
+    distinct(orig_ID, genus, species_epithet, subtaxon, author, ref_long) |>
+    mutate(
+      id = orig_ID,
+      # Replace NA with empty strings for easier later concatenation
+      across(genus:author, \(x) stringr::str_replace_na(x, "")),
+      # Remove introduced double spaces when pasting all parts of species name
+      species_name = gsub(
+        "  ", " ", paste(genus, species_epithet, subtaxon, author)
+      )
+    ) |>
+    distinct(id, species_name, ref_long) |>
+    semi_join(gift_sub_traits, by = c("id", "species_name")) |>
+    pull(ref_long)
 
 }

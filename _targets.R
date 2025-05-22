@@ -211,7 +211,7 @@ list(
   ),
   tar_target(
     gift_raw_tnrs,
-    match_tnrs(gift_raw_species_df)
+    match_tnrs(select(gift_raw_species_df, id = new_id, species_name))
   ),
   tar_target(
     gift_harmonized,
@@ -643,16 +643,20 @@ list(
   # Get data references --------------------------------------------------------------------------------
   tar_target(
     austraits_refs,
-    gather_austraits_references(austraits, austraits_tnrs, combined_traits_full)
+    gather_austraits_references(
+      austraits, austraits_tnrs, austraits_species_df, combined_traits_full
+    )
   ),
   tar_target(
     bien_refs,
     gather_bien_references(bien_traits, combined_traits_full)
   ),
-  # tar_target(
-  #   gift_refs,
-  #   gather_gift_references()
-  # ),
+  tar_target(
+    gift_refs,
+    gather_gift_references(
+      gift_raw_tnrs, gift_raw_species_df, gift_raw_traits, combined_traits_full
+    )
+  ),
   # tar_target(
   #   try_refs
   # ),
