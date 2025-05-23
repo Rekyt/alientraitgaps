@@ -321,7 +321,9 @@ list(
   ),
   tar_target(
     gift_traits_harmo,
-    match_gift_traits_taxonomy(gift_raw_traits, gift_raw_tnrs, gift_trait_meta)
+    match_gift_traits_taxonomy(
+      gift_raw_traits, gift_raw_species_df, gift_raw_tnrs, gift_trait_meta
+    )
   ),
 
 

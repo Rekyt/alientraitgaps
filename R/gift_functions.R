@@ -102,14 +102,23 @@ simplify_gift_traits = function(gift_raw_traits) {
 
 
 match_gift_traits_taxonomy = function(
-    gift_raw_traits, gift_raw_tnrs, gift_trait_meta
+    gift_raw_traits, gift_raw_species_df, gift_raw_tnrs, gift_trait_meta
 ) {
 
   gift_raw_traits |>
     distinct(orig_ID = as.character(orig_ID), trait_ID) |>
     inner_join(
+      # Get back matched name
       gift_raw_tnrs |>
-        distinct(orig_ID = ID, Accepted_species),
+        distinct(ID, Accepted_species) |>
+        # Rematch original species ID
+        inner_join(
+          gift_raw_species_df |>
+            select(orig_ID = id, ID = new_id) |>
+            mutate(orig_ID = as.character(orig_ID)),
+          by = "ID"
+        ) |>
+        select(-ID),
       by = "orig_ID"
     ) |>
     distinct(Accepted_species, trait_ID) |>

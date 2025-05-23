@@ -89,7 +89,8 @@ gather_gift_references = function(
     ) |>
     distinct(id, species_name, ref_long) |>
     semi_join(gift_sub_traits, by = c("id", "species_name")) |>
-    pull(ref_long)
+    pull(ref_long) |>
+    unique()
 
 }
 
