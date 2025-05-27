@@ -92,9 +92,6 @@ list(
     glonaf_tree,
     build_glonaf_phylo_tree(glonaf_species_fam)
   ),
-  tar_target(
-    glonaf_pev, PVR::PVRdecomp(glonaf_tree)
-  ),
 
 
   # Load GIFT data -------------------------------------------------------------
@@ -106,10 +103,6 @@ list(
   tar_target(
     gift_api,
     Sys.getenv("GIFT_RESTRICTED_API")
-  ),
-  tar_target(
-    gift_species,
-    GIFT::GIFT_species(gift_api, GIFT_version = gift_version)
   ),
   tar_target(
     gift_trait_meta,
@@ -202,20 +195,8 @@ list(
     get_gift_raw_species_df(gift_raw_traits)
   ),
   tar_target(
-    gift_species_df,
-    create_tnrs_df(gift_species, "gift", work_species, work_author)
-  ),
-  tar_target(
-    gift_tnrs,
-    match_tnrs(gift_species_df)
-  ),
-  tar_target(
     gift_raw_tnrs,
     match_tnrs(select(gift_raw_species_df, id = new_id, species_name))
-  ),
-  tar_target(
-    gift_harmonized,
-    get_gift_taxonomy(gift_species)
   ),
   # TRY
   tar_target(
@@ -446,11 +427,6 @@ list(
     pattern = map(trait_knowledge_df_prop),
     iteration = "list"
   ),
-  # tar_target(
-  #   trait_knowledge_signal,
-  #   estimate_phylogenetic_signal(trait_knowledge_df, trait_knowledge_model, glonaf_tree),
-  #   pattern = map(trait_knowledge_df, trait_knowledge_model)
-  # ),
 
   # World Regions --------------------------------------------------------------
   tar_target(
