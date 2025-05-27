@@ -239,11 +239,6 @@ list(
     glonaf_tnrs,
     match_tnrs(glonaf_species_df)
   ),
-  tar_target(
-    glonaf_family,
-    distinct(glonaf_alien_species, taxon_wcvp_id, taxon_orig_id, taxa_accepted,
-             family_wcvp)
-  ),
 
 
   # AusTraits traits -----------------------------------------------------------
@@ -837,7 +832,7 @@ list(
   tar_target(
     supp_fig5_treemap_number_trait,
     plot_treemaps_with_number_of_traits(
-      glonaf_family, trait_combinations_full
+      glonaf_tnrs, trait_combinations_full
     )
   ),
   tar_target(

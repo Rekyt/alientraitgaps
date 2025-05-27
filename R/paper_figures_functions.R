@@ -129,11 +129,12 @@ plot_proportion_species_with_trait = function(
 
 
 plot_treemaps_with_number_of_traits = function(
-  glonaf_family, trait_combinations_full
+  glonaf_tnrs, trait_combinations_full
 ) {
 
   tax_comb = glonaf_family %>%
-    distinct(species = taxa_accepted, family = family_wcvp) %>%
+    filter(Accepted_species != "") |>
+    distinct(species = Accepted_species, family = Accepted_family) %>%
     inner_join(trait_combinations_full, by = "species") %>%
     mutate(n_traits = purrr::map_int(traits, length)) %>%
     mutate(across(where(is.character), ~iconv(.x, "latin1", to = "UTF-8"))) %>%
