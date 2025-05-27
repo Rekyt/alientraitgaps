@@ -233,8 +233,10 @@ get_trait_combinations_and_cat_per_invasion_status = function(
     tidyr::pivot_wider(names_from = status_name, values_from = n) %>%
     right_join(
       contain_trait_combination %>%
+        rowwise() |>
         mutate(n_traits = length(traits)) %>%
-        select(-traits, -in_glonaf),
+        select(-traits, -in_glonaf) |>
+        ungroup(),
       by = "species"
     ) |>
     mutate(

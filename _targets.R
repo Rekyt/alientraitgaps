@@ -240,32 +240,9 @@ list(
     match_tnrs(glonaf_species_df)
   ),
   tar_target(
-    glonaf_harmonized,
-    get_glonaf_taxonomy(glonaf_alien_species)
-  ),
-  tar_target(
     glonaf_family,
     distinct(glonaf_alien_species, taxon_wcvp_id, taxon_orig_id, taxa_accepted,
              family_wcvp)
-  ),
-  # Combine each trait taxonomies with GloNAF
-  tar_target(
-    austraits_glonaf,
-    subset_glonaf_species(austraits_harmonized, glonaf_harmonized, "binomial")
-  ),
-  tar_target(
-    bien_glonaf,
-    subset_glonaf_species(
-      bien_harmonized, glonaf_harmonized, "scrubbed_species_binomial"
-    )
-  ),
-  tar_target(
-    gift_glonaf,
-    subset_glonaf_species(gift_harmonized, glonaf_harmonized, "work_species")
-  ),
-  tar_target(
-    try_glonaf,
-    subset_glonaf_species(try_harmonized, glonaf_harmonized, "MatchedName")
   ),
 
 
@@ -442,7 +419,7 @@ list(
     trait_knowledge_df,
     assemble_trait_knowledge_df(
       trait_combinations_types, standard_growth_form,
-      species_final_socioecovars, glonaf_harmonized
+      species_final_socioecovars, glonaf_tnrs
     ),
     pattern = map(trait_combinations_types),
     iteration = "list"
@@ -463,7 +440,7 @@ list(
     trait_knowledge_df_prop,
     assemble_trait_knowledge_df(
       trait_combinations_types[1], standard_growth_form,
-      species_final_socioecovars_prop, glonaf_harmonized
+      species_final_socioecovars_prop, glonaf_tnrs
     ),
     pattern = map(species_final_socioecovars_prop),
     iteration = "list"
@@ -671,19 +648,19 @@ list(
   tar_target(
     fig_species_per_trait_combined,
     plot_number_species_per_trait_combined(
-      simplified_traits_full, glonaf_harmonized
+      simplified_traits_full, glonaf_tnrs
     )
   ),
   # Create trait heatmaps with one trait per species = pixels
   # include several variations
   tar_target(
     fig_combined_trait_heatmap,
-    plot_combined_traits_heatmap(simplified_traits_full, glonaf_harmonized)
+    plot_combined_traits_heatmap(simplified_traits_full, glonaf_tnrs)
   ),
   tar_target(
     fig_combined_trait_heatmap_200,
     plot_combined_traits_heatmap(
-      simplified_traits_full, glonaf_harmonized, 200L
+      simplified_traits_full, glonaf_tnrs, 200L
     )
   ),
   tar_target(
@@ -703,26 +680,24 @@ list(
   ),
   tar_target(
     fig_treemap_general,
-    plot_general_treemap_trait_combination(
-      trait_combinations_full, glonaf_harmonized, glonaf_family
-    )
+    plot_general_treemap_trait_combination(trait_combinations_full, glonaf_tnrs)
   ),
   tar_target(
     fig_trait_combination_taxonomy,
     plot_taxonomy_treemap_trait_combination(
-      trait_combinations_full, glonaf_harmonized, glonaf_family
+      trait_combinations_full, glonaf_tnrs
     )
   ),
   tar_target(
     fig_trait_combination_number_logged,
     plot_taxonomy_treemap_number_traits(
-      trait_combinations_full, glonaf_harmonized, glonaf_family, logged = TRUE
+      trait_combinations_full, glonaf_tnrs, logged = TRUE
     )
   ),
   tar_target(
     fig_trait_combination_number_unlogged,
     plot_taxonomy_treemap_number_traits(
-      trait_combinations_full, glonaf_harmonized, glonaf_family, logged = FALSE
+      trait_combinations_full, glonaf_tnrs, logged = FALSE
     )
   ),
   # Proportion of known species per regions
@@ -854,7 +829,7 @@ list(
   tar_target(
     supp_fig4_proportion_species_trait,
     plot_proportion_species_with_trait(
-      trait_combinations_types, glonaf_harmonized
+      trait_combinations_types, glonaf_tnrs
     ),
     pattern = map(trait_combinations_types),
     iteration = "list"

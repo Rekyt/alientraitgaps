@@ -18,14 +18,15 @@ get_continental_origin = function() {
 
 assemble_trait_knowledge_df = function(
     combined_traits, simplified_growth_form, species_socioecovars,
-    glonaf_harmonized
+    glonaf_tnrs
 ) {
 
   simplified_growth_form = simplified_growth_form |>
     distinct(species = taxon_name, simplified_growth_form)
 
-  all_unified_species = glonaf_harmonized %>%
-    distinct(species = taxa_binomial)
+  all_unified_species = glonaf_tnrs %>%
+    filter(Accepted_species != "") |>
+    distinct(species = Accepted_species)
 
   number_measured_traits = combined_traits[[1]] %>%
     mutate(n_traits = purrr::map_int(traits, length)) |>

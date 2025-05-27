@@ -2,7 +2,7 @@
 # Trait Counts -----------------------------------------------------------------
 
 plot_number_species_per_trait_combined = function(
-    combined_traits, glonaf_harmonized
+    combined_traits, glonaf_tnrs
 ) {
 
   max_25_traits = combined_traits %>%
@@ -17,8 +17,10 @@ plot_number_species_per_trait_combined = function(
     ) %>%
     slice_head(n = 25)
 
-  total_sp = glonaf_harmonized %>%
-    pull(taxa_binomial) %>%
+  total_sp = glonaf_tnrs %>%
+    filter(Accepted_species != "") |>
+    distinct(species = Accepted_species)
+    pull(species) %>%
     unique() %>%
     length()
 
@@ -371,7 +373,7 @@ plot_number_of_traits_per_number_of_regions = function(
 # Taxonomic Treemaps -----------------------------------------------------------
 
 plot_taxonomy_treemap_trait_combination = function(
-    trait_combinations_full, glonaf_harmonized, glonaf_family
+    trait_combinations_full, glonaf_tnrs
 ) {
 
   # Pre-process data
@@ -469,20 +471,13 @@ plot_taxonomy_treemap_trait_combination = function(
 }
 
 plot_taxonomy_treemap_number_traits = function(
-    trait_combinations_full, glonaf_harmonized, glonaf_family,
-    logged = TRUE
+    trait_combinations_full, glonaf_tnrs, logged = TRUE
 ) {
 
   # Pre-process data
-  tax_comb = glonaf_harmonized |>
-    inner_join(
-      glonaf_family |>
-        distinct(taxon_wcvp_id,taxon_orig_id, family_wcvp),
-      by = c("taxon_wcvp_id", "taxon_orig_id")
-    ) %>%
-    rename(species = taxa_binomial, family = family_wcvp) |>
-    mutate(genus = stringr::str_extract(species, "^\\w+")) |>
-    distinct(species, genus, family) %>%
+  tax_comb = glonaf_tnrs |>
+    filter(Accepted_species != "") |>
+    distinct(species = Accepted_species, family = Accepted_family) |>
     inner_join(trait_combinations_full, by = "species") %>%
     mutate(
       n_traits = purrr::map_int(
@@ -507,7 +502,7 @@ plot_taxonomy_treemap_number_traits = function(
   }
 
   # Clean environment
-  rm(trait_combinations_full, glonaf_harmonized, glonaf_family)
+  rm(trait_combinations_full, glonaf_tnrs)
 
   # Actual plot
   tax_comb %>%
@@ -529,19 +524,13 @@ plot_taxonomy_treemap_number_traits = function(
 }
 
 plot_general_treemap_trait_combination = function(
-    trait_combinations_full, glonaf_harmonized, glonaf_family
+    trait_combinations_full, glonaf_tnrs
 ) {
 
   # Preprocess data
-  tax_comb = glonaf_harmonized |>
-    inner_join(
-      glonaf_family |>
-        distinct(taxon_wcvp_id,taxon_orig_id, family_wcvp),
-      by = c("taxon_wcvp_id", "taxon_orig_id")
-    ) %>%
-    rename(species = taxa_binomial, family = family_wcvp) |>
-    mutate(genus = stringr::str_extract(species, "^\\w+")) |>
-    distinct(species, genus, family) %>%
+  tax_comb = glonaf_tnrs |>
+    filter(Accepted_species != "") |>
+    distinct(species = Accepted_species, family = Accepted_family) %>%
     inner_join(
       trait_combinations_full %>%
         select(-traits),
@@ -573,7 +562,7 @@ plot_general_treemap_trait_combination = function(
     )
 
   # Clean environment
-  rm(trait_combinations_full, glonaf_harmonized, glonaf_family)
+  rm(trait_combinations_full, glonaf_tnrs)
 
   # Actual plot
   tax_comb %>%
@@ -624,15 +613,16 @@ plot_general_treemap_trait_combination = function(
 # Missing Traits ---------------------------------------------------------------
 
 plot_combined_traits_heatmap = function(
-    simplified_traits_full, glonaf_harmonized, first_n_traits = Inf
+    simplified_traits_full, glonaf_tnrs, first_n_traits = Inf
 ) {
 
   # Get all combinations of trait species which shows which has values
   comb_sp = simplified_traits_full %>%
     mutate(value = TRUE) %>%
     full_join(
-      glonaf_harmonized %>%
-        distinct(species = taxa_binomial) %>%
+      glonaf_tnrs %>%
+        filter(Accepted_species != "") |>
+        distinct(species = Accepted_species) %>%
         tidyr::crossing(
           consolidated_name = simplified_traits_full[["consolidated_name"]]
         ),

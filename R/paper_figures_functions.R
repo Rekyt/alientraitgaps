@@ -96,7 +96,7 @@ plot_partial_residuals = function(trait_knowledge_model) {
 }
 
 plot_proportion_species_with_trait = function(
-    combined_traits, glonaf_harmonized
+    combined_traits, glonaf_tnrs
 ) {
 
   trait_number = combined_traits[[1]] %>%
@@ -107,9 +107,9 @@ plot_proportion_species_with_trait = function(
     arrange(desc(n_traits)) %>%
     mutate(cumulative_species = cumsum(n_species))
 
-  n_total = sum(unique(glonaf_harmonized[["taxa_binomial"]]) != "")
+  n_total = sum(unique(glonaf_tnrs[["Accepted_species"]]) != "")
 
-  rm(combined_traits, glonaf_harmonized)
+  rm(combined_traits, glonaf_tnrs)
 
   trait_number %>%
     ggplot(aes(n_traits, cumulative_species)) +
