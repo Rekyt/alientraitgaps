@@ -132,7 +132,7 @@ plot_treemaps_with_number_of_traits = function(
   glonaf_tnrs, trait_combinations_full
 ) {
 
-  tax_comb = glonaf_family %>%
+  tax_comb = glonaf_tnrs %>%
     filter(Accepted_species != "") |>
     distinct(species = Accepted_species, family = Accepted_family) %>%
     inner_join(trait_combinations_full, by = "species") %>%
@@ -149,7 +149,7 @@ plot_treemaps_with_number_of_traits = function(
     count(family, trait_category, name = "n_species")
 
   # Clean environment
-  rm(glonaf_family, trait_combinations_full)
+  rm(glonaf_tnrs, trait_combinations_full)
 
   # Only by trait category
   general_treemap = tax_comb %>%

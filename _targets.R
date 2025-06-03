@@ -429,7 +429,11 @@ list(
   ),
   tar_target(
     trait_knowledge_model_prop,
-    model_alien_trait_knowledge(trait_knowledge_df_prop),
+    model_alien_trait_knowledge(
+      filter_trait_knowledge(
+        trait_knowledge_df_prop
+      )
+    ),
     pattern = map(trait_knowledge_df_prop),
     iteration = "list"
   ),
@@ -798,22 +802,36 @@ list(
       )
     )
   ),
+  # Supplementary figures
   tar_target(
-    supp_fig1_euler_trait_databases,
+    supp_fig1_venn_shared_species,
+    plot_venn_diagram_shared_species(
+      austraits_tnrs, bien_traits_simple, gift_raw_tnrs, try_tnrs, glonaf_tnrs
+    )
+  ),
+  tar_target(
+    supp_fig2_euler_trait_databases,
     fig_euler_diagrams_top_25_traits_database_full
   ),
   tar_target(
-    supp_fig2_model_partial_residuals,
+    supp_fig3_model_partial_residuals,
     plot_partial_residuals(trait_knowledge_model),
     pattern = map(trait_knowledge_model),
     iteration = "list"
   ),
   tar_target(
-    supp_fig3_trait_model_alt,
+    supp_fig4_trait_model_alt,
     plot_all_models(trait_knowledge_model_prop),
   ),
+
   tar_target(
-    supp_fig4_proportion_species_trait,
+    supp_fig5_comparison_model,
+    plot_comparison_phylo_models(
+      trait_knowledge_model[[1]], phylo_trait_knowledge_model[[1]]
+    )
+  ),
+  tar_target(
+    supp_fig6_proportion_species_trait,
     plot_proportion_species_with_trait(
       trait_combinations_types, glonaf_tnrs
     ),
@@ -821,33 +839,23 @@ list(
     iteration = "list"
   ),
   tar_target(
-    supp_fig5_treemap_number_trait,
+    supp_fig7_treemap_number_trait,
     plot_treemaps_with_number_of_traits(
       glonaf_tnrs, trait_combinations_full
     )
   ),
   tar_target(
-    supp_fig6_maps_median_sd_n_traits,
+    supp_fig8_maps_median_sd_n_traits,
     assemble_maps_number_of_traits(
       fig_map_median_n_traits_region[[1]], fig_map_sd_n_traits_region[[1]]
-    )
-  ),
-  tar_target(
-    supp_fig7_venn_shared_species,
-    plot_venn_diagram_shared_species(
-      austraits_tnrs, bien_traits_simple, gift_raw_tnrs, try_tnrs, glonaf_tnrs
-    )
-  ),
-  tar_target(
-    supp_fig8_comparison_model,
-    plot_comparison_phylo_models(
-      trait_knowledge_model[[1]], phylo_trait_knowledge_model[[1]]
     )
   ),
 
 
   # Online supplementary material
-  tarchetypes::tar_render(online_supp, "manuscript/online_supplementary_material.Rmd"),
+  tarchetypes::tar_render(
+    online_supp, "manuscript/online_supplementary_material.Rmd"
+  ),
 
 
   # Save Plots for paper -------------------------------------------------------
