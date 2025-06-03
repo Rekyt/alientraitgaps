@@ -21,7 +21,7 @@ source("R/try_functions.R")
 # Initial options --------------------------------------------------------------
 
 tar_option_set(
-  packages = c("data.table", "dplyr", "ggplot2", "here", "treemapify", "sf", "phylobase")
+  packages = c("data.table", "dplyr", "ggplot2", "here", "treemapify", "sf", "phylobase", "phylolm", "parameters")
 )
 
 # Target factory ---------------------------------------------------------------
@@ -401,15 +401,21 @@ list(
     iteration = "list"
   ),
   tar_target(
-    trait_knowledge_model,
-    model_alien_trait_knowledge(trait_knowledge_df),
+    trait_knowledge_df_filtered,
+    filter_trait_knowledge(trait_knowledge_df),
     pattern = map(trait_knowledge_df),
     iteration = "list"
   ),
   tar_target(
+    trait_knowledge_model,
+    model_alien_trait_knowledge(trait_knowledge_df_filtered),
+    pattern = map(trait_knowledge_df_filtered),
+    iteration = "list"
+  ),
+  tar_target(
     trait_knowledge_model_for_r2,
-    model_alien_trait_knowledge_with_intercept(trait_knowledge_df),
-    pattern = map(trait_knowledge_df),
+    model_alien_trait_knowledge_with_intercept(trait_knowledge_df_filtered),
+    pattern = map(trait_knowledge_df_filtered),
     iteration = "list"
   ),
   tar_target(
@@ -427,6 +433,15 @@ list(
     pattern = map(trait_knowledge_df_prop),
     iteration = "list"
   ),
+  tar_target(
+    phylo_trait_knowledge_model,
+    phylogenetic_model_alien_trait_knowledge(
+      trait_knowledge_df_filtered, glonaf_tree
+    ),
+    pattern = map(trait_knowledge_df_prop),
+    iteration = "list"
+  ),
+
 
   # World Regions --------------------------------------------------------------
   tar_target(
@@ -821,6 +836,12 @@ list(
     supp_fig7_venn_shared_species,
     plot_venn_diagram_shared_species(
       austraits_tnrs, bien_traits_simple, gift_raw_tnrs, try_tnrs, glonaf_tnrs
+    )
+  ),
+  tar_target(
+    supp_fig8_comparison_model,
+    plot_comparison_phylo_models(
+      trait_knowledge_model[[1]], phylo_trait_knowledge_model[[1]]
     )
   ),
 

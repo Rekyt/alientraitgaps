@@ -271,3 +271,55 @@ plot_all_models = function(all_models) {
     theme(legend.position = "top")
 
 }
+
+
+plot_comparison_phylo_models = function(non_phylo_model, phylo_model) {
+
+  mp_non_phylo = parameters::parameters(
+    non_phylo_model, drop = "growth_form"
+  )
+
+  # Tidy up name of parameters
+  mp_non_phylo = mp_non_phylo |>
+    mutate(Parameter = case_match(
+      Parameter,
+      "total_range_size"              ~ "Total Range Size",
+      "avg_human_influence_index"     ~ "Avg. Human Influence Index",
+      "n_biomes"                      ~ "Number of Biomes",
+      "sd_human_influence_index"      ~ "Std. Dev.\nHuman Influence Index",
+      "avg_accessibility"             ~ "Accessibility",
+      "avg_gdp_over_non_native_range" ~ "Avg. GDP\n(non-native range)",
+      "non_native_range_size"         ~ "Non-native Range Size",
+      "avg_gdp_over_native_range"     ~ "Avg. GDP\n(native range)"
+    ))
+
+
+  # Add phylo
+  mp_phylo = parameters:::parameters(
+    phylo_model, drop = c("(Intercept)", "growth_form")
+  )
+
+  mp_phylo = mp_phylo |>
+    mutate(Parameter = case_match(
+      Parameter,
+      "total_range_size"              ~ "Total Range Size",
+      "avg_human_influence_index"     ~ "Avg. Human Influence Index",
+      "n_biomes"                      ~ "Number of Biomes",
+      "sd_human_influence_index"      ~ "Std. Dev.\nHuman Influence Index",
+      "avg_accessibility"             ~ "Accessibility",
+      "avg_gdp_over_non_native_range" ~ "Avg. GDP\n(non-native range)",
+      "non_native_range_size"         ~ "Non-native Range Size",
+      "avg_gdp_over_native_range"     ~ "Avg. GDP\n(native range)"
+    ))
+
+
+  parameters::compare_parameters(
+    `Non Phylogenetic Model` = mp_non_phylo,
+    `Poisson Phylogenetic Model` = mp_phylo
+  ) |>
+    plot(size_point = 0.2) +
+    ggplot2::theme_bw() +
+    ggplot2::theme(legend.position = "top")
+
+
+}
