@@ -10,7 +10,7 @@ tar_load(combined_traits_full)
 tar_load(simplified_traits_full)
 tar_load(trait_names_full)
 
-tictoc::tic()
+
 # Count 25
 top_25_traits = simplified_traits_full |>
   count(consolidated_name, sort = TRUE) |>
@@ -72,6 +72,3 @@ saveRDS(
   try_traits,
   here::here("inst", "data_extracts", "weihan_data", "try_weihan.Rds")
 )
-
-tictoc::toc()
-

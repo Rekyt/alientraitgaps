@@ -6,8 +6,6 @@ library("targets")
 
 # Load data --------------------------------------------------------------------
 
-tictoc::tic()
-
 tar_load(trait_names_exact)
 
 sgubik_species = readr::read_csv(
@@ -169,6 +167,3 @@ list(
   try_non_native       = try_non_native
 ) |>
   purrr::iwalk(\(x, y) saveRDS(x, here::here(folder, paste0(y, ".Rds"))))
-
-
-tictoc::toc()
