@@ -40,7 +40,8 @@ trait_category_color_scale = tibble::tribble(
    "TRUE.TRUE.TRUE.TRUE"    , "#551601", "Aboveground spectrum\n& Root traits" # Aboveground + Root
 )
 
-taxonomy_trait_availability = readRDS(here::here("manuscript", "trait_combination.Rds")) |>
+taxonomy_trait_availability = tar_read(trait_combination_full_file) |>
+  readRDS() |>
   dplyr::mutate(final_cat = paste(family, trait_category, sep = " - ")) |>
   dplyr::inner_join(trait_category_color_scale, by = "trait_category")
 

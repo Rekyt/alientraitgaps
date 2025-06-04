@@ -620,7 +620,7 @@ plot_combined_traits_heatmap = function(
         filter(Accepted_species != "") |>
         distinct(species = Accepted_species) %>%
         tidyr::crossing(
-          consolidated_name = simplified_traits_full[["consolidated_name"]]
+          consolidated_name = unique(simplified_traits_full[["consolidated_name"]])
         ),
       by = c("species", "consolidated_name")
     ) %>%

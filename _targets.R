@@ -852,7 +852,20 @@ list(
   ),
 
 
-  # Online supplementary material
+  ## Online supplementary material
+  # Save the data for it
+  tar_target(
+    trait_combination_full_file,
+    {
+      saveRDS(
+      fig_trait_combination_taxonomy[["data"]],
+      here::here("manuscript", "trait_combination.Rds")
+    )
+      here::here("manuscript", "trait_combination.Rds")
+    },
+    format = "file"
+  ),
+  # Render the material
   tarchetypes::tar_render(
     online_supp, "manuscript/online_supplementary_material.Rmd"
   ),
