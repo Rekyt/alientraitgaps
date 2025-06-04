@@ -19,7 +19,7 @@ plot_number_species_per_trait_combined = function(
 
   total_sp = glonaf_tnrs %>%
     filter(Accepted_species != "") |>
-    distinct(species = Accepted_species)
+    distinct(species = Accepted_species) |>
     pull(species) %>%
     unique() %>%
     length()
@@ -377,13 +377,9 @@ plot_taxonomy_treemap_trait_combination = function(
 ) {
 
   # Pre-process data
-  tax_comb = glonaf_harmonized |>
-    inner_join(
-      glonaf_family |>
-        distinct(taxon_wcvp_id,taxon_orig_id, family_wcvp),
-      by = c("taxon_wcvp_id", "taxon_orig_id")
-    ) %>%
-    rename(species = taxa_binomial, family = family_wcvp) |>
+  tax_comb = glonaf_tnrs |>
+    filter(Accepted_species != "") |>
+    distinct(species = Accepted_species, family = Accepted_family) |>
     mutate(genus = stringr::str_extract(species, "^\\w+")) |>
     distinct(species, genus, family) %>%
     inner_join(
@@ -404,7 +400,7 @@ plot_taxonomy_treemap_trait_combination = function(
     )
 
   # Clean environment
-  rm(trait_combinations_full, glonaf_harmonized, glonaf_family)
+  rm(trait_combinations_full, glonaf_tnrs)
 
   # Actual Plot
   tax_comb %>%
@@ -661,7 +657,7 @@ plot_combined_traits_heatmap = function(
     distinct(species_rank, trait_rank, value)
 
   # Clean environment
-  rm(simplified_traits_full, sp_rank, trait_rank, glonaf_harmonized)
+  rm(simplified_traits_full, sp_rank, trait_rank, glonaf_tnrs)
 
   # Plot as a heatmap
   comb_sp_freq %>%
