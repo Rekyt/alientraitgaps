@@ -2453,6 +2453,18 @@
       ],
       "Hash": "1bf6228296b70a0c2f85f9f33045ae4f"
     },
+    "phylolm": {
+      "Package": "phylolm",
+      "Version": "2.6.5",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Requirements": [
+        "R",
+        "ape",
+        "future.apply"
+      ],
+      "Hash": "0183c0d9248f2ec5264e897a7f37d764"
+    },
     "phytools": {
       "Package": "phytools",
       "Version": "2.1-1",
