@@ -364,7 +364,7 @@ list(
     ),
     tar_target(
       trait_combinations,
-      count_trait_combinations(combined_traits_all, match_type)
+      count_trait_combinations(combined_traits_all, glonaf_tnrs, match_type)
     ),
     tar_target(
       fig_euler_diagrams_top_25_traits_database,

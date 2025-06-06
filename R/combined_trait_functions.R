@@ -350,7 +350,7 @@ combine_traits_all_databases = function(
 
 
 count_trait_combinations = function(
-    combined_traits_all, match_type
+    combined_traits_all, glonaf_tnrs, match_type
 ) {
 
   combs = case_when(match_type == "full" ~ get_full_combs(),
@@ -361,7 +361,17 @@ count_trait_combinations = function(
     filter(species != "") |>
     distinct(consolidated_name, species, in_glonaf) |>
     group_by(species) |>
-    summarise(traits = list(consolidated_name), in_glonaf = unique(in_glonaf)) |>
+    summarise(
+      traits = list(consolidated_name), in_glonaf = unique(in_glonaf)
+    ) |>
+    # Add GlonAF species without trait data
+    full_join(
+      glonaf_tnrs |>
+        filter(Accepted_species != "") |>
+        distinct(species = Accepted_species) |>
+        mutate(in_glonaf = TRUE),
+      by = join_by(species, in_glonaf)
+    ) |>
     rowwise() |>
     mutate(
       has_at_least_one_trait = length(traits) > 0 & all(!is.na(traits)),
