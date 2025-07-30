@@ -14,7 +14,9 @@ This document is an online supplement to the following manuscript:
 
 > Grenié M., Bruelheide H., Dawson W., Essl F., van Kleunen M., Kühn I., Kref H., Pyšek P., Weigelt P., and Winter M.. *Gaps in global non-native plant trait data and how to fill them*. EcoEvoRxiv preprint: https://doi.org/10.32942/X2FH0T
 
-It aims to provide some interactive figures to make easier exploration of the data produced in the paper.
+You can get more information on the workflow used in the manuscript by refering to its hosted version on GitHub: https://github.com/Rekyt/alientraitgaps, which is archived on Zenodo as: https://doi.org/10.5281/zenodo.13940200.
+
+This document aims to provide some interactive figures to make easier exploration of the data produced in the paper.
 It also displays the trait description network that links all the trait concepts across databases and let users download the table behind the trait description.
 
 
