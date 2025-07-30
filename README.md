@@ -1,7 +1,20 @@
+:notebook: Code compendium for “Gaps in global non-native plant trait
+data and how to fill them”
+================
+
+- [Summary](#summary)
+- [Citation](#citation)
+- [Workflow structure](#workflow-structure)
+- [Installation](#installation)
+- [How to run the workflow](#how-to-run-the-workflow)
+- [Needed environment variables](#needed-environment-variables)
+- [Trait concept network](#trait-concept-network)
+- [Long-term data availability](#long-term-data-availability)
+- [Detailed structure of the
+  repository](#detailed-structure-of-the-repository)
+- [Acknowledgements](#acknowledgements)
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
-
-# :notebook: Code compendium for “Gaps in global non-native plant trait data and how to fill them”
 
 <!-- badges: start -->
 
@@ -54,28 +67,10 @@ with their names. This file refers to many different functions,
 abstracting away the complexity of the pipeline, that are split
 throughout different `.R` files in the `R/` folder.
 
-Because the workflow is quite complex, here a summary visualization:
-
-``` r
-glimpse = targets::tar_glimpse(targets_only = FALSE)
-#> - The project is out-of-sync -- use `renv::status()` for details.
-```
-
-``` r
-
-htmlwidgets::saveWidget(glimpse, "inst/glimpse.html")
-
-htmltools::tags$iframe(
-  src  = file.path("inst/glimpse.html"),
-  width = "100%",
-  height = "600",
-  scrolling = "no",
-  seamless = "seamless",
-  frameBorder = "0"
-)
-```
-
-<iframe src="inst/glimpse.html" width="100%" height="600" scrolling="no" seamless="seamless" frameBorder="0"></iframe>
+Because the workflow is quite complex, you can visualize it
+[here](https://raw.githack.com/Rekyt/alientraitgaps/main/inst/glimpse.html)
+as a network, thanks to `targets::tar_glimpse()` from its HTML version
+stored in `inst/glimpse.html`?
 
 Here’s a summary of the workflow:
 
@@ -95,7 +90,7 @@ Here’s a summary of the workflow:
     through this network
 5.  Collate all databases
 6.  Count the number of available traits per species and model it
-7.  Visualize these numbers and analyses
+7.  Visualize these numbers and models
 
 ## Installation
 

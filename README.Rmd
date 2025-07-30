@@ -1,10 +1,13 @@
 ---
-output: github_document
+title: ':notebook: Code compendium for "Gaps in global non-native plant trait data and how to fill them"'
+output:
+  github_document:
+    toc: true
 ---
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-```{r, include = FALSE}
+```{r, include = FALSE, echo=FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
@@ -12,8 +15,6 @@ knitr::opts_chunk$set(
   out.width = "100%"
 )
 ```
-
-# :notebook: Code compendium for "Gaps in global non-native plant trait data and how to fill them"
 
 <!-- badges: start -->
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.13940200.svg)](https://doi.org/10.5281/zenodo.13940200)
@@ -43,22 +44,13 @@ Please also cite the preprint:
 
 The workflow leverages the [`targets`](https://docs.ropensci.org/targets/) package to make reproducible analyses. The main workflow file `_targets.R` sits at the root of the repository. It defines all the the objects that are generated and that can later be accessed through `targets::tar_read()` with their names. This file refers to many different functions, abstracting away the complexity of the pipeline, that are split throughout different `.R` files in the `R/` folder.
 
-Because the workflow is quite complex, here a summary visualization:
-
-```{r targets-glimpse}
+```{r targets-glimpse, echo=FALSE}
 glimpse = targets::tar_glimpse(targets_only = FALSE)
 
 htmlwidgets::saveWidget(glimpse, "inst/glimpse.html")
-
-htmltools::tags$iframe(
-  src  = file.path("inst/glimpse.html"),
-  width = "100%",
-  height = "600",
-  scrolling = "no",
-  seamless = "seamless",
-  frameBorder = "0"
-)
 ```
+
+Because the workflow is quite complex, you can visualize it [here](https://raw.githack.com/Rekyt/alientraitgaps/main/inst/glimpse.html) as a network, thanks to `targets::tar_glimpse()` from its HTML version stored in `inst/glimpse.html`?
 
 Here's a summary of the workflow:
 
@@ -73,7 +65,7 @@ Here's a summary of the workflow:
 4. Make a trait concept network and simplify all trait databases through this network
 5. Collate all databases
 6. Count the number of available traits per species and model it
-7. Visualize these numbers and analyses
+7. Visualize these numbers and models
 
 ## Installation
 
@@ -142,6 +134,12 @@ Here's a breakdown of the structure of the repository:
 ├── renv                           # Files for the renv package
 └── _targets                       # Storage for the targets package
 ```
+
+## Figures and online supplements
+
+All of the main figures of the manuscript are available as PDF and png versions in the `figures/` folder.
+
+For the ease of reading an extended version of Figure 2 (treemap of the nubmer of species with different trait sets available), is available online at the following address:  https://rekyt.github.io/alientraitgaps/, it's also available offline as the `docs/index.html` file.
 
 
 ## Acknowledgements
