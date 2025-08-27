@@ -634,6 +634,39 @@ list(
     )
   ),
 
+  # Export references files
+  tar_target(
+    austraits_refs_file,
+    write_austraits_refs(
+      austraits_refs,
+      here::here(
+        "inst", "refs", "austraits_refs.txt"
+      )
+    )
+  ),
+  tar_target(
+    bien_refs_file,
+    write_bien_refs(
+      bien_refs,
+      here::here("inst", "refs", "bien_refs.txt")
+    )
+  ),
+  tar_target(
+    gift_refs_file,
+    write_gift_refs(
+      gift_refs,
+      here::here("inst", "refs", "gift_refs.txt")
+    )
+  ),
+  tar_target(
+    try_refs_file,
+    write_gift_refs(
+      try_refs,
+      here::here("inst", "refs", "try_refs.txt")
+    )
+  ),
+
+
   # Make figures ---------------------------------------------------------------
   tar_target(
     fig_species_per_trait_combined,

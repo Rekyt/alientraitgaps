@@ -1,5 +1,8 @@
 # Script to gather data references from the trait databases
 
+
+# Gather actual references -----------------------------------------------------
+
 gather_austraits_references = function(
     austraits, austraits_tnrs, austraits_species_df, combined_traits_full
 ) {
@@ -125,6 +128,66 @@ gather_try_references = function(
       try_sub_traits, by = join_by(AccSpeciesID == TRY_AccSpeciesID)
     ) |>
     distinct(Reference) |>
+    filter(Reference != "unpub.") |>
     pull(Reference)
+
+}
+
+
+# Save References File ---------------------------------------------------------
+
+write_austraits_refs = function(austraits_refs, ref_file) {
+
+  aus_out = capture.output(
+    print(austraits_refs, .opts = list(bib.style = "authoryear"))
+  )
+
+  aus_out[aus_out == ""] = "\n"
+
+  aus_out |>
+    paste(collapse = "") |>
+    cat(file = ref_file, sep = "\n")
+
+  return(ref_file)
+
+}
+
+write_bien_refs = function(bien_refs, ref_file) {
+
+  bien_refs_tidy = bien_refs$references |>
+    stringr::str_replace(stringr::fixed('}\"'), stringr::fixed("}")) |>
+    stringr::str_replace(stringr::fixed("}\\"), stringr::fixed("}")) |>
+    stringr::str_replace(stringr::fixed("\r\n}"), stringr::fixed("}")) |>
+    stringr::str_replace(stringr::fixed("\\n}"), stringr::fixed("}")) |>
+    stringr::str_replace('"', '')
+
+  bien_tempfile = tempfile(fileext = "bib")
+
+  writeLines(
+    bien_refs_tidy,
+    bien_tempfile
+  )
+
+  bien_bib = RefManageR::ReadBib(bien_tempfile)
+
+  bien_out = capture.output(
+    print(bien_bib, .opts = list(bib.style = "authoryear"))
+  )
+
+  bien_out[bien_out == ""] = "\n"
+
+  paste(bien_out, collapse = "") |>
+    cat(file = ref_file, sep = "\n")
+
+  return(ref_file)
+
+}
+
+write_gift_refs = function(gift_refs, ref_file) {
+
+  gift_refs[order(gift_refs)] |>
+    cat(file = ref_file, sep = "\n")
+
+  return(ref_file)
 
 }
