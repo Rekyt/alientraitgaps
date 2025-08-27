@@ -15,6 +15,7 @@ source("R/glonaf_functions.R")
 source("R/gift_functions.R")
 source("R/harmonize_taxonomy_functions.R")
 source("R/paper_figures_functions.R")
+source("R/supplementary_figures_functions.R")
 source("R/trait_knowledge.R")
 source("R/try_functions.R")
 
@@ -1009,5 +1010,152 @@ list(
       units = "in", dpi = 300
     ),
     format = "file"
+  ),
+
+
+  # Save Supplementary Figures ---------------------------------------------------
+  # Supplementary Figure 1
+  tar_target(
+    supp_fig1_venn_shared_species_pdf,
+    save_supp_fig1_pdf(
+      supp_fig1_venn_shared_species,
+      here::here("inst", "figures","supp_fig1_venn_shared_species.pdf")
+    ),
+    format = "file"
+  ),
+  tar_target(
+    supp_fig1_venn_shared_species_png,
+    save_supp_fig1_png(
+      supp_fig1_venn_shared_species,
+      here::here("inst", "figures","supp_fig1_venn_shared_species.png")
+    ),
+    format = "file"
+  ),
+
+  # Supplementary Figure 2
+  tar_target(
+    supp_fig2_euler_trait_databases_pdf,
+    save_supp_fig1_pdf(
+      supp_fig2_euler_trait_databases, here::here(
+        "inst", "figures","supp_fig2_euler_trait_databases.pdf"
+      )
+    ),
+    format = "file"
+  ),
+  tar_target(
+    supp_fig2_euler_trait_databases_png,
+    save_supp_fig2_png(
+      supp_fig2_euler_trait_databases,
+      here::here("inst", "figures","supp_fig2_euler_trait_databases.png")
+    ),
+    format = "file"
+  ),
+  # Supplementary Figure 3
+  tar_target(
+    supp_fig3_model_partial_residuals_pdf,
+    custom_ggsave(
+      supp_fig3_model_partial_residuals[[1]],
+      here::here("inst", "figures","supp_fig3_model_partial_residuals.pdf")
+    ),
+    format = "file"
+  ),
+  tar_target(
+    supp_fig3_model_partial_residuals_png,
+    custom_ggsave(
+      supp_fig3_model_partial_residuals[[1]],
+      here::here("inst", "figures","supp_fig3_model_partial_residuals.png"),
+      dpi = 300
+    ),
+    format = "file"
+  ),
+  # Supplementary Figure 4
+  tar_target(
+    supp_fig4_trait_model_alt_pdf,
+    custom_ggsave(
+      supp_fig4_trait_model_alt,
+      here::here("inst", "figures","supp_fig4_trait_model_alt.pdf")
+    ),
+    format = "file"
+  ),
+  tar_target(
+    supp_fig4_trait_model_alt_png,
+    custom_ggsave(
+      supp_fig4_trait_model_alt,
+      here::here("inst", "figures","supp_fig4_trait_model_alt.png"), dpi = 300
+    ),
+    format = "file"
+  ),
+  # Supplementary Figure 5
+  tar_target(
+    supp_fig5_comparison_model_pdf,
+    custom_ggsave(
+      supp_fig5_comparison_model,
+      here::here("inst", "figures","supp_fig5_comparison_model.pdf")
+    ),
+    format = "file"
+  ),
+  tar_target(
+    supp_fig5_comparison_model_png,
+    custom_ggsave(
+      supp_fig5_comparison_model,
+      here::here("inst", "figures","supp_fig5_comparison_model.png"), dpi = 300
+    ),
+    format = "file"
+  ),
+  # Supplementary Figure 6
+  tar_target(
+    supp_fig6_proportion_species_trait_pdf,
+    custom_ggsave(
+      supp_fig6_proportion_species_trait[[1]],
+      here::here("inst", "figures","supp_fig6_proportion_species_trait.pdf")
+    ),
+    format = "file"
+  ),
+  tar_target(
+    supp_fig6_proportion_species_trait_png,
+    custom_ggsave(
+      supp_fig6_proportion_species_trait[[1]],
+      here::here("inst", "figures","supp_fig6_proportion_species_trait.png"),
+      dpi = 300
+    ),
+    format = "file"
+  ),
+  # Supplementary Figure 7
+  tar_target(
+    supp_fig7_treemap_number_trait_pdf,
+    custom_ggsave(
+      supp_fig7_treemap_number_trait,
+      here::here("inst", "figures","supp_fig7_treemap_number_trait.pdf")
+    ),
+    format = "file"
+  ),
+  tar_target(
+    supp_fig7_treemap_number_trait_png,
+    custom_ggsave(
+      supp_fig7_treemap_number_trait,
+      here::here("inst", "figures","supp_fig7_treemap_number_trait.png"),
+      dpi = 300
+    ),
+    format = "file"
+  ),
+  # Supplementary Figure 8
+  tar_target(
+    supp_fig8_maps_median_sd_n_traits_pdf,
+    custom_ggsave(
+      supp_fig8_maps_median_sd_n_traits,
+      here::here("inst", "figures","supp_fig8_maps_median_sd_n_traits.pdf")
+    ),
+    format = "file"
+  ),
+  tar_target(
+    supp_fig8_maps_median_sd_n_traits_png,
+    custom_ggsave(
+      supp_fig8_maps_median_sd_n_traits,
+      here::here("inst", "figures","supp_fig8_maps_median_sd_n_traits.png"),
+      dpi = 300
+    ),
+    format = "file"
   )
 )
+
+
